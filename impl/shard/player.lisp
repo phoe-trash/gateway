@@ -44,10 +44,10 @@
 	 (%player-by-email email))))
 
 (defun %player-by-id (id)
-  nil)
+  (todo "%player-by-id"))
 
 (defun %player-by-username (username)
-  nil)
+  (todo "%player-by-username"))
 
 (defun %player-by-email (email)
-  nil)
+  (todo "%player-by-email"))

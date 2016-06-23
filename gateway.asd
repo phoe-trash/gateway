@@ -6,39 +6,45 @@
 ;;;; There are also an interface available from lisp:
 ;;;; (asd-generator:regen &key im-sure)
 (asdf/parse-defsystem:defsystem #:gateway
-  :description "A graphical chat/RP client written in Common Lisp."
-  :author "Michał \"phoe\" Herda"
-  :license "GPL3"
-  :depends-on (#:hu.dwim.defclass-star
-	       #:ironclad
-	       #:cl-colors
-	       #:jpl-queues
-	       #:alexandria
-	       #:bordeaux-threads
-	       #:usocket
-	       #:iterate
-	       #:flexi-streams
-	       #:local-time)
-  :serial t
-  :components ((:file "package")
-	       (:file "helper/list-utils")
-	       (:file "helper/queue")
-	       (:file "arch/server/connection")
-	       (:file "arch/server/crown")
-	       (:file "arch/server/event")
-	       (:file "arch/server/gem")
-	       (:file "arch/server/jewel")
-	       (:file "arch/server/shard")
-	       (:file "arch/shard/appearance")
-	       (:file "arch/shard/chat")
-	       (:file "arch/shard/colors")
-	       (:file "arch/shard/gender")
-	       (:file "arch/shard/message")
-	       (:file "arch/shard/password")
-	       (:file "arch/shard/persona")
-	       (:file "arch/shard/player")
-	       (:file "arch/shard/species")
-	       (:file "arch/shard/world-map")
-	       (:file "impl/shard/password")
-	       (:file "impl/shard/world-map")
-	       (:file "gateway")))
+ :description "A graphical chat/RP client written in Common Lisp."
+ :author "Michał \"phoe\" Herda"
+ :license "GPL3"
+ :depends-on (#:hu.dwim.defclass-star
+              #:ironclad
+              #:closer-mop
+              #:cl-colors
+              #:jpl-queues
+              #:alexandria
+              #:bordeaux-threads
+              #:usocket
+              #:iterate
+              #:flexi-streams
+              #:local-time)
+ :serial t
+ :components ((:file "package")
+              (:file "protocol")
+              (:file "helper/list-utils")
+              (:file "helper/logging")
+              (:file "helper/queue")
+              (:file "helper/varia")
+              (:file "impl/shard/chat")
+              (:file "impl/shard/empty")
+              (:file "impl/shard/message")
+              (:file "impl/shard/password")
+              (:file "impl/shard/persona")
+              (:file "impl/shard/player")
+              (:file "impl/shard/world-map")
+              (:file "constants")
+              (:file "data/data")
+              (:file "gateway")
+              (:file "old/arch/server/connection")
+              (:file "old/arch/server/crown")
+              (:file "old/arch/server/event")
+              (:file "old/arch/server/gem")
+              (:file "old/arch/server/jewel")
+              (:file "old/arch/server/shard")
+              (:file "old/impl/shard/chat")
+              (:file "old/impl/shard/message")
+              (:file "old/impl/shard/password")
+              (:file "old/impl/shard/persona")
+              (:file "old/impl/shard/world-map")))

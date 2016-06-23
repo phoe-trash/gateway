@@ -1,10 +1,9 @@
 ;;;; asd-generator-data.asd
 
 ((#:package)
- (#:helper (:rest))
- (#:arch (:rest)
-	 (#:server (:rest))
-	 (#:shard (:rest)))
+ (#:protocol)
+ (#:data (:rest))
+ (#:helper (:rest)) 
  (#:impl (:rest)
 	 (#:server (:rest))
 	 (#:shard (:rest)))

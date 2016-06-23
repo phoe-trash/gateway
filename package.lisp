@@ -2,6 +2,7 @@
 
 (defpackage #:gateway
   (:use #:cl
+	#:closer-mop
 	#:hu.dwim.defclass-star
 	#:cl-colors
 	#:jpl-queues
