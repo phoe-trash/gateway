@@ -39,18 +39,19 @@
   (princ (name obj) stream) 
   (princ ">" stream))
 
+(defconstructor (persona)
+  (let ((duplicate-name (find-persona (name persona))))
+    (cond (duplicate-name
+	   (error "Duplicate persona name."))
+	  (t
+	   (with-lock-held (*cache-lock*)
+	     (push persona *persona-cache*))))))
+
 (defmethod location ((persona persona))
   (find-persona persona shard))
-
-#|
-(let* ((world-map (world-map (shard persona)))
-       (dimensions (array-dimensions world-map))
-       (size (reduce #'* dimensions)))
-  (iter (for i from 0 to (1- size))
-    (when (eq persona (row-major-aref world-map i))
-      (return-from location (values i dimensions))))))
-|#
 
 (defmethod send-message ((message message) (persona persona)) ;; TODO
   (send-message message (player persona)))
 
+(defmethod find-persona ((name string))
+  (find name *persona-cache* :test #'name))

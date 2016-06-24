@@ -30,6 +30,20 @@
 	       :initarg :connection
 	       :accessor connection)))
 
+(defconstructor (player)
+  (let ((duplicate-id (find-player :id (id player)))
+	(duplicate-username (find-player :username (username player)))
+	(duplicate-email (find-player :email (email player))))
+    (cond (duplicate-id
+	   (error "Duplicate player ID."))
+	  (duplicate-username
+	   (error "Duplicate player username."))
+	  (duplicate-email
+	   (error "Duplicate player email."))
+	  (t
+	   (with-lock-held (*cache-lock*)
+	     (push player *player-cache*))))))
+
 (defmethod send-message ((message message) (player player))
   (output message (connection player)))
 
@@ -41,13 +55,15 @@
 	(username
 	 (%player-by-username username))
 	(email
-	 (%player-by-email email))))
+	 (%player-by-email email))
+	(t
+	 (error "Should not end up here - FIND-PLAYER broke."))))
 
 (defun %player-by-id (id)
-  (todo "%player-by-id"))
+  (find id *player-cache* :key #'id))
 
 (defun %player-by-username (username)
-  (todo "%player-by-username"))
+  (find username *player-cache* :key #'username))
 
 (defun %player-by-email (email)
-  (todo "%player-by-email"))
+  (find email *player-cache* :key #'email))

@@ -1,8 +1,11 @@
 ;;;; package.lisp
 
 (defpackage #:gateway
-  (:use #:cl
+  (:shadowing-import-from :closer-mop
+   :standard-generic-function :defmethod :defgeneric)
+  (:use #:common-lisp
 	#:closer-mop
+	#:named-readtables
 	#:hu.dwim.defclass-star
 	#:cl-colors
 	#:jpl-queues

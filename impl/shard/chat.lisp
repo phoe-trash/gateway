@@ -31,7 +31,7 @@
   (format t "[~A] ~A TO ~A: ~A"
 	  (name chat) (sender message) (recipient message) (contents message))
   (mapcar (lambda (persona) (send-message message persona)) (personas chat))
-  nil)
+  message)
 
 (defmethod find-messages (chat &key sender recipient after-date before-date contents)
   (declare (ignore after-date before-date))

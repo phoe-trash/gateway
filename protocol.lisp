@@ -14,63 +14,64 @@
 ;;;; shard protocol
 
 ;; message.lisp
-(defspecialization sender (message))
-(defspecialization recipient (message))
-(defspecialization date-of (message))
-(defspecialization contents (message))
-(defspecialization msg (sender recipient contents))
+(defspecialization sender (message)) ;; done
+(defspecialization recipient (message)) ;; done
+(defspecialization date-of (message)) ;; done
+(defspecialization contents (message)) ;; done
+(defspecialization msg (sender recipient contents)) ;; done
 
 
 ;; persona.lisp
-(defspecialization name (persona))
-(defspecialization player (persona))
-(defspecialization avatar (persona))
-(defspecialization gender (persona))
-(defspecialization species (persona))
-(defspecialization colors (persona))
+(defspecialization name (persona)) ;; done
+(defspecialization player (persona)) ;; done
+(defspecialization avatar (persona)) ;; done
+(defspecialization gender (persona)) ;; done
+(defspecialization species (persona)) ;; done
+(defspecialization colors (persona)) ;; done
+(defspecialization shard (persona)) ;; done
 
-(defspecialization shard (persona))
-(defspecialization location (persona))
-
-(defspecialization send-message (message persona))
+(defspecialization find-persona (name)) ;; done
+(defspecialization location (persona)) ;; done
+(defspecialization send-message (message persona)) ;; done
 
 
 ;; chat.lisp
-(defspecialization name (chat))
-(defspecialization messages (chat))
-(defspecialization personas (chat))
-(defspecialization shard (chat))
+(defspecialization name (chat)) ;; done
+(defspecialization messages (chat)) ;; done
+(defspecialization personas (chat)) ;; done
+(defspecialization shard (chat)) ;; done
 
-(defspecialization send-message (message chat))
-(defspecialization find-messages (chat &key sender recipient after-date before-date contents))
-(defspecialization delete-message (message chat))
+(defspecialization send-message (message chat)) ;; done
+(defspecialization find-messages
+    (chat &key sender recipient after-date before-date contents)) ;; done
+(defspecialization delete-message (message chat)) ;; done
 
-(defspecialization add-persona (persona chat))
-(defspecialization delete-persona (persona chat))
+(defspecialization add-persona (persona chat)) ;; done
+(defspecialization delete-persona (persona chat)) ;; done
 
 
 ;; password.lisp
-(defspecialization make-password (passphrase))
-(defspecialization password-matches-p (password passphrase))
+(defspecialization make-password (passphrase)) ;; done
+(defspecialization password-matches-p (password passphrase)) ;; done
 
 
 ;; world-map.lisp
-(defspecialization dimensions (world-map))
-(defspecialization x-dimension (world-map))
-(defspecialization y-dimension (world-map))
-(defspecialization object-at (world-map x y))
-(defspecialization resize (world-map up left down right &key initial-element))
+(defspecialization dimensions (world-map)) ;; done
+(defspecialization x-dimension (world-map)) ;; done
+(defspecialization y-dimension (world-map)) ;; done
+(defspecialization object-at (world-map x y)) ;; done
+(defspecialization resize (world-map up left down right &key initial-element)) ;; done
 
 
 ;; player.lisp
-(defspecialization id (player))
-(defspecialization username (player))
-(defspecialization password (player))
-(defspecialization email (player))
-(defspecialization personas (player))
-(defspecialization connection (player))
-(defspecialization find-player (&key id username email))
-(defspecialization send-message (message player))
+(defspecialization id (player)) ;; done
+(defspecialization username (player)) ;; done
+(defspecialization password (player)) ;; done
+(defspecialization email (player)) ;; done
+(defspecialization personas (player)) ;; done
+(defspecialization connection (player)) ;; done
+(defspecialization send-message (message player)) ;; done
+(defspecialization find-player (&key id username email)) ;; done
 
 
 ;;;; server protocol
@@ -81,9 +82,9 @@
 (defspecialization personas (shard))
 (defspecialization chats (shard))
 (defspecialization lock (shard))
-(defspecialization find-persona (persona shard))
 
 
 ;; connection.lisp
 (defspecialization output (object connection))
-(defspecialization input (connection))
+(defspecialization input (connection &key safe-p)) ;; done <3
+(defspecialization kill (connection)) ;; done

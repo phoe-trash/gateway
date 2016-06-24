@@ -9,11 +9,11 @@
   ((%sender :initform nil
 	    :initarg :sender
 	    :accessor sender
-	    :type (or nil persona keyword))
+	    :type list)
    (%recipient :initform nil
 	       :initarg :recipient
 	       :accessor recipient
-	       :type (or nil persona chat keyword))
+	       :type list)
    (%date :initform (now)
 	  :initarg :date
 	  :accessor date-of
