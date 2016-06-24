@@ -58,8 +58,8 @@
 (define-condition incomplete-input () ())
 (define-condition malformed-input (error) ())
 
-(defun input ((connection connection) &key safe-p)
-  (with-lock-held (lock connection)
+(defun input (connection &key safe-p)
+  (with-lock-held ((lock connection))
     (if safe-p
 	(safe-read connection)
 	(unsafe-read connection))))
@@ -112,8 +112,7 @@
 (let ((*readtable* %safe-readtable%))
   (flet ((signal-malformed-input (stream ignore)
 	   (declare (ignore stream ignore))
-	   (signal 'malformed-input)))
-    (set-macro-character #\: #'signal-malformed-input)
+	   (signal 'malformed-input))) 
     (dotimes (i 256)
       (let* ((char (code-char i))
 	     (macro-char (get-macro-character char)))
@@ -122,7 +121,8 @@
 		    (eql char #\))
 		    (eql char #\")
 		    (null macro-char))
-	  (set-macro-character char #'signal-malformed-input))))))
+	  (set-macro-character char #'signal-malformed-input))))
+    (set-macro-character #\: #'signal-malformed-input t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; SAFE-READ
