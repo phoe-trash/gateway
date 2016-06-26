@@ -79,6 +79,7 @@
 ;;;; server protocol
 
 ;; shard.lisp
+(defspecialization id (shard))
 (defspecialization world-map (shard))
 (defspecialization jewel (shard))
 (defspecialization personas (shard))
@@ -87,7 +88,7 @@
 
 
 ;; connection.lisp
-(defspecialization output (object connection))
+(defspecialization output (object connection)) ;; done
 (defspecialization input (connection &key safe-p)) ;; done <3
 (defspecialization kill (connection)) ;; done
 

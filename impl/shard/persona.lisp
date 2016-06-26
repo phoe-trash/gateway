@@ -4,6 +4,7 @@
 ;;;; gateway.lisp
 
 (in-package #:gateway)
+
 (defclass persona ()
   ((id :initform (error "No ID provided.")
        :initarg :id
