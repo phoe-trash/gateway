@@ -26,12 +26,11 @@
   (let ((args (remove-if #'null args)))
     (= 1 (length args))))
 
+(defun condition-key (condition)
+  (intern (string (type-of condition)) (find-package :keyword)))
+
 (defmacro defprint (object &body body)
   `(defmethod print-object ((obj ,object) stream)
-     ,@body))
-
-(defmacro defconstructor ((class . keys) &body body)
-  `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
      ,@body))
 
 ;; defgeneric - just the generic method with generic lambda list
@@ -39,6 +38,10 @@
 ;; defaccessors - mapcar #'%defaccessor fun-names
 ;; defspecialization - warn if function unbound/not generic, stub warning method
 (eval-when (:compile-toplevel :load-toplevel :execute)
+  (defmacro defconstructor ((class . keys) &body body)
+    `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
+       ,@body))
+
   (defmacro defaccessors (&rest fun-names)
     (cons 'progn
 	  (mapcar #'%defaccessor (remove-duplicates fun-names))))
