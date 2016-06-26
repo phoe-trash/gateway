@@ -55,3 +55,6 @@
   (with-lock-held ((lock connection))
     (close (stream-of connection))
     (socket-close (socket connection))))
+
+(defmethod output (object connection)
+  (format (stream-of connection) "~S~%" (get-sexp object)))

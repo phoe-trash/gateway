@@ -22,6 +22,7 @@
 
 
 ;; persona.lisp
+(defspecialization id (chat)) ;; done
 (defspecialization name (persona)) ;; done
 (defspecialization player (persona)) ;; done
 (defspecialization avatar (persona)) ;; done
@@ -36,6 +37,7 @@
 
 
 ;; chat.lisp
+(defspecialization id (chat)) ;; done
 (defspecialization name (chat)) ;; done
 (defspecialization messages (chat)) ;; done
 (defspecialization personas (chat)) ;; done
@@ -88,3 +90,7 @@
 (defspecialization output (object connection))
 (defspecialization input (connection &key safe-p)) ;; done <3
 (defspecialization kill (connection)) ;; done
+
+
+;; get-sexp.lisp
+(defspecialization get-sexp (object))

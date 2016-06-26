@@ -6,7 +6,11 @@
 (in-package #:gateway)
 
 (defclass chat ()
-  ((%name :initform "Unnamed Chat"
+  ((id :initform (error "No ID provided.")
+       :initarg :id
+       :accessor id
+       :type integer)
+   (%name :initform "Unnamed Chat"
 	  :initarg :name
 	  :accessor name
 	  :type string)

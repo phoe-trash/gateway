@@ -4,6 +4,8 @@
  (#:helper (:rest))
  (#:protocol)
  (#:constants)
+ (#:lib (#:safe-reader (#:utils)
+		       (:rest)))
  (#:data (:rest)) 
  (#:impl (:rest)
 	 (#:shard (#:message)

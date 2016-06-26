@@ -33,3 +33,17 @@
        (unwind-protect (let ((*package* ,gensym))
 			 ,@body)
 	 (delete-package ,gensym)))))
+
+(defun read-limited-line (stream)
+  (let* (result-status
+	 (line-read
+	   (with-output-to-string (result)
+	     (do ((char-counter 0)
+		  (char (read-char stream nil #\Nul)
+			(read-char stream nil #\Nul)))
+		 ((member char '(#\Newline #\Nul))
+		  (setf result-status (if (eql char #\Newline) :newline :eof)))
+	       (when (< *max-input-size* (incf char-counter))
+		 (signal (make-condition 'input-size-exceeded)))
+	       (princ char result)))))
+    (values line-read result-status)))

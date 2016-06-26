@@ -4,7 +4,6 @@
 
 (in-package #:gateway)
 
-
 (defun safe-read (connection)
   (let ((buffer (buffer-of connection)))
     (handler-case
@@ -32,13 +31,13 @@
 	      (signal error))))))
 
   (defun %safe-read-no-buffer (connection)
-    (let ((line (safe-read-line (stream-of connection))))
+    (let ((line (read-limited-line (stream-of connection))))
       (safe-read-handler-case
-       (with-temp-package
+       (with-temp-package 
 	 (read-from-string line)))))
 
   (defun %safe-read-buffer (connection)
-    (let* ((line (safe-read-line (stream-of connection)))
+    (let* ((line (read-limited-line (stream-of connection)))
 	   (buffer (buffer-of connection))
 	   (line (cat line buffer)))
       (safe-read-handler-case

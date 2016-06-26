@@ -28,12 +28,12 @@
 	      (signal (make-condition 'incomplete-input)))))))
 
   (defun %unsafe-read-no-buffer (connection)
-    (let ((line (safe-read-line (stream-of connection))))
+    (let ((line (read-limited-line (stream-of connection))))
       (unsafe-read-handler-case
        (read-from-string line))))
 
   (defun %unsafe-read-buffer (connection)
-    (let* ((line (safe-read-line (stream-of connection)))
+    (let* ((line (read-limited-line (stream-of connection)))
 	   (buffer (buffer-of connection))
 	   (line (cat line buffer)))
       (unsafe-read-handler-case
