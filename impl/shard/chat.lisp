@@ -21,6 +21,7 @@
 	      :accessor personas
 	      :type list)
    (%shard :initform nil
+	   :initarg :shard
 	   :accessor shards
 	   :type (or null shard))))
 

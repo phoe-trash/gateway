@@ -6,10 +6,10 @@
 (in-package #:gateway)
 
 (defaccessors sender recipient date-of contents
-  name player avatar gender species colors shard
-  name messages personas shard
+  id name player avatar gender species colors shard
+  id name messages personas shard
   id username password email personas connection
-  world-map jewel personas chats lock)
+  id name world-map jewel personas chats lock)
 
 ;;;; shard protocol
 
@@ -80,6 +80,7 @@
 
 ;; shard.lisp
 (defspecialization id (shard))
+(defspecialization name (shard))
 (defspecialization world-map (shard))
 (defspecialization jewel (shard))
 (defspecialization personas (shard))
@@ -94,4 +95,4 @@
 
 
 ;; get-sexp.lisp
-(defspecialization get-sexp (object))
+(defspecialization get-sexp (object)) ;; done

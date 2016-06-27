@@ -45,8 +45,7 @@
   (list :player :id (get-sexp (id object))
 		:username (get-sexp (username object))))
 
-#|
 (defsexp (shard)
   (list :shard  :id (get-sexp (id object))
 		:name (get-sexp (name object))))
-|#
+
