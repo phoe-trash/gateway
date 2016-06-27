@@ -59,4 +59,4 @@
   (send-message message (player persona)))
 
 (defmethod find-persona ((name string))
-  (find name *persona-cache* :test #'name))
+  (find name *persona-cache* :key #'name :test #'string=))

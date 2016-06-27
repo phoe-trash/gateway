@@ -6,10 +6,14 @@
 (in-package #:gateway)
 
 (defclass shard ()
-  ((id :initform (error "No ID provided.")
-       :initarg :id
-       :accessor id
-       :type integer)
+  ((%id :initform (error "No ID provided.")
+	:initarg :id
+	:accessor id
+	:type integer)
+   (%name :initform ""
+	  :initarg :name
+	  :accessor name
+	  :type string)
    (%world-map :initform (error "No world map provided.")
 	       :initarg :world-map
 	       :accessor world-map

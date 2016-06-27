@@ -6,39 +6,40 @@
 ;;;; There are also an interface available from lisp:
 ;;;; (asd-generator:regen &key im-sure)
 (asdf/parse-defsystem:defsystem #:gateway
- :description "A graphical chat/RP client written in Common Lisp."
- :author "Michał \"phoe\" Herda"
- :license "GPL3"
- :depends-on (#:hu.dwim.defclass-star
-              #:named-readtables
-              #:ironclad
-              #:closer-mop
-              #:cl-colors
-              #:jpl-queues
-              #:alexandria
-              #:bordeaux-threads
-              #:usocket
-              #:iterate
-              #:flexi-streams
-              #:local-time)
- :serial t
- :components ((:file "package")
-              (:file "helper/list-utils")
-              (:file "helper/logging")
-              (:file "helper/queue")
-              (:file "helper/varia")
-              (:file "protocol")
-              (:file "constants")
-              (:file "lib/safe-reader/utils")
-              (:file "lib/safe-reader/safe-read")
-              (:file "lib/safe-reader/unsafe-read")
-              (:file "data/data")
-              (:file "impl/shard/message")
-              (:file "impl/shard/password")
-              (:file "impl/shard/persona")
-              (:file "impl/shard/chat")
-              (:file "impl/shard/player")
-              (:file "impl/shard/world-map")
-              (:file "impl/server/connection")
-              (:file "impl/server/get-sexp")
-              (:file "gateway")))
+  :description "A graphical chat/RP client written in Common Lisp."
+  :author "Michał \"phoe\" Herda"
+  :license "GPL3"
+  :depends-on (#:hu.dwim.defclass-star
+	       #:named-readtables
+	       #:ironclad
+	       #:closer-mop
+	       #:cl-colors
+	       #:jpl-queues
+	       #:alexandria
+	       #:bordeaux-threads
+	       #:usocket
+	       #:iterate
+	       #:flexi-streams
+	       #:local-time
+	       #:1am)
+  :serial t
+  :components ((:file "package")
+	       (:file "helper/list-utils")
+	       (:file "helper/logging")
+	       (:file "helper/queue")
+	       (:file "helper/varia")
+	       (:file "protocol")
+	       (:file "constants")
+	       (:file "lib/safe-reader/utils")
+	       (:file "lib/safe-reader/safe-read")
+	       (:file "lib/safe-reader/unsafe-read")
+	       (:file "data/data")
+	       (:file "impl/shard/message")
+	       (:file "impl/shard/password")
+	       (:file "impl/shard/persona")
+	       (:file "impl/shard/chat")
+	       (:file "impl/shard/player")
+	       (:file "impl/shard/world-map")
+	       (:file "impl/server/connection")
+	       (:file "impl/server/get-sexp")
+	       (:file "gateway")))
