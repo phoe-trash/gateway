@@ -18,7 +18,8 @@
 		 (is (not (password-matches-p password wrong-passphrase))))))
 	(mapcar #'check-password
 		'("" "pass" "password-1" "password-2PassW0RD"
-		  "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))))
+		  "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆ
+ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))))
 
 #|
 (test %%general-test
