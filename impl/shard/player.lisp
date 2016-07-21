@@ -6,9 +6,7 @@
 (in-package #:gateway)
 
 (defclass player ()
-  ((id :initform (error "No ID provided.")
-       :initarg :id
-       :accessor id
+  ((id :accessor id
        :type integer)
    (username :initform ""
 	     :initarg :username
@@ -31,6 +29,7 @@
 	       :accessor connection)))
 
 (defconstructor (player)
+  (setf (id player) (assign-id player))
   (let ((duplicate-id (find-player :id (id player)))
 	(duplicate-username (find-player :username (username player)))
 	(duplicate-email (find-player :email (email player))))

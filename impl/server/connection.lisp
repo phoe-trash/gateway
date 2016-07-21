@@ -45,16 +45,19 @@
 	     (when stream
 	       (setf (stream-of connection) stream)))))))
 
-(defmethod input (connection &key safe-p)
+(defmethod input ((connection connection) &key safe-p)
   (with-lock-held ((lock connection))
     (if safe-p
 	(safe-read connection)
 	(unsafe-read connection))))
 
-(defmethod kill (connection)
+(defmethod kill ((connection connection))
   (with-lock-held ((lock connection))
     (close (stream-of connection))
     (socket-close (socket connection))))
 
-(defmethod output (object connection)
+(defmethod output (object (connection connection))
   (format (stream-of connection) "~S~%" (get-sexp object)))
+
+(defmethod output (object (connection null))
+  (format t "[OUTPUT] ~S~%" (get-sexp object)))

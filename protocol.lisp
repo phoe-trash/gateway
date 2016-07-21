@@ -8,91 +8,186 @@
 (defaccessors sender recipient date-of contents
   id name player avatar gender species colors shard
   id name messages personas shard
+  dimensions x-dimension y-dimension
   id username password email personas connection
-  id name world-map jewel personas chats lock)
-
-;;;; shard protocol
-
-;; message.lisp
-(defspecialization sender (message)) ;; done
-(defspecialization recipient (message)) ;; done
-(defspecialization date-of (message)) ;; done
-(defspecialization contents (message)) ;; done
-(defspecialization msg (sender recipient contents)) ;; done
+  id name world-map jewel personas chats lock
+  sexp)
 
 
-;; persona.lisp
-(defspecialization id (chat)) ;; done
-(defspecialization name (persona)) ;; done
-(defspecialization player (persona)) ;; done
-(defspecialization avatar (persona)) ;; done
-(defspecialization gender (persona)) ;; done
-(defspecialization species (persona)) ;; done
-(defspecialization colors (persona)) ;; done
-(defspecialization shard (persona)) ;; done
+(defgeneric find-persona (name))
+(defgeneric location (object))
+(defgeneric find-messages (chat &key sender recipient after-date before-date contents))
+(defgeneric delete-message (message chat))
+(defgeneric add-persona (persona chat))
+(defgeneric delete-persona (persona chat))
+(defgeneric make-password (passphrase))
+(defgeneric password-matches-p (password passphrase))
+(defgeneric object-at (world-map x y))
+(defgeneric resize (world-map up left down right &key initial-element))
+(defgeneric find-player (&key id username email))
 
-(defspecialization find-persona (name)) ;; done
-(defspecialization location (persona)) ;; done
-(defspecialization send-message (message persona)) ;; done
+(defgeneric output (object connection)) ;; done
+(defgeneric input (connection &key safe-p)) ;; done <3
+(defgeneric kill (connection)) ;; done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ;; chat.lisp
-(defspecialization id (chat)) ;; done
-(defspecialization name (chat)) ;; done
-(defspecialization messages (chat)) ;; done
-(defspecialization personas (chat)) ;; done
-(defspecialization shard (chat)) ;; done
+(defprotocol id (chat)) ;; done
+(defprotocol name (chat)) ;; done
+(defprotocol messages (chat)) ;; done
+(defprotocol personas (chat)) ;; done
+(defprotocol shard (chat)) ;; done
 
-(defspecialization send-message (message chat)) ;; done
-(defspecialization find-messages
+(defprotocol send-message (message chat)) ;; done
+(defprotocol find-messages
     (chat &key sender recipient after-date before-date contents)) ;; done
-(defspecialization delete-message (message chat)) ;; done
+(defprotocol delete-message (message chat)) ;; done
 
-(defspecialization add-persona (persona chat)) ;; done
-(defspecialization delete-persona (persona chat)) ;; done
+(defprotocol add-persona (persona chat)) ;; done
+(defprotocol delete-persona (persona chat)) ;; done
 
-
-;; password.lisp
-(defspecialization make-password (passphrase)) ;; done
-(defspecialization password-matches-p (password passphrase)) ;; done
 
 
 ;; world-map.lisp
-(defspecialization dimensions (world-map)) ;; done
-(defspecialization x-dimension (world-map)) ;; done
-(defspecialization y-dimension (world-map)) ;; done
-(defspecialization object-at (world-map x y)) ;; done
-(defspecialization resize (world-map up left down right &key initial-element)) ;; done
+(defprotocol dimensions (world-map)) ;; done
+(defprotocol x-dimension (world-map)) ;; done
+(defprotocol y-dimension (world-map)) ;; done
+(defprotocol object-at (world-map x y)) ;; done
+(defprotocol resize (world-map up left down right &key initial-element)) ;; done
 
 
 ;; player.lisp
-(defspecialization id (player)) ;; done
-(defspecialization username (player)) ;; done
-(defspecialization password (player)) ;; done
-(defspecialization email (player)) ;; done
-(defspecialization personas (player)) ;; done
-(defspecialization connection (player)) ;; done
-(defspecialization send-message (message player)) ;; done
-(defspecialization find-player (&key id username email)) ;; done
+(defprotocol id (player)) ;; done
+(defprotocol username (player)) ;; done
+(defprotocol password (player)) ;; done
+(defprotocol email (player)) ;; done
+(defprotocol personas (player)) ;; done
+(defprotocol connection (player)) ;; done
+(defprotocol send-message (message player)) ;; done
+(defprotocol find-player (&key id username email)) ;; done
 
 
 ;;;; server protocol
 
 ;; shard.lisp
-(defspecialization id (shard))
-(defspecialization name (shard))
-(defspecialization world-map (shard))
-(defspecialization jewel (shard))
-(defspecialization personas (shard))
-(defspecialization chats (shard))
-(defspecialization lock (shard))
+(defprotocol id (shard))
+(defprotocol name (shard))
+(defprotocol world-map (shard))
+(defprotocol jewel (shard))
+(defprotocol personas (shard))
+(defprotocol chats (shard))
+(defprotocol lock (shard))
 
 
 ;; connection.lisp
-(defspecialization output (object connection)) ;; done
-(defspecialization input (connection &key safe-p)) ;; done <3
-(defspecialization kill (connection)) ;; done
+(defprotocol output (object connection)) ;; done
+(defprotocol input (connection &key safe-p)) ;; done <3
+(defprotocol kill (connection)) ;; done
 
 
-;; get-sexp.lisp
-(defspecialization get-sexp (object)) ;; done
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Sexpable protocol
+(defgeneric sexp (object)) ;; done
+
+;; Password protocol
+(defclass password () ())
+(defgeneric make-password (passphrase)) ;; done
+(defgeneric password-matches-p (password passphrase)) ;; done
+
+;; Chatter protocol
+(defclass chatter () ())
+(defgeneric send-message (message recipient))
+
+;; Message protocol
+(defclass message () ())
+(defgeneric sender (message))
+(defgeneric (setf sender) (message))
+(defgeneric recipient (message))
+(defgeneric (setf recipient) (message))
+(defgeneric date-of (message))
+(defgeneric (setf date-of) (message))
+(defgeneric contents (message))
+(defgeneric (setf contents) (message))
+(defgeneric msg (sender recipient contents))
+
+;; Persona protocol
+(defclass persona () ())
+(defgeneric name (persona))
+(defgeneric (setf name) (persona))
+(defgeneric player (persona))
+(defgeneric (setf player) (persona))
+(defgeneric find-persona (name))

@@ -12,3 +12,5 @@
 (defvar *player-cache* nil)
 (defvar *persona-cache* nil)
 (defvar *socket-cache* nil)
+(defvar *id-hash-table* (make-weak-hash-table :weakness :value :test #'eql))
+(defvar *id-counter* -1)

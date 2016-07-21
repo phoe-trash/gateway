@@ -9,6 +9,7 @@
 	#:hu.dwim.defclass-star
 	#:cl-colors
 	#:jpl-queues
+	#:trivial-garbage
 	#:bordeaux-threads
 	#:alexandria
 	#:usocket

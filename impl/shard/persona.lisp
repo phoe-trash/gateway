@@ -6,9 +6,7 @@
 (in-package #:gateway)
 
 (defclass persona ()
-  ((id :initform (error "No ID provided.")
-       :initarg :id
-       :accessor id
+  ((id :accessor id
        :type integer)
    (%name :initform ""
 	  :initarg :name
@@ -45,6 +43,7 @@
   (princ ">" stream))
 
 (defconstructor (persona)
+  (setf (id persona) (assign-id persona))
   (let ((duplicate-name (find-persona (name persona))))
     (cond (duplicate-name
 	   (error "Duplicate persona name."))
@@ -52,8 +51,8 @@
 	   (with-lock-held (*cache-lock*)
 	     (push persona *persona-cache*))))))
 
-(defmethod location ((persona persona))
-  (find-persona persona shard))
+(defmethod location ((persona persona)) ;; TODO
+  (todo "~S" '(find-persona persona (shard persona))))
 
 (defmethod send-message ((message message) (persona persona)) ;; TODO
   (send-message message (player persona)))

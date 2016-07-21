@@ -6,9 +6,7 @@
 (in-package #:gateway)
 
 (defclass shard ()
-  ((%id :initform (error "No ID provided.")
-	:initarg :id
-	:accessor id
+  ((%id :accessor id
 	:type integer)
    (%name :initform ""
 	  :initarg :name
@@ -32,3 +30,6 @@
 	   :type list)
    (%lock :initform (make-lock)
 	  :accessor lock)))
+
+(defconstructor (shard)
+  (setf (id shard) (assign-id shard)))

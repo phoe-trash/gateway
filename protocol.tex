@@ -1,0 +1,144 @@
+\documentclass[10pt]{extarticle}
+\usepackage{extsizes}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\usepackage{lipsum}
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{setspace}
+
+\titleformat{\subsection}
+  {\normalfont\Large\bfseries}{\thesubsection}{1em}{}[{\titlerule[1.2pt]}]
+\titleformat{\subsubsection}[block]
+    {\bfseries}{\hspace{0.4cm}\thesubsubsection}{1ex}{}[{\titlerule[0.4pt]}]
+
+\usepackage{multicol}
+\setlength{\columnseprule}{0.4pt}
+
+\font\tt=rm-lmtl10
+\font\itt=rm-lmtlo10
+\font\btt=rm-lmtk10
+\font\bitt=rm-lmtko10
+
+\newcommand{\genericentry}[4] {\setstretch{0.7}
+                               \vspace{-0.5em} \subsubsection{{\btt #1} \hfill {\it #2} \\
+                               {\vspace{0.0em} \hspace{0.2cm} \scriptsize \ttfamily #3 $\rightarrow$ #4}}
+                               \setstretch{1.0}}
+\newcommand{\classentry}[2] {\subsubsection{{\btt #1} \hfill {\it #2}}}
+
+\newcommand{\accessorentry}[4] {\setstretch{0.7}
+                               \vspace{-0.5em} \subsubsection{{\btt #1, (SETF #1)} \hfill {\it #2} \\
+                               {\vspace{0.0em} \hspace{0.2cm} \scriptsize \ttfamily #3 $\rightarrow$ #4}}
+                               \setstretch{1.0}}
+
+\begin{document}
+%\begin{multicols*}{2}
+%[
+\section{Gateway server internal protocol}
+This describes the internal protocol for the Gateway server, which is written in Common Lisp.
+%]
+
+
+
+\subsection{Sexpable}
+An object is sexpable if:
+\begin{itemize}[noitemsep]
+\item it provides a method for the {\btt SEXP} generic function;
+\item it should ever be output from/to the server so that its representation is reconstructible in the client.
+\end{itemize}
+\genericentry{SEXP}{Generic Function}{object}{sexp}
+This function takes a sexpable object and produces its representation as an S-expression. \par
+The resulting S-expression may contain only lists, symbols, numbers and strings. \par
+This representation must not refer to any system-specific details of the object, such as its temporary memory location on the machine and/or any IDs internal to the runtime and not the persistent data store.
+
+
+
+
+\subsection{Password}
+A class fulfills the password protocol if:
+\begin{itemize}[noitemsep]
+\item it provides a method for the {\btt MAKE-PASSWORD} and {\btt PASSWORD-MATCHES-P} generic functions;
+\item it is the {\btt PASSWORD} class itself or a subclass of it.
+\end{itemize}
+\classentry{PASSWORD}{Class}
+The PASSWORD class provides a default implementation of the password protocol. It may be overridden by a subclass's own behaviour that suits the subclass's own implementation.
+\genericentry{MAKE-PASSWORD}{Generic Function}{passphrase}{password}
+This creates a newly allocated instance of the {\btt PASSWORD} class, for which {\btt(password-matches-p instance passphrase)} returns {\btt T}.
+\genericentry{PASSWORD-MATCHES-P}{Generic Function}{password passphrase}{generalized-boolean}
+Returns {\btt T} if {\btt passphrase} matches the {\btt password}; otherwise, returns {\btt NIL}.
+
+
+
+
+\subsection{Chatter}
+A class fulfills the chatter protocol if:
+\begin{itemize}[noitemsep]
+\item it provides a method for the {\btt SEND-MESSAGE} and {\btt MSG} generic functions;
+\item it is a subclass of the {\btt CHATTER} class.
+\end{itemize}
+\classentry{CHATTER}{Protocol Class}
+\genericentry{SEND-MESSAGE}{Generic Function}{message recipient}{nil}
+This sends the provided message, which is a generalized instance of the {\btt MESSAGE} class, to the provided recipient, which is a generalized instance of the {\btt CHATTER} class. \par
+For {\btt MSG}, see the {\bf Message} protocol.
+
+
+
+
+
+\subsection{Message}
+A class fulfills the message protocol if:
+\begin{itemize}[noitemsep]
+\item it provides a method for the {\btt SENDER}, {\btt RECIPIENT}, {\btt DATE-OF}, {\btt CONTENTS} and {\btt MSG} generic function;
+\item it is a subclass of the {\btt CHATTER} class.
+\end{itemize}
+\classentry{MESSAGE}{Class}
+The MESSAGE class provides a default implementation of the message protocol. It may be overridden by a subclass's own behaviour that suits the subclass's own implementation.
+
+\genericentry{SENDER}{Generic Function}{message}{chatter}
+\classentry{SETF SENDER}{Generic Function}
+Accesses the sender of the {\btt message}. The sender must be a generalized instance of the {\btt CHATTER} class.
+
+\genericentry{RECIPIENT}{Generic Function}{message}{chatter}
+\classentry{SETF RECIPIENT}{Generic Function}
+Accesses the recipient of the {\btt message}. The recipient must be a generalized instance of the {\btt CHATTER} class.
+
+\genericentry{DATE-OF}{Generic Function}{message}{chatter}
+\classentry{SETF DATE-OF}{Generic Function}
+Accesses the date of the {\btt message}. The date must be a generalized instance of the {\btt DATE} class.
+
+\genericentry{CONTENTS}{Generic Function}{message}{chatter}
+\classentry{SETF CONTENTS}{Generic Function}
+Accesses the contents of the {\btt message}. The contents must be a {\btt STRING}.
+
+\genericentry{MSG}{Generic Function}{sender recipient contents}{message}
+This creates a newly allocated instance of the {\btt MESSAGE} class, using the provided {\btt sender} (a {\btt CHATTER}), {\btt recipient} (a {\btt CHATTER}), {\btt contents} (a {\btt STRING}) and the current system date. \par
+For {\btt SEND-MESSAGE}, see the {\bf Chatter} protocol.
+
+
+
+
+
+\subsection{Persona}
+A class fulfills the persona protocol if:
+\begin{itemize}[noitemsep]
+\item it provides a method for the {\btt NAME}, {\btt PLAYER} and {\btt FIND-PERSONA} generic function;
+\item it is a subclass of the {\btt PERSONA} class.
+\end{itemize}
+\classentry{PERSONA}{Class}
+The PERSONA class provides a default implementation of the persona protocol. It may be overridden by a subclass's own behaviour that suits the subclass's own implementation. \par
+Each persona can be uniquely described by its {\btt name}. It is an error to try to instantiate a persona whose name is {\btt STRING=} to another persona already existing in the database.
+
+\accessorentry{NAME}{Generic Function}{persona}{name}
+Accesses the name of the {\btt persona}. The contents must be a {\btt STRING}.
+
+\accessorentry{PLAYER}{Generic Function}{persona}{name}
+Accesses the player of the {\btt persona}. The contents must be a {\btt PLAYER}.
+
+\genericentry{FIND-PERSONA}{Generic Function}{name}{persona}
+Returns the {\btt persona} whose name is {\btt STRING=} to {\btt name}.
+
+%\end{multicols*}
+ 
+\end{document}

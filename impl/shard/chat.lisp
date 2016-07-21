@@ -6,9 +6,7 @@
 (in-package #:gateway)
 
 (defclass chat ()
-  ((id :initform (error "No ID provided.")
-       :initarg :id
-       :accessor id
+  ((id :accessor id
        :type integer)
    (%name :initform "Unnamed Chat"
 	  :initarg :name
@@ -24,6 +22,9 @@
 	   :initarg :shard
 	   :accessor shards
 	   :type (or null shard))))
+
+(defconstructor (chat)
+  (setf (id chat) (assign-id chat)))
 
 (defprint chat
   (print-unreadable-object (obj stream :type t)
