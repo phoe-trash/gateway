@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; gateway.lisp
+;;;; FIXME-TODO-GENERIC-FILENAME.lisp
 
 (in-package #:gateway)
