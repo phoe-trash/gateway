@@ -7,17 +7,14 @@
 
 
 ;; SEXPABLE protocol
-;; 
 (defprotocol sexpable () 
   (defgeneric sexp (object)))
 
 ;; MESSAGABLE protocol
-;; 
 (defprotocol messagable ()
   (defgeneric send-message (message recipient)))
 
-;; MESSAGE protocol
-;; implemented by STANDARD-MESSAGE
+;; MESSAGE protocol - implemented by STANDARD-MESSAGE
 (defprotocol message 
     (message () () 
       (:documentation "Must be SEXPABLE and IMMUTABLE.
@@ -33,8 +30,7 @@ Constructor arguments:
   (defgeneric contents (object))
   (defgeneric msg (sender recipient contents &key date)))
 
-;; DATE protocol
-;; implemented by STANDARD-DATE
+;; DATE protocol - implemented by STANDARD-DATE
 (defprotocol date 
     (date () ()
       (:documentation "Must be SEXPABLE and IMMUTABLE."))
@@ -49,8 +45,7 @@ Constructor arguments:
   (defgeneric date-max (date-1 &rest dates))
   (defgeneric now ()))
 
-;; PASSWORD protocol
-;; implemented by STANDARD-PASSWORD
+;; PASSWORD protocol - implemented by STANDARD-PASSWORD
 (defprotocol password
     (password () ()
       (:documentation "Must be SEXPABLE and IMMUTABLE.
@@ -60,8 +55,7 @@ Constructor arguments:
   (defgeneric password-matches-p (password passphrase))
   (defgeneric make-password (passphrase)))
 
-;; CHAT protocol
-;; no implementation - TODO
+;; CHAT protocol - implemented by STANDARD-CHAT
 (defprotocol chat
     (chat () ()
       (:documentation "Must be SEXPABLE and MESSAGABLE.
@@ -75,8 +69,7 @@ Constructor arguments:
   (defgeneric delete-persona (persona object))
   (defgeneric find-chat (name)))
 
-;; PLAYER protocol
-;; implemented by STANDARD-PLAYER
+;; PLAYER protocol - implemented by STANDARD-PLAYER
 (defprotocol player
     (player () ()
       (:documentation "Must be SEXPABLE and MESSAGABLE.
@@ -94,8 +87,7 @@ Constructor arguments:
   (defgeneric delete-persona (persona object))
   (defgeneric find-player (name)))
 
-;; PERSONA protocol
-;; implemented by STANDARD-PERSONA
+;; PERSONA protocol - implemented by STANDARD-PERSONA
 (defprotocol persona
     (persona () ()
       (:documentation "Must be SEXPABLE and MESSAGABLE.
