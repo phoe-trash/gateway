@@ -6,12 +6,32 @@
 (in-package #:gateway)
 
 (defclass standard-password (password)
-  ((%key :accessor key-of
+  ((%key :reader key-of
 	 :type string)
-   (%salt :accessor salt
+   (%salt :reader salt
 	  :type string) 
-   (%iteration-count :accessor iteration-count
+   (%iteration-count :reader iteration-count
 		     :type integer)))
+
+(defconstructor (standard-password passphrase) 
+  (check-type passphrase string)
+  (setf (values (slot-value standard-password '%key)
+		(slot-value standard-password '%salt)
+		(slot-value standard-password '%iteration-count))
+	(derive-key passphrase)))
+
+(defmethod password-matches-p ((password standard-password) (passphrase string))
+  (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))
+	 (key (derive-key passphrase
+			  :salt salt
+			  :iteration-count (iteration-count password)
+			  :key-length (key-length password))))
+    (string= key (key-of password))))
+
+(defmethod sexp ((password standard-password))
+  `(:password :key ,(key-of password)
+	      :salt ,(salt password)
+	      :iters ,(iteration-count password)))
 
 (defun derive-key (passphrase &key salt iteration-count key-length)
   (let* ((kdf (ironclad:make-kdf 'ironclad:scrypt-kdf :digest :sha1))
@@ -30,21 +50,6 @@
 (defun salt-length (password)
   (/ (length (salt password)) 2))
 
-(defconstructor (standard-password passphrase) 
-  (check-type passphrase string)
-  (setf (values (key-of standard-password)
-		(salt standard-password)
-		(iteration-count standard-password))
-	(derive-key passphrase)))
-
-(defmethod password-matches-p ((password standard-password) (passphrase string))
-  (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))
-	 (key (derive-key passphrase
-			  :salt salt
-			  :iteration-count (iteration-count password)
-			  :key-length (key-length password))))
-    (string= key (key-of password))))
-
-(defun make-password (passphrase)
+(defmethod make-password ((passphrase string))
   (check-type passphrase string)
   (make-instance 'standard-password :passphrase passphrase))

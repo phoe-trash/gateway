@@ -33,9 +33,6 @@
 
        ',name)))
 
-(defmacro defprotoclass (name super-classes &optional slots &rest options)
-  `(define-protocol-class ,name ,super-classes ,slots ,@options))
-
 (defmacro defconstructor ((class . keys) &body body)
   `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
      ,@body))
@@ -43,3 +40,13 @@
 (defmacro defprint (object &body body)
   `(defmethod print-object ((obj ,object) stream)
      ,@body))
+
+(defmacro defprotocol (protocol-name
+		       (&optional class-name class-args class-slots &body class-options)
+		       &body body)
+  (declare (ignore protocol-name))
+  `(progn
+     ,(when class-name
+	`(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
+     ,@body))
+

@@ -12,7 +12,8 @@
   :depends-on (#:alexandria
 	       #:closer-mop
 	       #:ironclad
-	       #:flexi-streams)
+	       #:flexi-streams
+	       #:local-time)
   #|
   (#:hu.dwim.defclass-star
    #:named-readtables
@@ -26,7 +27,6 @@
    #:usocket
    #:iterate
    #:flexi-streams
-   #:local-time
    #:1am)
   |#
   :serial t
@@ -34,6 +34,12 @@
 	       (:file "constants")
 	       (:file "macros")
 	       (:file "protocol")
+	       (:file "impl/standard-message") 
+	       (:file "impl/standard-date")
+	       (:file "impl/standard-password")
+	       (:file "impl/standard-chat")
+	       (:file "impl/standard-player")
+	       (:file "impl/standard-persona")
 	       (:file "gateway")) 
   #|  
   ((:file "package")
