@@ -20,7 +20,7 @@
 	  :type chat)))
 
 (defmethod sexp ((persona standard-persona))
-  `(:persona :name ,(name persona)))
+  (sexp `(#:persona #:name ,(name persona))))
 
 (defmethod send-message ((message message) (recipient standard-persona))
   (send-message message (player recipient)))

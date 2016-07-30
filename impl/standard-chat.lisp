@@ -17,8 +17,11 @@
 	      :initform ()
 	      :accessor personas)))
 
+(defconstructor (standard-chat)
+  (setf (cache :chat (name standard-chat)) standard-chat))
+
 (defmethod sexp ((chat standard-chat))
-  `(:chat :name ,(name chat)))
+  (sexp `(#:chat #:name ,(name chat))))
 
 (defmethod send-message ((message message) (chat standard-chat))
   (when (not (eq (recipient message) chat))

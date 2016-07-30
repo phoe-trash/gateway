@@ -5,10 +5,13 @@
 
 (in-package #:gateway)
 
-(defvar *password-iteration-count* 1000)
-(defvar *password-key-length* 512)
-(defvar *password-salt-length* 64)
+(defconfig *password-iteration-count* 1000)
+(defconfig *password-key-length* 512)
+(defconfig *password-salt-length* 64)
 
-(defvar *persona-cache* (make-hash-table :test 'equal))
-(defvar *player-cache* (make-hash-table :test 'equal))
-(defvar *chat-cache* (make-hash-table :test 'equal))
+(defconfig *cache-list* (make-hash-table))
+(defconfig *cache-lock* (make-lock))
+(defconfig *persona-cache* (make-hash-table :test 'equal) :cache :persona)
+(defconfig *player-cache* (make-hash-table :test 'equal) :cache :player)
+(defconfig *chat-cache* (make-hash-table :test 'equal) :cache :chat)
+(defconfig *connection-cache* (make-hash-table) :cache :connection)

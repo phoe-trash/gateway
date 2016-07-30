@@ -8,29 +8,22 @@
 (defmacro define-protocol-class (name super-classes &optional slots &rest options)
   (let* ((sym-name (symbol-name name))
 	 (protocol-predicate
-	   (intern (concatenate 'string
-				sym-name
-				(if (find #\- sym-name) "-" "")
-				(symbol-name '#:p))))
+	   (intern (concatenate 'string sym-name
+				(if (find #\- sym-name) "-" "") (symbol-name '#:p))))
 	 (predicate-docstring
-	   (concatenate 'string
-			"Returns T if the  " sym-name ".")))
+	   (concatenate 'string "Returns T if object is of class " sym-name
+			", otherwise returns NIL.")))
     `(progn
        (defclass ,name ,super-classes ,slots ,@options)
-
        (let ((the-class (find-class ',name)))
 	 (setf (documentation the-class 'type) "Gateway protocol class")
          (defmethod initialize-instance :after ((object ,name) &key &allow-other-keys)
            (when (eq (class-of object) the-class)
              (error "~S is a protocol class and thus can't be instantiated." ',name))))
-
        (defgeneric ,protocol-predicate (object)
-	 (:method ((object t))
-	   nil)
-	 (:method ((object ,name))
-	   t)
+	 (:method ((object t)) nil)
+	 (:method ((object ,name)) t)
 	 (:documentation ,predicate-docstring))
-
        ',name)))
 
 (defmacro defconstructor ((class . keys) &body body)
@@ -50,3 +43,22 @@
 	`(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
      ,@body))
 
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *config-vars* nil)
+  (defvar *cache-list* (make-hash-table))
+  (defmacro defconfig (var val &key cache doc)
+    `(progn
+       (pushnew (list ',var ',val) *config-vars* :test #'equal)
+       (defvar ,var ,val ,doc)
+       ,(when cache
+	  `(setf (gethash ,cache *cache-list*) ,var))))
+  (defmacro with-clean-config (&body body)
+    `(let ,*config-vars*
+       (declare (ignorable ,@(mapcar #'first *config-vars*)))
+       ,@body)))
+
+(defmacro with-connections (connections &body body)
+  `(let* ,connections
+     (unwind-protect
+	  ,@body 
+       (mapcar #'kill (list ,@(mapcar #'first connections))))))

@@ -13,7 +13,11 @@
 	       #:closer-mop
 	       #:ironclad
 	       #:flexi-streams
-	       #:local-time)
+	       #:local-time
+	       #:1am
+	       #:secure-read
+	       #:bordeaux-threads
+	       #:usocket)
   #|
   (#:hu.dwim.defclass-star
    #:named-readtables
@@ -31,9 +35,11 @@
   |#
   :serial t
   :components ((:file "package")
-	       (:file "constants")
 	       (:file "macros")
+	       (:file "constants")
 	       (:file "protocol")
+	       (:file "impl/standard-methods")
+	       (:file "impl/standard-connection") 
 	       (:file "impl/standard-message") 
 	       (:file "impl/standard-date")
 	       (:file "impl/standard-password")

@@ -17,18 +17,18 @@
 	  :reader date
 	  :type date)
    (%contents :initarg :contents
-	      :initform (error "Attempted to create an empty message.")
+	      :initform ""
 	      :reader contents
 	      :type string)))
 
 (defmethod sexp ((message standard-message)) 
-  `(:message :sender ,(sender message)
-	     :recipient ,(recipient message)
-	     :date ,(date message)
-	     :contents ,(contents message)))
+  (sexp `(#:message #:sender ,(sexp (sender message))
+		    #:recipient ,(sexp (recipient message))
+		    #:date ,(sexp (date message))
+		    #:contents ,(contents message))))
 
 (defmethod msg (sender recipient contents &key (date (now)))
-  (make-instance 'message :sender sender
-			  :recipient recipient
-			  :contents contents
-			  :date date))
+  (make-instance 'standard-message :sender sender
+				   :recipient recipient
+				   :contents contents
+				   :date date))

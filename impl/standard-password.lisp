@@ -13,12 +13,21 @@
    (%iteration-count :reader iteration-count
 		     :type integer)))
 
-(defconstructor (standard-password passphrase) 
-  (check-type passphrase string)
-  (setf (values (slot-value standard-password '%key)
-		(slot-value standard-password '%salt)
-		(slot-value standard-password '%iteration-count))
-	(derive-key passphrase)))
+(defconstructor (standard-password passphrase %read-data)
+  (if %read-data
+      (progn (check-type %read-data cons)
+	     (assert (= (length %read-data) 3))
+	     (check-type (first %read-data) string)
+	     (check-type (second %read-data) string)
+	     (check-type (third %read-data) integer))
+      (check-type passphrase string)) 
+  (macrolet
+      ((val (slot) `(slot-value standard-password ',slot))
+       (bind (place)
+	 `(setf (values (val %key) (val %salt) (val %iteration-count)) ,place)))
+    (if %read-data
+	(bind (values-list %read-data))
+	(bind (derive-key passphrase)))))
 
 (defmethod password-matches-p ((password standard-password) (passphrase string))
   (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))
@@ -29,9 +38,9 @@
     (string= key (key-of password))))
 
 (defmethod sexp ((password standard-password))
-  `(:password :key ,(key-of password)
-	      :salt ,(salt password)
-	      :iters ,(iteration-count password)))
+  (sexp `(#:password #:key ,(key-of password)
+		     #:salt ,(salt password)
+		     #:iters ,(iteration-count password))))
 
 (defun derive-key (passphrase &key salt iteration-count key-length)
   (let* ((kdf (ironclad:make-kdf 'ironclad:scrypt-kdf :digest :sha1))

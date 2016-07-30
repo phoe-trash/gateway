@@ -6,6 +6,13 @@
 (defpackage #:gateway
   (:shadowing-import-from :closer-mop
    :standard-generic-function :defmethod :defgeneric)
+  (:use #:common-lisp
+	#:closer-mop 
+	#:alexandria
+	#:1am
+	#:secure-read
+	#:bordeaux-threads
+	#:usocket)
   #|
   (:use #:common-lisp
 	#:closer-mop
@@ -22,7 +29,5 @@
 	#:local-time
 	#:1am)
   |#
-  (:use #:common-lisp
-	#:closer-mop 
-	#:alexandria))
+  )
 

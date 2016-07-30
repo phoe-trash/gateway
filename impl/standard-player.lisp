@@ -22,8 +22,11 @@
 	      :accessor personas 
 	      :type list)))
 
+(defconstructor (standard-player)
+  (setf (cache :player (name standard-player)) standard-player))
+
 (defmethod sexp ((player standard-player))
-  `(:player :name ,(name player)))
+  (sexp `(#:player #:name ,(name player))))
 
 (defmethod send-message ((message message) (player standard-player))
   (when (not (eq (recipient message) player))
