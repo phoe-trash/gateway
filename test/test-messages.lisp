@@ -50,8 +50,8 @@
 	(is (date> date-year date-month))
 	(is (eq date-orig (apply #'date-min vars)))
 	(is (eq date-year (apply #'date-max vars)))
-	(is (date= date-orig (parse (sexp date-orig))))
-	(values)))))
+	(is (date= date-orig (parse (sexp date-orig)))))))
+  (values))
 
 ;; STANDARD-PASSWORD test
 (test test-standard-password
@@ -64,8 +64,8 @@
 	(mapcar #'check-password
 		'("" "pass" "password-1" "password-2PassW0RD"
 		  "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
-ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))
-	(values)))))
+ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś")))))
+  (values))
 
 ;; STANDARD-CONNECTION test
 (test test-standard-connection
@@ -93,8 +93,8 @@
 		       (test client accept data)
 		       (test accept client data)))
 	      (mapcar #'test-case (list date password chat player persona message))))))
-      (check-conns)
-      (values))))
+      (check-conns)))
+  (values))
 
 ;; STANDARD-PLAYER, STANDARD-MESSAGE and STANDARD-PERSONA test
 (test test-standard-player-persona-message
@@ -130,6 +130,54 @@
 		   (message (msg persona-3 persona-1 "test-message")))
 	      (send-message message player) 
 	      (let ((message-2 (receive (connection player-2))))
-		(is (message= message message-2)))))))
-      (values))))
+		(is (message= message message-2)))))))))
+  (values))
+
+;; STANDARD-CHAT test
+(test test-standard-chat
+  (with-clean-config
+    (macrolet ((make (&body body) `(make-instance 'standard-connection ,@body))
+	       (mkpl (&body body) `(make-instance 'standard-player ,@body))
+	       (mkpe (&body body) `(make-instance 'standard-persona ,@body))
+	       (mkch (&body body) `(make-instance 'standard-chat ,@body))
+	       (mkpw (&body body) `(make-password ,@body)))
+      ;; TODO: rewrite connections using server loop
+      (with-connections
+	  ((listen (make :type :listen))
+	   (client-1 (make :type :client))
+	   (accept-1 (make :type :accept :socket (socket listen))) 
+	   (client-2 (make :type :client))
+	   (accept-2 (make :type :accept :socket (socket listen))))
+	(let* ((pass-1 (mkpw "password-1"))
+	       (pass-2 (mkpw "password-2"))
+	       (player-1 (mkpl :name "name-1" :email "email-1"
+			       :password pass-1 :connection accept-1))
+	       (player-2 (mkpl :name "name-2" :email "email-2"
+			       :password pass-2 :connection accept-2))
+	       (persona-1 (mkpe :name "test-persona-1" :player player-1))
+	       (persona-2 (mkpe :name "test-persona-2" :player player-1))
+	       (persona-3 (mkpe :name "test-persona-3" :player player-2))
+	       (chat (mkch :name "chat-1"))
+	       (message-1 (msg persona-1 persona-3 "contents-1"))
+	       (message-2 (msg persona-3 persona-2 "contents-2")))
+	  (is (string= (name chat) "chat-1"))
+	  (is (eq (messages chat) nil))
+	  (is (eq (personas chat) nil))
+	  (add-persona persona-1 chat)
+	  (is (find persona-1 (personas chat)))
+	  (add-persona persona-2 chat)
+	  (add-persona persona-3 chat)
+	  (is (find persona-2 (personas chat)))
+	  (is (find persona-3 (personas chat)))
+	  (flet ((test-message (message) 
+		   (send-message message chat)
+		   (is (message= message (receive client-1)))
+		   (is (message= message (receive client-2)))
+		   (is (not (readyp client-1)))
+		   (is (not (readyp client-2)))))
+	    (test-message message-1)
+	    (test-message message-2))))))
+  (values))
+
+
 
