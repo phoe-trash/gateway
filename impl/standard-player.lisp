@@ -10,7 +10,7 @@
 	  :initform (error "Attempted to create a player with an empty name.")
 	  :reader name
 	  :type string)
-   (%email :initarg :name
+   (%email :initarg :email
 	   :initform ""
 	   :reader email
 	   :type string)
@@ -20,18 +20,24 @@
 	      :type password)
    (%personas :initform ()
 	      :accessor personas 
-	      :type list)))
+	      :type list)
+   (%connection :initarg :connection
+		:initform nil
+		:reader connection
+		:type connection)))
 
 (defconstructor (standard-player)
-  (setf (cache :player (name standard-player)) standard-player))
+  (if (cache :player (name standard-player))
+      (error "A player by name ~S already exists." (name standard-player))
+      (setf (cache :player (name standard-player)) standard-player)))
 
 (defmethod sexp ((player standard-player))
   (sexp `(#:player #:name ,(name player))))
 
 (defmethod send-message ((message message) (player standard-player))
-  (when (not (eq (recipient message) player))
-    (format t "[!] Warning: recipient mismatch.~%"))
-  (format t "[!] Stub: SEND-MESSAGE to ~A:~%~A~%" player (sexp message)))
+  (if (connection player)
+      (send (connection player) message)
+      (format t "[!] Stub: SEND-MESSAGE to ~A:~%~A~%" player (sexp message))))
 
 (defmethod add-persona ((persona persona) (player standard-player))
   (pushnew persona (personas player)))
@@ -40,5 +46,5 @@
   (deletef (personas player) persona))
 
 (defmethod find-player ((name string))
-  (gethash name *player-cache*))
+  (cache :player name))
 

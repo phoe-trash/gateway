@@ -75,20 +75,6 @@ Constructor arguments:
   (defgeneric readyp (connection))
   (defgeneric kill (object)))
 
-;; CHAT protocol - implemented by STANDARD-CHAT
-(defprotocol chat
-    (chat () ()
-      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
-
-Constructor arguments:
-:NAME - a STRING."))
-  (defgeneric name (object))
-  (defgeneric messages (object))
-  (defgeneric personas (object))
-  (defgeneric add-persona (persona object))
-  (defgeneric delete-persona (persona object))
-  (defgeneric find-chat (name)))
-
 ;; PLAYER protocol - implemented by STANDARD-PLAYER
 (defprotocol player
     (player () ()
@@ -102,6 +88,7 @@ Constructor arguments:
   (defgeneric name (object))
   (defgeneric email (object))
   (defgeneric password (object))
+  (defgeneric connection (object))
   (defgeneric personas (object))
   (defgeneric add-persona (persona object))
   (defgeneric delete-persona (persona object))
@@ -135,4 +122,19 @@ Constructor arguments:
   (defgeneric recipient (object))
   (defgeneric date (object))
   (defgeneric contents (object))
-  (defgeneric msg (sender recipient contents &key date)))
+  (defgeneric msg (sender recipient contents &key date))
+  (defgeneric message= (message-1 message-2)))
+
+;; CHAT protocol - implemented by STANDARD-CHAT
+(defprotocol chat
+    (chat () ()
+      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
+
+Constructor arguments:
+:NAME - a STRING."))
+  (defgeneric name (object))
+  (defgeneric messages (object))
+  (defgeneric personas (object))
+  (defgeneric add-persona (persona object))
+  (defgeneric delete-persona (persona object))
+  (defgeneric find-chat (name)))

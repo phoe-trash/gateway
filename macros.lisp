@@ -45,16 +45,24 @@
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *config-vars* nil)
-  (defvar *cache-list* (make-hash-table))
+  (defvar *cache-vars* nil)
+  (defvar *cache-list* (make-hash-table)) 
   (defmacro defconfig (var val &key cache doc)
-    `(progn
-       (pushnew (list ',var ',val) *config-vars* :test #'equal)
-       (defvar ,var ,val ,doc)
-       ,(when cache
-	  `(setf (gethash ,cache *cache-list*) ,var))))
+    `(progn (pushnew (list ',var ',val) *config-vars* :test #'equal) 
+	    (defvar ,var ,val ,doc)
+	    ,@(when cache
+		`((pushnew (list ',cache ',var) *cache-vars*)
+		  (setf (gethash ,cache *cache-list*) ,var)))))
   (defmacro with-clean-config (&body body)
-    `(let ,*config-vars*
-       (declare (ignorable ,@(mapcar #'first *config-vars*)))
+    `(let ((*config-vars* nil) ,@*config-vars*)
+       ;;TODO: use PROGV for dynamic binding
+       (declare (ignorable *config-vars* ,@#1=(mapcar #'first *config-vars*)))
+       ;; reconstruct *CONFIG-VARS*
+       #|(map nil (lambda (x y) (pushnew (list x y) *config-vars* :test #'equal))
+       ',#1# (mapcar #'symbol-value ',#1#))|#
+       ;; reconstruct *CACHE-LIST*
+       (mapc (lambda (x) (setf (gethash (first x) *cache-list*) (second x)))
+	     (list ,@(mapcar (lambda (x) `(list ',(first x) ,(second x))) *cache-vars*)))
        ,@body)))
 
 (defmacro with-connections (connections &body body)

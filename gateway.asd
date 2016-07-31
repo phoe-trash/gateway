@@ -37,6 +37,7 @@
   :components ((:file "package")
 	       (:file "macros")
 	       (:file "constants")
+	       (:file "utils")
 	       (:file "protocol")
 	       (:file "impl/standard-methods")
 	       (:file "impl/standard-connection") 
@@ -46,6 +47,7 @@
 	       (:file "impl/standard-chat")
 	       (:file "impl/standard-player")
 	       (:file "impl/standard-persona")
+	       (:file "test/test-messages")
 	       (:file "gateway")) 
   #|  
   ((:file "package")

@@ -70,39 +70,64 @@
 ;; STANDARD-CONNECTION test
 (test test-standard-connection
   (with-clean-config
-    (let* ((date (now))
-	   (password (make-password "test-password"))
-	   (chat (make-instance 'standard-chat :name "test-chat"))
-	   (player (make-instance 'standard-player :name "Player"))
-	   (persona (make-instance 'standard-persona :name "Sebastian"
-						     :player player)))
-      (macrolet ((make (&body body) `(make-instance 'standard-connection ,@body)))
-	(with-connections
-	    ((connection-listen (make :type :listen))
-	     (connection-client (make :type :client))
-	     (connection-accept (make :type :accept
-				      :socket (socket connection-listen))))
-	  (flet ((test-case (data)
-		   (send connection-client data)
-		   (is (equal (format nil "~S" (sexp (receive connection-accept)))
-			      (format nil "~S" (sexp data))))
-		   (send connection-accept data)
-		   (is (equal (format nil "~S" (sexp (receive connection-client)))
-			      (format nil "~S" (sexp data))))))
-	    (mapcar #'test-case (list date password chat player persona)))))
-      (is (null (maphash (lambda (x y) (list x y)) *connection-cache*))))))
+    (labels ((check-conns () (is (null (maphash #'list *connection-cache*)))))
+      (kill (make-instance 'standard-connection :type :listen))
+      (check-conns)
+      (let* ((date (now))
+	     (password (make-password "password"))
+	     (chat (make-instance 'standard-chat :name "chat"))
+	     (player (make-instance 'standard-player :name "player"))
+	     (persona (make-instance 'standard-persona :name "persona" :player player))
+	     (message (msg persona chat "message" :date date)))
+	(macrolet ((make (&body body) `(make-instance 'standard-connection ,@body)))
+	  (with-connections
+	      ((listen (make :type :listen))
+	       (client (make :type :client))
+	       (accept (make :type :accept :socket (socket listen))))
+	    (labels ((form (data) (format nil "~S" (sexp data)))
+		     (test (x y data)
+		       (send x data)
+		       (is (readyp y)) 
+		       (is (equal (form (receive y)) (form data))))
+		     (test-case (data)
+		       (test client accept data)
+		       (test accept client data)))
+	      (mapcar #'test-case (list date password chat player persona message))))))
+      (check-conns)
+      (values))))
 
-#|
-;; STANDARD-MESSAGE test
-(test test-standard-message
+;; STANDARD-PLAYER, STANDARD-MESSAGE and STANDARD-PERSONA test
+(test test-standard-player-persona-message
   (with-clean-config
-    (let* ((sender 'sender) (recipient 'recipient) (contents "contents")
-	   (date (make-instance 'standard-date :day 1))
-	   (message (msg sender recipient contents :date date)))
-      (is (equal (sender message) sender))
-      (is (equal (recipient message) recipient))
-      (is (date= (date message) date))
-      (is (string= (contents message) contents))
-      (let ((parsed-message (parse (sexp message))))))))
-|#
+    (macrolet ((make (&body body) `(make-instance 'standard-connection ,@body))
+	       (mkpl (&body body) `(make-instance 'standard-player ,@body))
+	       (mkpe (&body body) `(make-instance 'standard-persona ,@body)))
+      (with-connections
+	  ((listen (make :type :listen))
+	   (client (make :type :client))
+	   (accept (make :type :accept :socket (socket listen))))
+	(let* ((name "test-name")
+	       (email "test@email.com")
+	       (password (make-password "test-password"))
+	       (player (mkpl :name name :email email
+			     :password password :connection accept)))
+	  (is (eq (name player) name))
+	  (is (eq (email player) email))
+	  (is (eq (password player) password))
+	  (is (eq (connection player) accept))
+	  (is (eq (personas player) nil))
+	  (is (eq (find-player name) player))
+	  (signals simple-error
+	    (make-instance 'standard-player :name name))
+	  (let ((persona-1 (mkpe :name "test-persona-1" :player player))
+		(persona-2 (mkpe :name "test-persona-2" :player player)))
+	    (is (find persona-1 (personas player)))
+	    (is (find persona-2 (personas player)))
+	    (let* ((player-2 (mkpl :name "test-name-2" :email "test2@email.com"
+				   :password password :connection client))
+		   (persona-3 (mkpe :name "test-persona-3" :player player-2))
+		   (message (msg persona-3 persona-1 "test-message")))
+	      (send-message message player) 
+	      (let ((message-2 (receive (connection player-2))))
+		(is (message= message message-2))))))))))
 

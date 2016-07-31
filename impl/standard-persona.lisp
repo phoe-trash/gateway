@@ -19,6 +19,12 @@
 	  :reader chat
 	  :type chat)))
 
+(defconstructor (standard-persona)
+  (add-persona standard-persona (player standard-persona))
+  (if (cache :persona (name standard-persona))
+      (error "A persona by name ~S already exists." (name standard-persona))
+      (setf (cache :persona (name standard-persona)) standard-persona)))
+
 (defmethod sexp ((persona standard-persona))
   (sexp `(#:persona #:name ,(name persona))))
 

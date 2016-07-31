@@ -22,13 +22,22 @@
 
 (defmethod sexp ((object symbol))
   (make-instance '%quasisymbol :symbol object))
-(defclass %quasisymbol () ((symbol :initarg :symbol :accessor s)))
-(defprint %quasisymbol (princ (symbol-name (s obj)) stream))
+(defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
+(defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
+(defun %dequasify (object)
+  (setf object (cond ((consp object)
+		      (mapcar #'%dequasify object))
+		     ((typep object '%quasisymbol)
+		      (setf object (%symbol object)))
+		     (t
+		      object))))
 
 ;; PARSE
 
 (defun %parse (object)
-  (destructuring-bind (identifier . data) object
+  (when (typep (first object) '%quasisymbol)
+    (setf object (%dequasify object)))
+  (destructuring-bind (identifier . data) object 
     (switch (identifier :test #'string=)
       (:date (parse-date (string=-getf data :date)))
       (:message (%parse-message data))
@@ -79,9 +88,11 @@
 ;; CACHE
 
 (defun %cache (type key)
+  (declare (special *cache-lock* *cache-list*))
   (with-lock-held (*cache-lock*)
     (gethash key (gethash type *cache-list*))))
 
 (defun (setf %cache) (new-value type key)
+  (declare (special *cache-lock* *cache-list*))
   (with-lock-held (*cache-lock*)
     (setf (gethash key (gethash type *cache-list*)) new-value)))

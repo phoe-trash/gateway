@@ -24,10 +24,8 @@
   (sexp `(#:chat #:name ,(name chat))))
 
 (defmethod send-message ((message message) (chat standard-chat))
-  (when (not (eq (recipient message) chat))
-    (format t "[!] Warning: recipient mismatch.~%"))
   (push message (messages chat))
-  (format t "[!] Stub: SEND-MESSAGE to ~A:~%~A~%" chat (sexp message)))
+  (mapcar (lambda (x) (send-message message x)) (personas chat)))
 
 (defmethod add-persona ((persona persona) (chat standard-chat))
   (pushnew persona (personas chat)))

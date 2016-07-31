@@ -22,9 +22,9 @@
 	      :type string)))
 
 (defmethod sexp ((message standard-message)) 
-  (sexp `(#:message #:sender ,(sexp (sender message))
-		    #:recipient ,(sexp (recipient message))
-		    #:date ,(sexp (date message))
+  (sexp `(#:message #:sender ,(sender message)
+		    #:recipient ,(recipient message)
+		    #:date ,(date message)
 		    #:contents ,(contents message))))
 
 (defmethod msg (sender recipient contents &key (date (now)))
@@ -32,3 +32,9 @@
 				   :recipient recipient
 				   :contents contents
 				   :date date))
+
+(defmethod message= ((message-1 standard-message) (message-2 standard-message))
+  (and (eq (sender message-1) (sender message-2))
+       (eq (recipient message-1) (recipient message-2))
+       (date= (date message-1) (date message-2))
+       (string= (contents message-1) (contents message-2))))
