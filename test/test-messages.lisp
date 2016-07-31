@@ -102,6 +102,7 @@
     (macrolet ((make (&body body) `(make-instance 'standard-connection ,@body))
 	       (mkpl (&body body) `(make-instance 'standard-player ,@body))
 	       (mkpe (&body body) `(make-instance 'standard-persona ,@body)))
+      ;; TODO: rewrite connections using server loop
       (with-connections
 	  ((listen (make :type :listen))
 	   (client (make :type :client))
@@ -129,5 +130,6 @@
 		   (message (msg persona-3 persona-1 "test-message")))
 	      (send-message message player) 
 	      (let ((message-2 (receive (connection player-2))))
-		(is (message= message message-2))))))))))
+		(is (message= message message-2)))))))
+      (values))))
 
