@@ -25,12 +25,12 @@
 (defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
 (defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
 (defun %dequasify (object)
-  (setf object (cond ((consp object)
-		      (mapcar #'%dequasify object))
-		     ((typep object '%quasisymbol)
-		      (setf object (%symbol object)))
-		     (t
-		      object))))
+  (cond ((consp object)
+	 (mapcar #'%dequasify object))
+	((typep object '%quasisymbol)
+	 (%symbol object))
+	(t
+	 object)))
 
 ;; PARSE
 
@@ -71,19 +71,7 @@
   (multiple-value-bind (value found-p) (cache type key) 
     (if found-p
 	value
-	(format t "[!] %IDENTIFY: not found: ~S ~S.~%" type key)))
-  #|
-  (flet ((ensure (key hash-table)
-	   (multiple-value-bind (value foundp) (gethash key hash-table)
-	     (if foundp
-		 value
-		 (format t "[!] IDENTIFY: not found: ~S ~S.~%" type key))))) 
-    (case type
-      (:chat (ensure key *chat-cache*))
-      (:player (ensure key *player-cache*))
-      (:persona (ensure key *persona-cache*))
-      (t (format t "[!] %IDENTIFY: CASE failed: ~S.~%" type))))
-    |#)
+	(format t "[!] %IDENTIFY: not found: ~S ~S.~%" type key))))
 
 ;; CACHE
 

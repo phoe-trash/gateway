@@ -25,7 +25,8 @@
 
 (defmethod send-message ((message message) (chat standard-chat))
   (push message (messages chat))
-  (mapcar (lambda (x) (send-message message x)) (personas chat)))
+  (let ((players (remove-duplicates (mapcar #'player (personas chat)))))
+    (mapc (lambda (x) (send-message message x)) players)))
 
 (defmethod add-persona ((persona persona) (chat standard-chat))
   (pushnew persona (personas chat)))

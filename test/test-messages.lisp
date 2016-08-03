@@ -179,5 +179,3 @@
 	    (test-message message-2))))))
   (values))
 
-
-

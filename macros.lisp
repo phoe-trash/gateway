@@ -54,12 +54,8 @@
 		`((pushnew (list ',cache ',var) *cache-vars*)
 		  (setf (gethash ,cache *cache-list*) ,var)))))
   (defmacro with-clean-config (&body body)
-    `(let ((*config-vars* nil) ,@*config-vars*)
+    `(let ,*config-vars*
        ;;TODO: use PROGV for dynamic binding
-       (declare (ignorable *config-vars* ,@#1=(mapcar #'first *config-vars*)))
-       ;; reconstruct *CONFIG-VARS*
-       #|(map nil (lambda (x y) (pushnew (list x y) *config-vars* :test #'equal))
-       ',#1# (mapcar #'symbol-value ',#1#))|#
        ;; reconstruct *CACHE-LIST*
        (mapc (lambda (x) (setf (gethash (first x) *cache-list*) (second x)))
 	     (list ,@(mapcar (lambda (x) `(list ',(first x) ,(second x))) *cache-vars*)))

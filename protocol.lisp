@@ -3,13 +3,6 @@
 ;;;; © Michał "phoe" Herda 2016
 ;;;; protocol.lisp
 
-;; TODO: remhash on emptied buffers in secure-read
-;; TODO: add with-lock-held *cache-lock* to all cache users
-;; TODO: add locks everywhere, d'oh
-;; TODO: abstract cache away
-;; TODO: add make-instance detection on identify
-;; TODO: remove deleting people from cache
-
 (in-package #:gateway)
 
 ;; SEXPABLE protocol
@@ -35,7 +28,7 @@
     (setf (%cache type key) new-value)))
 
 ;; DATE protocol - implemented by STANDARD-DATE
-(defprotocol date 
+(defprotocol date
     (date () ()
       (:documentation "Must be SEXPABLE and IMMUTABLE.
 
@@ -138,3 +131,8 @@ Constructor arguments:
   (defgeneric add-persona (persona object))
   (defgeneric delete-persona (persona object))
   (defgeneric find-chat (name)))
+
+;; SHARD
+;; GEM
+;; JEWEL
+;; CROWN
