@@ -12,7 +12,8 @@
 	#:1am
 	#:secure-read
 	#:bordeaux-threads
-	#:usocket)
+	#:usocket
+	#:jpl-queues)
   #|
   (:use #:common-lisp
 	#:closer-mop

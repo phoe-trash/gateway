@@ -31,10 +31,9 @@
 
 (defmethod password-matches-p ((password standard-password) (passphrase string))
   (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))
-	 (key (derive-key passphrase
-			  :salt salt
-			  :iteration-count (iteration-count password)
-			  :key-length (key-length password))))
+	 (key (derive-key passphrase :salt salt
+				     :iteration-count (iteration-count password)
+				     :key-length (key-length password))))
     (string= key (key-of password))))
 
 (defmethod sexp ((password standard-password))

@@ -5,11 +5,13 @@
 
 (in-package #:gateway)
 
+;; TODO: make all KILL implementations return (values)
+
 ;; SEXPABLE protocol
 (defprotocol sexpable () 
   (defgeneric sexp (object))
-  (defun parse (sexp)
-    (%parse sexp)))
+  (defun parse (sexp &optional parent)
+    (%parse sexp parent)))
 
 ;; MESSAGABLE protocol
 (defprotocol messagable ()
@@ -64,9 +66,10 @@ Constructor arguments:
 :HOST - hostname.
 :PORT - port."))
   (defgeneric send (connection object))
-  (defgeneric receive (connection))
+  (defgeneric receive (connection &key))
   (defgeneric readyp (connection))
-  (defgeneric kill (object)))
+  (defgeneric kill (object))
+  (defgeneric alivep (object)))
 
 ;; PLAYER protocol - implemented by STANDARD-PLAYER
 (defprotocol player
@@ -131,6 +134,31 @@ Constructor arguments:
   (defgeneric add-persona (persona object))
   (defgeneric delete-persona (persona object))
   (defgeneric find-chat (name)))
+
+;; SHARD protocol - no impl ;_;
+(defprotocol shard
+    (shard () ())
+
+  (defgeneric players (object))
+  (defgeneric chats (object))
+  (defgeneric add-persona (persona object))
+  (defgeneric delete-persona (persona object)))
+
+;; CROWN protocol - no impl ;_;
+(defprotocol crown
+    (crown () ()))
+
+;; LISTENER protocol - implemented by STANDARD-LISTENER
+(defprotocol listener
+    (listener () ()))
+
+;; LISTENER protocol - implemented by STANDARD-LISTENER
+(defprotocol gem
+    (gem () ()))
+
+;; JEWEL protocol - no impl ;_;
+(defprotocol jewel
+    (jewel () ()))
 
 ;; SHARD
 ;; GEM

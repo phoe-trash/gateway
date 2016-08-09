@@ -46,7 +46,6 @@
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *config-vars* nil)
   (defvar *cache-vars* nil)
-  (defvar *cache-list* (make-hash-table)) 
   (defmacro defconfig (var val &key cache doc)
     `(progn (pushnew (list ',var ',val) *config-vars* :test #'equal) 
 	    (defvar ,var ,val ,doc)

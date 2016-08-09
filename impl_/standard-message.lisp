@@ -38,3 +38,4 @@
        (eq (recipient message-1) (recipient message-2))
        (date= (date message-1) (date message-2))
        (string= (contents message-1) (contents message-2))))
+

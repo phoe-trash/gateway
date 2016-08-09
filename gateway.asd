@@ -17,7 +17,8 @@
 	       #:1am
 	       #:secure-read
 	       #:bordeaux-threads
-	       #:usocket)
+	       #:usocket
+	       #:jpl-queues)
   #|
   (#:hu.dwim.defclass-star
    #:named-readtables
@@ -41,12 +42,14 @@
 	       (:file "protocol")
 	       (:file "impl/standard-methods")
 	       (:file "impl/standard-connection") 
-	       (:file "impl/standard-message") 
-	       (:file "impl/standard-date")
-	       (:file "impl/standard-password")
-	       (:file "impl/standard-chat")
-	       (:file "impl/standard-player")
-	       (:file "impl/standard-persona")
+	       ;;(:file "impl/standard-message") 
+	       ;;(:file "impl/standard-date")
+	       ;;(:file "impl/standard-password")
+	       ;;(:file "impl/standard-chat")
+	       ;;(:file "impl/standard-player")
+	       ;;(:file "impl/standard-persona")
+	       (:file "impl/standard-crown")
+	       (:file "impl/standard-listener")
 	       (:file "test/test-messages")
 	       (:file "gateway")) 
   #|  
