@@ -5,7 +5,8 @@
 
 (in-package #:gateway)
 
-;; TODO: make all KILL implementations return (values)
+;; TODO: refactor crown subfunctions
+;; TODO: rethink connections and their locks
 
 ;; SEXPABLE protocol
 (defprotocol sexpable () 

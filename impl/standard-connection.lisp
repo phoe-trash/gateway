@@ -39,13 +39,13 @@
 	(setf (gethash standard-connection *connection-cache*)
 	      standard-connection)))))
 
-(defmethod receive ((connection standard-connection) &key parent) 
-  (handler-case
-      (with-lock-held ((lock connection))
-        (parse (safe-read (stream-of connection)) parent))
-    (end-of-file (e)
-      (kill connection)
-      (error e))))
+(defmethod receive ((connection standard-connection) &key parent)
+  (when (alivep connection)
+    (handler-case
+        (with-lock-held ((lock connection))
+          (parse (safe-read (stream-of connection)) parent))
+      (end-of-file ()
+        (kill connection)))))
 
 (defmethod send ((connection standard-connection) object) 
   (with-lock-held ((lock connection))
