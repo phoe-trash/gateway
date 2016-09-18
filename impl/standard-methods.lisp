@@ -6,7 +6,6 @@
 (in-package #:gateway)
 
 ;; SEXP
-
 (defmethod sexp (object)
   (format t "[!] SEXP: no method for ~S. Bug?~%" object)
   object)
@@ -22,8 +21,11 @@
 
 (defmethod sexp ((object symbol))
   (make-instance '%quasisymbol :symbol object))
+
 (defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
+
 (defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
+
 (defun %dequasify (object)
   (cond ((consp object)
 	 (mapcar #'%dequasify object))
@@ -33,7 +35,7 @@
 	 object)))
 
 ;; PARSE
-
+;; TODO: refactor this into a full parser, elsewhere
 (defun %parse (object &optional parent)
   (when (typep (first object) '%quasisymbol)
     (setf object (%dequasify object)))
@@ -80,7 +82,6 @@
 		   :%read-data (list key salt iters))))
 
 ;; IDENTIFY
-
 (defun %identify (type key)
   (multiple-value-bind (value found-p) (cache type key) 
     (if found-p
@@ -88,7 +89,6 @@
 	(format t "[!] %IDENTIFY: not found: ~S ~S.~%" type key))))
 
 ;; CACHE
-
 (defun %cache (type key)
   (declare (special *cache-lock* *cache-list*))
   (with-lock-held (*cache-lock*)

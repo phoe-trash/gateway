@@ -1,250 +1,201 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; gateway.lisp
+;;;; protocol.lisp
 
 (in-package #:gateway)
 
-(defaccessors sender recipient date-of contents
-  id name player avatar gender species colors shard
-  id name messages personas shard
-  dimensions x-dimension y-dimension
-  id username password email personas connection
-  id name world-map jewel personas chats lock
-  sexp)
-
-
-(defgeneric find-persona (name))
-(defgeneric location (object))
-(defgeneric find-messages (chat &key sender recipient after-date before-date contents))
-(defgeneric delete-message (message chat))
-(defgeneric add-persona (persona chat))
-(defgeneric delete-persona (persona chat))
-(defgeneric make-password (passphrase))
-(defgeneric password-matches-p (password passphrase))
-(defgeneric object-at (world-map x y))
-(defgeneric resize (world-map up left down right &key initial-element))
-(defgeneric find-player (&key id username email))
-
-(defgeneric output (object connection)) ;; done
-(defgeneric input (connection &key safe-p)) ;; done <3
-(defgeneric kill (connection)) ;; done
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;; chat.lisp
-(defprotocol id (chat)) ;; done
-(defprotocol name (chat)) ;; done
-(defprotocol messages (chat)) ;; done
-(defprotocol personas (chat)) ;; done
-(defprotocol shard (chat)) ;; done
-
-(defprotocol send-message (message chat)) ;; done
-(defprotocol find-messages
-    (chat &key sender recipient after-date before-date contents)) ;; done
-(defprotocol delete-message (message chat)) ;; done
-
-(defprotocol add-persona (persona chat)) ;; done
-(defprotocol delete-persona (persona chat)) ;; done
-
-
-
-;; world-map.lisp
-(defprotocol dimensions (world-map)) ;; done
-(defprotocol x-dimension (world-map)) ;; done
-(defprotocol y-dimension (world-map)) ;; done
-(defprotocol object-at (world-map x y)) ;; done
-(defprotocol resize (world-map up left down right &key initial-element)) ;; done
-
-
-;; player.lisp
-(defprotocol id (player)) ;; done
-(defprotocol username (player)) ;; done
-(defprotocol password (player)) ;; done
-(defprotocol email (player)) ;; done
-(defprotocol personas (player)) ;; done
-(defprotocol connection (player)) ;; done
-(defprotocol send-message (message player)) ;; done
-(defprotocol find-player (&key id username email)) ;; done
-
-
-;;;; server protocol
-
-;; shard.lisp
-(defprotocol id (shard))
-(defprotocol name (shard))
-(defprotocol world-map (shard))
-(defprotocol jewel (shard))
-(defprotocol personas (shard))
-(defprotocol chats (shard))
-(defprotocol lock (shard))
-
-
-;; connection.lisp
-(defprotocol output (object connection)) ;; done
-(defprotocol input (connection &key safe-p)) ;; done <3
-(defprotocol kill (connection)) ;; done
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TODO: refactor crown subfunctions
+;; TODO: rethink connections and their locks
+;; TODO: lock refactor
 
 ;; SEXPABLE protocol
-
-(defprotocol sexp (object))
+(defprotocol sexpable () 
+  (defgeneric sexp (object))
+  (defun parse (sexp &optional parent)
+    (%parse sexp parent)))
 
 ;; MESSAGABLE protocol
+(defprotocol messagable ()
+  (defgeneric send-message (message recipient)))
 
-(defprotocol send-message (message recipient))
+;; IDENTIFIABLE protocol
+(defprotocol identifiable ()
+  (defun identify (type key)
+    (%identify type key)))
 
-;; MESSAGE protocol
+;; CACHE protocol
+(defprotocol cache ()
+  (defun cache (type key)
+    (%cache type key))
+  (defun (setf cache) (new-value type key)
+    (setf (%cache type key) new-value)))
 
-(defclass message () ()
-  (:documentation "Must be SEXPABLE and IMMUTABLE.
+;; DATE protocol - implemented by STANDARD-DATE
+(defprotocol date
+    (date () ()
+      (:documentation "Must be SEXPABLE and IMMUTABLE.
+
+The :UNIT argument must accepts arguments 
+:YEAR, :MONTH, :DAY, :HOUR, :MINUTE, :SECOND, :NANOSECOND."))
+  (defgeneric parse-date (string))
+  (defgeneric date= (date-1 date-2 &key unit))
+  (defgeneric date/= (date-1 date-2 &key unit))
+  (defgeneric date< (date-1 date-2))
+  (defgeneric date<= (date-1 date-2 &key unit))
+  (defgeneric date> (date-1 date-2))
+  (defgeneric date>= (date-1 date-2 &key unit))
+  (defgeneric date-min (&rest dates))
+  (defgeneric date-max (&rest dates))
+  (defgeneric now ()))
+
+;; PASSWORD protocol - implemented by STANDARD-PASSWORD
+(defprotocol password
+    (password () ()
+      (:documentation "Must be SEXPABLE and IMMUTABLE.
 
 Constructor arguments:
-:SENDER - the sender of the message.
-:RECIPIENT - the recipient of the message.
-:DATE - object of type DATE.
-:CONTENTS - contents of the message (a STRING).
-"))
-(defprotocol sender (message))
-(defprotocol recipient (message))
-(defprotocol date (message))
-(defprotocol contents (message))
+:PASSPHRASE - a passphrase."))
+  (defgeneric password-matches-p (password passphrase))
+  (defgeneric make-password (passphrase)))
 
-;; PASSWORD protocol
+;; CONNECTION protocol - implemented by STANDARD-CONNECTION
+(defprotocol connection
+    (connection () ()
+      (:documentation "Constructor arguments:
 
-(defclass password () ()
-  (:documentation "Must be IMMUTABLE.
+:TYPE - one of :LISTEN, :ACCEPT, :CLIENT.
+:HOST - hostname.
+:PORT - port."))
+  (defgeneric send (connection object))
+  (defgeneric receive (connection &key))
+  (defgeneric readyp (connection))
+  (defgeneric kill (object))
+  (defgeneric alivep (object)))
 
-Constructor arguments:
-:PASSPHRASE - a passphrase.
-"))
-(defprotocol password-matches-p (password passphrase))
-
-;; PLAYER protocol
-
-(defclass player () ()
-  (:documentation "Must be SEXPABLE and MESSAGABLE.
+;; PLAYER protocol - implemented by STANDARD-PLAYER
+(defprotocol player
+    (player () ()
+      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
 
 Constructor arguments:
 :NAME - a STRING.
 :EMAIL (optional) - a STRING.
 :PASSWORD - a PASSWORD or a passphrase (a STRING).
 "))
-(defprotocol name (player))
-(defprotocol email (player))
-(defprotocol personas (player))
+  (defgeneric name (object))
+  (defgeneric email (object))
+  (defgeneric password (object))
+  (defgeneric connection (object))
+  (defgeneric personas (object))
+  (defgeneric add-persona (persona object))
+  (defgeneric delete-persona (persona object))
+  (defgeneric find-player (name)))
 
-;; PERSONA protocol
-
-(defclass persona () ()
-  (:documentation "Must be SEXPABLE and MESSAGABLE.
+;; PERSONA protocol - implemented by STANDARD-PERSONA
+(defprotocol persona
+    (persona () ()
+      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
 
 Constructor arguments:
 :NAME - a STRING.
 :PLAYER - a PLAYER.
-:CHAT - a CHAT.
-"))
-(defprotocol name (persona))
-(defprotocol player (persona))
-(defprotocol chat (persona))
-(defprotocol find-persona (name))
+:CHAT - a CHAT."))
+  (defgeneric name (object))
+  (defgeneric player (object))
+  (defgeneric chat (object))
+  (defgeneric find-persona (name)))
 
-;; DATE protocol
-
-(defclass date () ()
-  (:documentation "Must be SEXPABLE and IMMUTABLE.
-
-Constructor arguments:
-:TIMESTAMP (optional) - a timestamp, to be declared later.
-"))
-(defprotocol read-date (string))
-(defprotocol print-object (date stream))
-(defprotocol date= (date-1 date-2 &key fuzziness))
-(defprotocol date< (date-1 date-2 &key fuzziness))
-(defprotocol date> (date-1 date-2 &key fuzziness))
-
-;; CHAT protocol
-
-(defclass chat () ()
-  (:documentation "Must be SEXPABLE and MESSAGABLE.
+;; MESSAGE protocol - implemented by STANDARD-MESSAGE
+(defprotocol message 
+    (message () () 
+      (:documentation "Must be SEXPABLE and IMMUTABLE.
 
 Constructor arguments:
-:NAME - a STRING.
-"))
-(defprotocol name (chat))
-(defprotocol messages (chat))
-(defprotocol personas (chat))
+:SENDER - the sender of the message.
+:RECIPIENT - the recipient of the message.
+:DATE - object of type DATE.
+:CONTENTS - contents of the message (a STRING)."))
+  (defgeneric sender (object))
+  (defgeneric recipient (object))
+  (defgeneric date (object))
+  (defgeneric contents (object))
+  (defgeneric msg (sender recipient contents &key date))
+  (defgeneric message= (message-1 message-2)))
+
+;; CHAT protocol - implemented by STANDARD-CHAT
+(defprotocol chat
+    (chat () ()
+      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
+
+Constructor arguments:
+:NAME - a STRING."))
+  (defgeneric name (object))
+  (defgeneric messages (object))
+  (defgeneric personas (object))
+  (defgeneric add-persona (persona object))
+  (defgeneric delete-persona (persona object))
+  (defgeneric find-chat (name)))
+
+;; SHARD protocol - no impl ;_;
+(defprotocol shard
+    (shard () ())
+
+  (defgeneric players (object))
+  (defgeneric chats (object))
+  (defgeneric add-persona (persona object))
+  (defgeneric delete-persona (persona object)))
+
+;; CROWN protocol - no impl ;_;
+(defprotocol crown
+    (crown () ())
+  ;; LIBRARY
+  (defgeneric lookup (key))
+  (defgeneric (setf lookup) (new-value key))
+  ;; EVENT QUEUE
+  (defgeneric event-queue (object))
+  (defgeneric gems (object))
+  ;; N-CONNECTIONS
+  (defgeneric n-acceptor (object))
+  (defgeneric n-connections (object))
+  (defgeneric n-lock (object))
+  (defgeneric n-listener (object)) 
+  ;; E-CONNECTIONS
+  (defgeneric e-connections (object))
+  (defgeneric e-lock (object))
+  (defgeneric e-listener (object)) 
+  ;; I-CONNECTIONS
+  (defgeneric i-acceptor (object))
+  (defgeneric i-connections (object))
+  (defgeneric i-lock (object))
+  (defgeneric i-listener (object))
+  ;; METHODS
+  (defgeneric kill (object))
+  (defgeneric alivep (object)))
+
+;; ACCEPTOR protocol - no impl ;_;
+(defprotocol acceptor
+    (acceptor () ())
+  (defgeneric socket (object))
+  (defgeneric thread (object))
+  (defgeneric owner (object))
+  (defgeneric kill (object))
+  (defgeneric alivep (object)))
+
+;; LISTENER protocol - implemented by STANDARD-LISTENER
+(defprotocol listener
+    (listener () ())
+  (defgeneric owner (object)))
+
+;; LISTENER protocol - implemented by STANDARD-LISTENER
+(defprotocol gem
+    (gem () ()))
+
+;; JEWEL protocol - no impl ;_;
+(defprotocol jewel
+    (jewel () ()))
+
+;; SHARD
+;; GEM
+;; JEWEL
+;; CROWN

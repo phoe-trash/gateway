@@ -22,10 +22,8 @@
   (defun cat (&rest strings)
     (apply #'concatenate 'string strings)))
 
-(defun peek-char-no-hang (&optional (input-stream *standard-input*)
-                            (eof-error-p t) eof-value recursive-p)
-  (let ((character (read-char-no-hang input-stream eof-error-p
-                                      eof-value recursive-p)))
+(defun peek-char-no-hang (&optional (input-stream *standard-input*) (eof-error-p t) eof-value recursive-p)
+  (let ((character (read-char-no-hang input-stream eof-error-p eof-value recursive-p)))
     (when character
       (unread-char character input-stream)
       character)))

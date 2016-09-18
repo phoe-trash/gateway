@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; gateway.lisp
+;;;; standard-gem.lisp
 
 (in-package #:gateway)
 
@@ -56,79 +56,80 @@
       (progn
         (%gem-crown-clean-n-conn gem)
         (%gem-crown-n-conn gem))
-      (sleep 0.1)))
+      (sleep 0.01)))
 
 (defun %gem-crown-queue (gem)
   (let* ((crown (parent gem))
-         (queue (queue crown)))
+         (queue (event-queue crown)))
     (declare (ignore queue))
     nil))
 
 (defun %gem-crown-clean-i-conn (gem)
   (let ((crown (parent gem)))
-    (with-lock-held ((i-connections-lock crown))
+    (with-lock-held ((i-lock crown))
       (let ((to-cleanup (remove-if #'alivep (i-connections crown))))
         (when to-cleanup
           (format t "[~~] Gem: cleaning I-connections.~%")
-          (mapcar (lambda (x) (deletef (i-connections crown) x))
-                  to-cleanup))))))
+          (mapc (lambda (x) (deletef (i-connections crown) x))
+                to-cleanup)
+          t)))))
 
 (defun %gem-crown-clean-e-conn (gem)
   (let ((crown (parent gem)))
-    (with-lock-held ((e-connections-lock crown))
+    (with-lock-held ((e-lock crown))
       (let ((to-cleanup (remove-if #'alivep (e-connections crown))))
         (when to-cleanup
           (format t "[~~] Gem: cleaning E-connections.~%")
-          (mapcar (lambda (x) (deletef (e-connections crown) x))
-                  to-cleanup))))))
+          (mapc (lambda (x) (deletef (e-connections crown) x))
+                to-cleanup)
+          t)))))
 
 (defun %gem-crown-clean-n-conn (gem)
   (let ((crown (parent gem)))
-    (with-lock-held ((n-connections-lock crown))
+    (with-lock-held ((n-lock crown))
       (let ((to-cleanup (remove-if #'alivep (n-connections crown))))
         (when to-cleanup
           (format t "[~~] Gem: cleaning N-connections.~%")
-          (mapcar (lambda (x) (deletef (n-connections crown) x))
-                  to-cleanup))))))
+          (mapc (lambda (x) (deletef (n-connections crown) x))
+                to-cleanup)
+          t)))))
 
 (defun %gem-crown-i-conn (gem)
   (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((i-connections-lock crown))
-                        (find-if #'readyp (i-connections crown)))))
+    (let ((connection (with-lock-held ((i-lock crown)) (find-if #'readyp (i-connections crown)))))
       (when connection
-        (let ((object (receive connection :parent crown)))
+        (let ((object (receive connection)))
           (when object
             (format t "[.] Gem: I-received: ~S~%" object)))
         t))))
 
 (defun %gem-crown-e-conn (gem)
   (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((e-connections-lock crown))
-                        (find-if #'readyp (e-connections crown)))))
+    (let ((connection (with-lock-held ((e-lock crown)) (find-if #'readyp (e-connections crown)))))
       (when connection
-        (let ((object (receive connection :parent crown)))
+        (let ((object (receive connection)))
           (when object
             (format t "[.] Gem: E-received: ~S~%" object)))
         t))))
 
 (defun %gem-crown-n-conn (gem)
   (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((n-connections-lock crown))
-                        (find-if #'readyp (n-connections crown)))))
+    (let ((connection (with-lock-held ((n-lock crown)) (find-if #'readyp (n-connections crown)))))
       (when connection
-        (let ((object (receive connection :parent crown)))
+        (let ((object (receive connection)))
           (when object
             (format t "[~~] Gem: N-received: ~S~%" object)
-            (with-lock-held ((n-connections-lock crown))
+            (with-lock-held ((n-lock crown))
               (deletef (n-connections crown) connection))
             (cond ((and (consp object)
                         (string= (first object) :open)
                         (string= (second object) :gateway))
-                   (format t "[~~] Gem: Accepting E-connection.~%")
-                   (with-lock-held ((e-connections-lock crown))
+                   (format t "[~~] Gem: accepting E-connection.~%")
+                   (with-lock-held ((e-lock crown))
                      (pushnew connection (e-connections crown))))
                   (t
                    (format t "[~~] Gem: killing N-connection.~%")
+                   (send connection (list 'error 'wrong-greeting object))
                    (kill connection))))
           t)))))
 
