@@ -10,11 +10,11 @@
 	    :type socket)
    (%stream :accessor stream-of
 	    :type stream)
-   (%lock :initform (make-lock)
-	  :accessor lock)
-   (%auth :initform nil
+   (%lock :accessor lock
+          :initform (make-lock))
+   (%auth :accessor auth 
 	  :initarg :auth
-	  :accessor auth)))
+          :initform nil)))
 
 (defconstructor (standard-connection type (host "127.0.0.1") (port 65001) socket)
   (check-type type (member :listen :client :accept :ready))
@@ -55,10 +55,11 @@
       (force-output (stream-of connection)))))
 
 (defmethod readyp ((connection standard-connection))
-  (with-lock-held ((lock connection))
-    (handler-case
-        (peek-char-no-hang (stream-of connection))
-      (end-of-file () t))))
+  (when (alivep connection)
+    (with-lock-held ((lock connection))
+      (handler-case
+          (peek-char-no-hang (stream-of connection))
+        (end-of-file () t)))))
 
 (defmethod alivep ((connection standard-connection))
   (with-lock-held ((lock connection))

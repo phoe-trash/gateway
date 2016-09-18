@@ -53,7 +53,7 @@
   (let* ((connection (%find-ready-connection connections lock)))
     (if connection
         (%listener-handler type listener connection)
-        (sleep 0.1))))
+        (sleep 0.01))))
 
 (defun %find-ready-connection (connections lock)
   (with-lock-held (lock)

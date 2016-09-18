@@ -47,70 +47,100 @@
 
 (defun %gem-crown-loop (gem)
   (or (%gem-crown-queue gem)
-      (progn
-        (%gem-crown-clean-i-conn gem)
-        (%gem-crown-i-conn gem))
-      (progn
-        (%gem-crown-clean-e-conn gem)
-        (%gem-crown-e-conn gem))
-      (progn
-        (%gem-crown-clean-n-conn gem)
-        (%gem-crown-n-conn gem))
-      (sleep 0.01)))
+      (%gem-crown-clean-i-conn gem)
+      (%gem-crown-clean-e-conn gem)
+      (%gem-crown-clean-n-conn gem) 
+      (sleep 0.1)))
+
+(macrolet
+    ((clean (lock-fn conn-fn type)
+       `(let ((crown (parent gem)))
+          (with-lock-held ((,lock-fn crown))
+            (let ((to-cleanup (remove-if #'alivep (,conn-fn crown))))
+              (when to-cleanup
+                (format t "[~~] Gem: cleaning ~D dead ~A-connections.~%" (length to-cleanup) ,type)
+                (mapc (lambda (x) (deletef (,conn-fn crown) x)) to-cleanup)))))))
+  (defun %gem-crown-clean-n-conn (gem)
+    (clean n-lock n-connections :n))
+  (defun %gem-crown-clean-e-conn (gem)
+    (clean e-lock e-connections :e))
+  (defun %gem-crown-clean-i-conn (gem)
+    (clean i-lock i-connections :i)))
 
 (defun %gem-crown-queue (gem)
   (let* ((crown (parent gem))
-         (queue (event-queue crown)))
-    (declare (ignore queue))
-    nil))
-
-(defun %gem-crown-clean-i-conn (gem)
-  (let ((crown (parent gem)))
-    (with-lock-held ((i-lock crown))
-      (let ((to-cleanup (remove-if #'alivep (i-connections crown))))
-        (when to-cleanup
-          (format t "[~~] Gem: cleaning I-connections.~%")
-          (mapc (lambda (x) (deletef (i-connections crown) x))
-                to-cleanup)
-          t)))))
-
-(defun %gem-crown-clean-e-conn (gem)
-  (let ((crown (parent gem)))
-    (with-lock-held ((e-lock crown))
-      (let ((to-cleanup (remove-if #'alivep (e-connections crown))))
-        (when to-cleanup
-          (format t "[~~] Gem: cleaning E-connections.~%")
-          (mapc (lambda (x) (deletef (e-connections crown) x))
-                to-cleanup)
-          t)))))
-
-(defun %gem-crown-clean-n-conn (gem)
-  (let ((crown (parent gem)))
-    (with-lock-held ((n-lock crown))
-      (let ((to-cleanup (remove-if #'alivep (n-connections crown))))
-        (when to-cleanup
-          (format t "[~~] Gem: cleaning N-connections.~%")
-          (mapc (lambda (x) (deletef (n-connections crown) x))
-                to-cleanup)
-          t)))))
-
-(defun %gem-crown-i-conn (gem)
-  (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((i-lock crown)) (find-if #'readyp (i-connections crown)))))
-      (when connection
-        (let ((object (receive connection)))
-          (when object
-            (format t "[.] Gem: I-received: ~S~%" object)))
+         (queue (event-queue crown))
+         (inner-queue (slot-value queue 'jpl-queues::queue))
+         (lock (slot-value queue 'jpl-queues::lock)))
+    (with-lock-held (lock)
+      (unless (empty? inner-queue)
+        (let ((entry (dequeue inner-queue)))
+          (format t "[.] Gem: on the queue: ~S~%" entry)
+          (parse-entry crown entry))
         t))))
 
-(defun %gem-crown-e-conn (gem)
-  (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((e-lock crown)) (find-if #'readyp (e-connections crown)))))
-      (when connection
-        (let ((object (receive connection)))
-          (when object
-            (format t "[.] Gem: E-received: ~S~%" object)))
-        t))))
+(defun parse-entry (crown entry)
+  (check-type crown crown)
+  (destructuring-bind (type connection command) entry
+    (ecase type
+      (:n (parse-n-entry crown connection command))
+      (:e (parse-e-entry crown connection command))
+      (:i (parse-i-entry crown connection command)))))
+
+(defun parse-n-entry (crown connection command)
+  (check-type crown crown)
+  (check-type connection connection)
+  (check-type command cons)
+  (cond ((and (consp command)
+              (string= (first command) :open)
+              (string= (second command) :gateway))
+         (format t "[~~] Gem: accepting E-connection.~%")
+         (send connection (list 'ok command)) 
+         (with-lock-held ((n-lock crown))
+           (deletef (n-connections crown) connection))
+         (with-lock-held ((e-lock crown))
+           (pushnew connection (e-connections crown))))
+        ((and (consp command)
+              (= 2 (length command))
+              (string= (first command) :ping))
+         (format t "[~~] Gem: ping-pong: ~S~%" command) 
+         (send connection (rplaca command 'pong)))
+        (t
+         (format t "[~~] Gem: killing N-connection.~%")
+         (send connection (list 'error 'wrong-greeting command)) 
+         (with-lock-held ((n-lock crown))
+           (deletef (n-connections crown) connection))
+         (kill connection))))
+
+(defun parse-e-entry (crown connection command)
+  (check-type crown crown)
+  (check-type connection connection)
+  (check-type command cons)
+  nil)
+
+(defun parse-i-entry (crown connection command)
+  (check-type crown crown)
+  (check-type connection connection)
+  (check-type command cons)
+  nil)
+
+;; (defun %gem-crown-i-conn (gem)
+;;   (let ((crown (parent gem)))
+;;     (let ((connection (with-lock-held ((i-lock crown)) (find-if #'readyp (i-connections crown)))))
+;;       (when connection
+;;         (let ((object (receive connection)))
+;;           (when object
+;;             (format t "[.] Gem: I-received: ~S~%" object)))
+;;         t))))
+
+;; (defun %gem-crown-e-conn (gem)
+;;   (let ((crown (parent gem)))
+;;     (let ((connection (with-lock-held ((e-lock crown)) (find-if #'readyp (e-connections crown)))))
+;;       (when connection
+;;         (let ((object (receive connection)))
+;;           (when object
+;;             (format t "[.] Gem: E-received: ~S~%" object)))
+;;         t))))
 
 (defun %gem-crown-n-conn (gem)
   (let ((crown (parent gem)))

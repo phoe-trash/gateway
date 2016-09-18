@@ -138,14 +138,14 @@
              (dq () '(dequeue queue))
              (do-test (conn-fn lock-fn type)
                `(let* ((crown (make-instance 'standard-crown))
-                       (queue (event-queue crown))
+                       (queue (event-queue crown)) 
                        (connection (make-instance 'standard-connection :port 0 :type :listen))
                        (port (get-local-port (socket connection))) 
                        (connection-1 (mk)) (aconnection-1 (amk))
                        (connection-2 (mk)) (aconnection-2 (amk))
-                       (connection-3 (mk)) (aconnection-3 (amk)) 
+                       (connection-3 (mk)) (aconnection-3 (amk))
                        (conns (list connection-1 connection-2 connection-3))
-                       (aconns (list aconnection-1 aconnection-2 aconnection-3))
+                       (aconns (list aconnection-1 aconnection-2 aconnection-3)) 
                        (listener (make-instance 'standard-listener :owner crown :type ,type))
                        (data '(dummy test object)))
                   (with-lock-held ((,lock-fn crown))
@@ -153,7 +153,7 @@
                   (send connection-1 (cons 'first data))
                   (send connection-2 (cons 'second data))
                   (send connection-3 (cons 'third data))
-                  (loop do (sleep 0.1) until (= 3 (size queue)))
+                  (loop do (sleep 0.01) until (= 3 (size queue)))
                   (flet ((form (data) (format nil "~S" (sexp data))))
                     (let ((queue-data (mapcar (compose #'form #'caddr) (list (dq) (dq) (dq))))
                           (expected (mapcar #'form (list (cons 'first data) (cons 'second data)
@@ -169,21 +169,57 @@
     (do-test i-connections i-lock :i)))
 
 ;;;; STANDARD-PASSWORD unit test
-;;;; Commented out for speed, as password hashing takes time.
-;; (let ((wrong-passphrase "Wr0ng-Pas$w0rd"))
-;;   (flet ((check-password (passphrase)
-;;            (let ((password (make-password passphrase)))
-;;              (assert (password-matches-p password passphrase))
-;;              (assert (not (password-matches-p password wrong-passphrase))))))
-;;     (mapcar #'check-password
-;;             '("" "pass" "password-1" "password-2PassW0RD"
-;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
-;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
-()
+(progn
+ ;;;; Commented out for speed, as password hashing takes time.
+  ;; (let ((wrong-passphrase "Wr0ng-Pas$w0rd"))
+  ;;   (flet ((check-password (passphrase)
+  ;;            (let ((password (make-password passphrase)))
+  ;;              (assert (password-matches-p password passphrase))
+  ;;              (assert (not (password-matches-p password wrong-passphrase))))))
+  ;;     (mapcar #'check-password
+  ;;             '("" "pass" "password-1" "password-2PassW0RD"
+  ;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
+  ;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
+  )
 
+;;;; STANDARD-GEM unit test
 (with-clean-config
-  (let* ((crown (make-instance 'standard-crown)))
-    ))
-
+  (macrolet ((mk () '(make-instance 'standard-connection :type :client :port port))
+             (amk () '(make-instance 'standard-connection :type :accept :socket (socket connection))))
+    (let* ((crown (make-instance 'standard-crown))
+           (queue (event-queue crown))
+           (connection (make-instance 'standard-connection :port 0 :type :listen))
+           (port (get-local-port (socket connection))) 
+           (connection-1 (mk)) (aconnection-1 (amk))
+           (connection-2 (mk)) (aconnection-2 (amk))
+           (connection-3 (mk)) (aconnection-3 (amk))
+           (gem (make-instance 'standard-gem :parent crown))
+           (ping '(#:ping (#:test #:dummy 1234 "abcABC")))
+           (pong (cons '#:pong (cdr ping))))
+      (with-lock-held ((n-lock crown))
+        (push aconnection-1 (n-connections crown)))
+      (with-lock-held ((e-lock crown))
+        (push aconnection-2 (e-connections crown)))
+      (with-lock-held ((i-lock crown))
+        (push aconnection-3 (i-connections crown)))
+      (enqueue (list :n aconnection-1 ping) queue)
+      (flet ((form (data) (format nil "~S" (sexp data))))
+        (let ((received-pong (receive connection-1)))
+          (assert (string= (form pong) (form received-pong)))))
+      (kill connection-1)
+      (kill connection-2)
+      (kill connection-3)
+      (receive aconnection-1)
+      (receive aconnection-2)
+      (receive aconnection-3)
+      (loop do (sleep 0.01)
+            until (and (empty? queue)
+                       (null (n-connections crown))
+                       (null (e-connections crown))
+                       (null (i-connections crown))))
+      (kill gem)
+      (kill crown)
+      (mapc #'kill (list connection connection-1 connection-2 connection-3
+                         aconnection-1 aconnection-2 aconnection-3)))))
 
 (finish-tests)
