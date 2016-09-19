@@ -63,5 +63,6 @@
   (let* ((queue (event-queue (owner listener)))
          (data (receive connection))
          (entry (list type connection data)))
-    (enqueue entry queue)))
+    (when data
+      (enqueue entry queue))))
 

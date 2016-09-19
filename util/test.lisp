@@ -189,7 +189,7 @@
     (let* ((crown (make-instance 'standard-crown))
            (queue (event-queue crown))
            (connection (make-instance 'standard-connection :port 0 :type :listen))
-           (port (get-local-port (socket connection))) 
+           (port (get-local-port (socket connection)))
            (connection-1 (mk)) (aconnection-1 (amk))
            (connection-2 (mk)) (aconnection-2 (amk))
            (connection-3 (mk)) (aconnection-3 (amk))
@@ -221,5 +221,20 @@
       (kill crown)
       (mapc #'kill (list connection connection-1 connection-2 connection-3
                          aconnection-1 aconnection-2 aconnection-3)))))
+
+;;;; Integration test
+(with-clean-config
+  (let* ((crown (make-instance 'standard-crown :full t))
+         (n-port (get-local-port (socket (n-acceptor crown))))
+         (connection-1 (make-instance 'standard-connection :port n-port :type :client))
+         (connection-2 (make-instance 'standard-connection :port n-port :type :client))
+         (connection-3 (make-instance 'standard-connection :port n-port :type :client))) 
+    (send connection-1 '(open gateway))
+    (send connection-2 '(open gateway))
+    (send connection-3 '(open gateway))
+    (loop do (sleep 0.01) until (= 3 (length (e-connections crown))))
+    ;; TODO: finish
+    (mapcar #'kill (list connection-1 connection-2 connection-3)) 
+    (kill crown)))
 
 (finish-tests)

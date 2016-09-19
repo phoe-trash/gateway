@@ -46,18 +46,21 @@
         (kill connection)))))
 
 (defmethod send ((connection standard-connection) object)
-  (with-lock-held ((lock connection))
-    (let ((sexp (sexp object))
-	  *print-pretty*)
-      (format (stream-of connection) "~S~%" sexp)
-      (force-output (stream-of connection)))))
+  (when (alivep connection)
+    (handler-case
+        (with-lock-held ((lock connection))
+          (let ((sexp (sexp object))
+                *print-pretty*)
+            (format (stream-of connection) "~S~%" sexp)
+            (force-output (stream-of connection))))
+      (error () (kill connection) t))))
 
 (defmethod readyp ((connection standard-connection))
   (when (alivep connection)
-    (with-lock-held ((lock connection))
-      (handler-case
-          (peek-char-no-hang (stream-of connection))
-        (end-of-file () t)))))
+    (handler-case
+        (with-lock-held ((lock connection))
+          (peek-char-no-hang (stream-of connection)))
+      (error () (kill connection) t))))
 
 (defmethod alivep ((connection standard-connection))
   (with-lock-held ((lock connection))
@@ -65,10 +68,13 @@
 
 (defmethod kill ((connection standard-connection))
   (with-lock-held ((lock connection))
-    (when (stream-of connection)
-      (close (stream-of connection)))
-    (when (socket connection)
-      (socket-close (socket connection))))
-  (with-lock-held (*cache-lock*)
-    (remhash connection *connection-cache*))
+    (%kill-connection connection))
   (values))
+
+(defun %kill-connection (connection)
+  (when (stream-of connection)
+    (close (stream-of connection)))
+  (when (socket connection)
+    (socket-close (socket connection)))
+  (with-lock-held (*cache-lock*)
+    (remhash connection *connection-cache*))) 

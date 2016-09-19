@@ -34,7 +34,8 @@
   `(defmethod print-object ((obj ,object) stream)
      ,@body))
 
-(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots &body class-options) &body body)
+(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots &body class-options)
+                       &body body)
   (declare (ignore protocol-name))
   `(progn ,(when class-name `(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
           ,@body))
@@ -63,7 +64,7 @@
        (mapcar #'kill (list ,@(mapcar #'first connections))))))
 
 (defun begin-tests ()
-  (make-thread (lambda () (format t "[~~] Begin running tests.~%"))))
+  (make-thread (lambda () (format t "~%[~~] Begin running tests.~%"))))
 
 (defun finish-tests ()
   (make-thread (lambda () (format t "[~~] Finished running tests.~%"))))
