@@ -5,7 +5,7 @@
 
 (defpackage #:gateway
   (:shadowing-import-from :closer-mop
-   :standard-generic-function :defmethod :defgeneric)
+   :standard-generic-function :defmethod :defgeneric :standard-method :standard-class)
   (:use #:common-lisp
 	#:closer-mop 
 	#:alexandria
