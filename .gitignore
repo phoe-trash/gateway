@@ -4,6 +4,7 @@
 *.FASL
 *.fasl
 *.lisp-temp
+*.lx64fsl
 
 # emacs
 *~

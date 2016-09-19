@@ -6,10 +6,8 @@
 (in-package #:gateway)
 
 (defclass standard-connection (connection)
-  ((%socket :accessor socket
-	    :type socket)
-   (%stream :accessor stream-of
-	    :type stream)
+  ((%socket :accessor socket)
+   (%stream :accessor stream-of)
    (%lock :accessor lock
           :initform (make-lock))
    (%auth :accessor auth 
