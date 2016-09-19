@@ -18,7 +18,9 @@
 	       #:secure-read
 	       #:bordeaux-threads
 	       #:usocket
-	       #:jpl-queues)
+	       #:jpl-queues
+               #:trivial-arguments
+               #:trivia)
   #|
   (#:hu.dwim.defclass-star
    #:named-readtables

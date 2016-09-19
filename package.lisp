@@ -13,7 +13,9 @@
 	#:secure-read
 	#:bordeaux-threads
 	#:usocket
-	#:jpl-queues)
+	#:jpl-queues
+        #:trivial-arguments
+        #:trivia)
   #|
   (:use #:common-lisp
 	#:closer-mop
