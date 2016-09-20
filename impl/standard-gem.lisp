@@ -82,48 +82,56 @@
 (defun parse-entry (crown entry)
   (check-type crown crown)
   (destructuring-bind (type connection command) entry
-    (ecase type
-      (:n (parse-n-entry crown connection command))
-      (:e (parse-e-entry crown connection command))
-      (:i (parse-i-entry crown connection command)))))
+    (let (hash-map
+	  (ecase type
+	    (:n *gem-n-handlers*)
+	    (:e *gem-e-handlers*)
+	    (:i *gem-i-handlers*)))
+      (%parse-entry crown connection command hash-map))))
 
-(defun parse-n-entry (crown connection command)
-  (check-type crown crown)
-  (check-type connection connection)
-  (check-type command cons)
-  (cond ((and (string= (first command) :open)
-              (string= (second command) :gateway))
-         (progn
-	   (format t "[~~] Gem: accepting E-connection.~%")
-	   (send connection (list 'ok command)) 
-	   (with-lock-held ((n-lock crown))
-	     (deletef (n-connections crown) connection))
-	   (with-lock-held ((e-lock crown))
-	     (pushnew connection (e-connections crown)))))
-        ((and (= 2 (length command))
-              (string= (first command) :ping))
-         (progn
-	   (format t "[~~] Gem: ping-pong: ~S~%" command) 
-	   (send connection (rplaca command 'pong))))
-        (t
-         (progn
-	   (format t "[~~] Gem: killing N-connection.~%")
-	   (send connection (list 'error 'wrong-greeting command)) 
-	   (with-lock-held ((n-lock crown))
-	     (deletef (n-connections crown) connection))
-	   (kill connection)))))
-
-(defun parse-e-entry (crown connection command)
+(defun %parse-entry (crown connection command hash-map)
   (check-type crown crown)
   (check-type connection connection)
   (check-type command cons)
   nil)
 
-(defun parse-i-entry (crown connection command)
-  (check-type crown crown)
-  (check-type connection connection)
-  (check-type command cons)
-  nil)
+;; (defun parse-n-entry (crown connection command)
+;;   (check-type crown crown)
+;;   (check-type connection connection)
+;;   (check-type command cons)
+;;   (cond ((and (string= (first command) :open)
+;;               (string= (second command) :gateway))
+;;          (progn
+;; 	   (format t "[~~] Gem: accepting E-connection.~%")
+;; 	   (send connection (list 'ok command)) 
+;; 	   (with-lock-held ((n-lock crown))
+;; 	     (deletef (n-connections crown) connection))
+;; 	   (with-lock-held ((e-lock crown))
+;; 	     (pushnew connection (e-connections crown)))))
+;;         ((and (= 2 (length command))
+;;               (string= (first command) :ping))
+;;          (progn
+;; 	   (format t "[~~] Gem: ping-pong: ~S~%" command) 
+;; 	   (send connection (rplaca command 'pong))))
+;;         (t
+;;          (progn
+;; 	   (format t "[~~] Gem: killing N-connection.~%")
+;; 	   (send connection (list 'error 'wrong-greeting command)) 
+;; 	   (with-lock-held ((n-lock crown))
+;; 	     (deletef (n-connections crown) connection))
+;; 	   (kill connection)))))
+
+;; (defun parse-e-entry (crown connection command)
+;;   (check-type crown crown)
+;;   (check-type connection connection)
+;;   (check-type command cons)
+;;   nil)
+
+;; (defun parse-i-entry (crown connection command)
+;;   (check-type crown crown)
+;;   (check-type connection connection)
+;;   (check-type command cons)
+;;   nil)
 
 ;; (defun %gem-crown-i-conn (gem)
 ;;   (let ((crown (parent gem)))
@@ -143,26 +151,26 @@
 ;;             (format t "[.] Gem: E-received: ~S~%" object)))
 ;;         t))))
 
-(defun %gem-crown-n-conn (gem)
-  (let ((crown (parent gem)))
-    (let ((connection (with-lock-held ((n-lock crown)) (find-if #'readyp (n-connections crown)))))
-      (when connection
-        (let ((object (receive connection)))
-          (when object
-            (format t "[~~] Gem: N-received: ~S~%" object)
-            (with-lock-held ((n-lock crown))
-              (deletef (n-connections crown) connection))
-            (cond ((and (consp object)
-                        (string= (first object) :open)
-                        (string= (second object) :gateway))
-                   (format t "[~~] Gem: accepting E-connection.~%")
-                   (with-lock-held ((e-lock crown))
-                     (pushnew connection (e-connections crown))))
-                  (t
-                   (format t "[~~] Gem: killing N-connection.~%")
-                   (send connection (list 'error 'wrong-greeting object))
-                   (kill connection))))
-          t)))))
+;; (defun %gem-crown-n-conn (gem)
+;;   (let ((crown (parent gem)))
+;;     (let ((connection (with-lock-held ((n-lock crown)) (find-if #'readyp (n-connections crown)))))
+;;       (when connection
+;;         (let ((object (receive connection)))
+;;           (when object
+;;             (format t "[~~] Gem: N-received: ~S~%" object)
+;;             (with-lock-held ((n-lock crown))
+;;               (deletef (n-connections crown) connection))
+;;             (cond ((and (consp object)
+;;                         (string= (first object) :open)
+;;                         (string= (second object) :gateway))
+;;                    (format t "[~~] Gem: accepting E-connection.~%")
+;;                    (with-lock-held ((e-lock crown))
+;;                      (pushnew connection (e-connections crown))))
+;;                   (t
+;;                    (format t "[~~] Gem: killing N-connection.~%")
+;;                    (send connection (list 'error 'wrong-greeting object))
+;;                    (kill connection))))
+;;           t)))))
 
 (defun %gem-jewel-loop (gem)
   (declare (ignore gem))
