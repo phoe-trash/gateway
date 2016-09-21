@@ -84,11 +84,11 @@
     (check-type crown crown)
     (check-type connection connection)
     (check-type command cons)
-    (let (hash-map
-	  (ecase type
-	    (:n *gem-n-handlers*)
-	    (:e *gem-e-handlers*)
-	    (:i *gem-i-handlers*)))
+    (let ((hash-map
+            (ecase type
+              (:n *gem-n-handlers*)
+              (:e *gem-e-handlers*)
+              (:i *gem-i-handlers*))))
       (%parse-entry crown connection command hash-map))))
 
 (defun %parse-entry (crown connection command hash-map)
@@ -96,11 +96,11 @@
     (multiple-value-bind (function function-found-p) (gethash command-word hash-map)
       (cond ((not function-found-p)
 	     (%parse-entry-error :unknown-function connection command))
-	    ((not (apply #'verify-arguments function arguments))
+	    ((not (apply #'verify-arguments function (list* crown connection arguments)))
 	     (%parse-entry-error :malformed-arguments connection command))
 	    (t
 	     (format t "[.] Applying function on command ~S.~%" command)
-	     (apply function crown connection command arguments))))))
+	     (apply function crown connection arguments))))))
 
 (defun %parse-entry-error (error-type connection command)
   (format t "[!] ~A error on connection ~S, command ~S.~%"

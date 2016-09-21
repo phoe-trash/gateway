@@ -49,7 +49,7 @@
                (:file "impl/standard-connection")
                (:file "impl/standard-acceptor")
                (:file "impl/standard-listener")
+               (:file "impl/standard-crown")
                (:file "impl/standard-gem")
                (:file "impl/standard-gem-commands")
-               (:file "impl/standard-crown")
 	       (:file "new")))
