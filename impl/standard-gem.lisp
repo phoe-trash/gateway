@@ -80,8 +80,10 @@
         t))))
 
 (defun parse-entry (crown entry)
-  (check-type crown crown)
   (destructuring-bind (type connection command) entry
+    (check-type crown crown)
+    (check-type connection connection)
+    (check-type command cons)
     (let (hash-map
 	  (ecase type
 	    (:n *gem-n-handlers*)
@@ -90,9 +92,19 @@
       (%parse-entry crown connection command hash-map))))
 
 (defun %parse-entry (crown connection command hash-map)
-  (check-type crown crown)
-  (check-type connection connection)
-  (check-type command cons)
+  (destructuring-bind (command-word . arguments) command
+    (multiple-value-bind (function function-found-p) (gethash command-word hash-map)
+      (cond ((not function-found-p)
+	     (%parse-entry-unknown-function connection command))
+	    ((not (apply #'verify-arguments function arguments))
+	     (%parse-entry-malformed-arguments connection command))
+	    (t
+	     (apply function crown connection command arguments))))))
+
+(defun %parse-entry-unknown-function (connection command)
+  nil)
+
+(defun %parse-entry-malformed-arguments (connection command)
   nil)
 
 ;; (defun parse-n-entry (crown connection command)
