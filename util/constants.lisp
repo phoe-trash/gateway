@@ -15,3 +15,7 @@
 (defconfig *player-cache* (make-hash-table :test 'equal) :cache :player)
 (defconfig *chat-cache* (make-hash-table :test 'equal) :cache :chat)
 (defconfig *connection-cache* (make-hash-table) :cache :connection)
+
+(defvar *gem-n-handlers* (make-hash-table :test #'equal))
+(defvar *gem-e-handlers* (make-hash-table :test #'equal))
+(defvar *gem-i-handlers* (make-hash-table :test #'equal))
