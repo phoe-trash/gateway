@@ -95,17 +95,17 @@
   (destructuring-bind (command-word . arguments) command
     (multiple-value-bind (function function-found-p) (gethash command-word hash-map)
       (cond ((not function-found-p)
-	     (%parse-entry-unknown-function connection command))
+	     (%parse-entry-error :unknown-function connection command))
 	    ((not (apply #'verify-arguments function arguments))
-	     (%parse-entry-malformed-arguments connection command))
+	     (%parse-entry-error :malformed-arguments connection command))
 	    (t
+	     (format t "[.] Applying function on command ~S.~%" command)
 	     (apply function crown connection command arguments))))))
 
-(defun %parse-entry-unknown-function (connection command)
-  nil)
-
-(defun %parse-entry-malformed-arguments (connection command)
-  nil)
+(defun %parse-entry-error (error-type connection command)
+  (format t "[!] ~A error on connection ~S, command ~S.~%"
+	  error-type connection command)  
+  (send connection `(error ,error-type ,command)))
 
 ;; (defun parse-n-entry (crown connection command)
 ;;   (check-type crown crown)
