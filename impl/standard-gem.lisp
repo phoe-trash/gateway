@@ -13,7 +13,6 @@
 
 (defconstructor (standard-gem)
   (check-type (parent standard-gem) (or crown jewel))
-  ;;(pushnew standard-gem (gems (parent standard-gem)))
   (setf (thread standard-gem) (%make-gem-thread standard-gem)))
 
 (defmethod kill ((gem standard-gem))
