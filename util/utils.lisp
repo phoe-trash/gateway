@@ -27,3 +27,19 @@
     (when character
       (unread-char character input-stream)
       character)))
+
+;;;; ARGLIST VERIFICATION
+(defun compile-lambda (lambda-expr)
+  (compile nil lambda-expr))
+
+(defun generate-matcher (lambda-list)
+  (labels ((clean-pred (x) (and (symbolp x) (not (member x lambda-list-keywords))))
+	   (clean-symbols (lambda-list) (substitute-if '_ #'clean-pred lambda-list)))
+    (compile-lambda 
+     (let ((candidate-name (gensym)))
+       `(lambda (,candidate-name) 
+	  (match ,candidate-name
+	    ((lambda-list ,@(clean-symbols lambda-list)) t)))))))
+
+(defun verify-arguments (function &rest arguments)
+  (funcall (generate-matcher (arglist function)) arguments))

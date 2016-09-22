@@ -83,15 +83,18 @@
     (check-type crown crown)
     (check-type connection connection)
     (check-type command cons)
-    (let ((hash-map (ecase type
+    (let ((hash-map (case type
                       (:n *gem-n-handlers*)
                       (:e *gem-e-handlers*)
-                      (:i *gem-i-handlers*))))
+                      (:i *gem-i-handlers*)
+		      (t (error "Bad type: ~S" type)))))
+      (format t "PARSE-ENTRY: ~S~%~S ~S~%" command type hash-map)
       (%parse-entry crown connection command hash-map))))
 
 (defun %parse-entry (crown connection command hash-map)
   (destructuring-bind (command-word . arguments) command
-    (multiple-value-bind (function function-found-p) (gethash command-word hash-map)
+    (multiple-value-bind (function function-found-p) 
+	(gethash (symbol-name command-word) hash-map)
       (cond ((not function-found-p)
 	     (%parse-entry-error :unknown-function connection command))
 	    ((not (apply #'verify-arguments function (list* crown connection arguments)))

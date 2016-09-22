@@ -5,6 +5,7 @@
 
 (in-package #:gateway)
 
+;;;; DEFINE-PROTOCOL-CLASS
 (defmacro define-protocol-class (name super-classes &optional slots &rest options)
   (let* ((sym-name (symbol-name name))
          (protocol-predicate
@@ -26,20 +27,24 @@
          (:documentation ,predicate-docstring))
        ',name)))
 
+;;;; DEFCONSTRUCTOR
 (defmacro defconstructor ((class . keys) &body body)
   `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
      ,@body))
 
+;;;; DEFPRINT
 (defmacro defprint (object &body body)
   `(defmethod print-object ((obj ,object) stream)
      ,@body))
 
+;;;; DEFPROTOCOL
 (defmacro defprotocol (protocol-name (&optional class-name class-args class-slots &body class-options)
                        &body body)
   (declare (ignore protocol-name))
   `(progn ,(when class-name `(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
           ,@body))
 
+;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defvar *config-vars* nil)
   (defvar *cache-vars* nil)
@@ -57,14 +62,34 @@
 	     (list ,@(mapcar (lambda (x) `(list ',(first x) ,(second x))) *cache-vars*)))
        ,@body)))
 
+;;;; WITH-CONNECTIONS
 (defmacro with-connections (connections &body body)
   `(let* ,connections
      (unwind-protect
 	  ,@body 
        (mapcar #'kill (list ,@(mapcar #'first connections))))))
 
+;;;; TESTING
 (defun begin-tests ()
   (make-thread (lambda () (format t "~%[~~] Begin running tests.~%"))))
 
 (defun finish-tests ()
   (make-thread (lambda () (format t "[~~] Finished running tests.~%"))))
+
+;;;; DEFCOMMAND
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun %defcommand-map (args)
+    (when args
+      (destructuring-bind (first . rest) args
+	(let ((elt (ecase first
+		     (:n '*gem-n-handlers*)
+		     (:e '*gem-e-handlers*)
+		     (:i '*gem-i-handlers*))))
+	  (cons elt (%defcommand-map rest))))))
+  (defmacro defcommand (command types (crown-var connection-var arguments-var) &body body)
+    `(let* ((command-name (symbol-name ,command))
+	    (lambda (lambda (,crown-var ,connection-var &rest ,arguments-var)
+		      ,@body))
+	    (function (compile-lambda lambda)))
+       (flet ((hash-push (hash-table) (setf (gethash command-name hash-table) function)))
+	 (mapcar #'hash-push (list ,@(%defcommand-map types)))))))
