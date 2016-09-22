@@ -116,8 +116,7 @@
     (assert (date> date-month date-day))
     (assert (date> date-year date-month))
     (assert (eq date-orig (apply #'date-min vars)))
-    (assert (eq date-year (apply #'date-max vars)))
-    (assert (date= date-orig (parse (sexp date-orig))))))
+    (assert (eq date-year (apply #'date-max vars)))))
 
 ;;;; STANDARD-LIBRARY unit test
 (let ((library (make-instance 'standard-library))
