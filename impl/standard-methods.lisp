@@ -19,20 +19,28 @@
 (defmethod sexp ((object string))
   object)
 
-(defmethod sexp ((object symbol))
-  (make-instance '%quasisymbol :symbol object))
+;; (defmethod sexp ((object symbol))
+;;   (make-instance '%quasisymbol :symbol object))
 
-(defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
+;; (defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
 
-(defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
+;; (defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
 
-(defun %dequasify (object)
-  (cond ((consp object)
-	 (mapcar #'%dequasify object))
-	((typep object '%quasisymbol)
-	 (%symbol object))
+;; (defun %dequasify (object)
+;;   (cond ((consp object)
+;; 	 (mapcar #'%dequasify object))
+;; 	((typep object '%quasisymbol)
+;; 	 (%symbol object))
+;; 	(t
+;; 	 object)))
+
+(defun data-equal (object-1 object-2)
+  (cond ((and (consp object-1) (consp object-2))
+	 (every #'data-equal object-1 object-2))
+	((and (symbolp object-1) (symbolp object-2))
+	 (string= object-1 object-2))
 	(t
-	 object)))
+	 (equal object-1 object-2))))
 
 ;; ;; PARSE
 ;; ;; TODO: refactor this into a full parser, elsewhere

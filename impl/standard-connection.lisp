@@ -51,7 +51,7 @@
         (with-lock-held ((lock connection))
           (let ((sexp (sexp object))
                 *print-pretty*)
-            (format (stream-of connection) "~S~%" sexp)
+            (format (stream-of connection) "~S~%" (%unintern-all-symbols sexp))
             (force-output (stream-of connection))))
       (error () (kill connection) t))))
 
@@ -78,3 +78,11 @@
     (socket-close (socket connection)))
   (with-lock-held (*cache-lock*)
     (remhash connection *connection-cache*))) 
+
+(defun %unintern-all-symbols (sexp)
+  (cond ((consp sexp)
+	 (mapcar #'%unintern-all-symbols sexp))
+	((symbolp sexp)
+	 (make-symbol (symbol-name sexp)))
+	(t
+	 sexp)))
