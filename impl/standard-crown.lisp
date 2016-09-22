@@ -49,7 +49,7 @@
 	   (n-listener (make-instance 'standard-listener :owner standard-crown :type :n))
 	   (e-listener (make-instance 'standard-listener :owner standard-crown :type :e))
 	   (i-listener (make-instance 'standard-listener :owner standard-crown :type :i))
-	   (gem (make-instance 'standard-gem :parent standard-crown)))
+	   (gem (make-instance 'standard-gem :owner standard-crown)))
       (setf (n-acceptor standard-crown) n-acceptor
 	    (i-acceptor standard-crown) i-acceptor
 	    (n-listener standard-crown) n-listener

@@ -42,7 +42,7 @@
   (unless (null object)
     (destructuring-bind (identifier . data) object
       (when (symbolp identifier)
-        (typecase parent
+        (etypecase parent
           (crown (switch (identifier :test #'string=)
                    (:date (parse-date (string=-getf data :date))) 
                    (:password (%parse-password data)) 
@@ -54,15 +54,15 @@
                    (:chat (identify :chat (string=-getf data :name))) 
                    (:persona (identify :persona (string=-getf data :name)))
                    (t object)))
-          (t (switch (identifier :test #'string=)
-               (:date (parse-date (string=-getf data :date)))
-               (:message (%parse-message data))
-               (:password (%parse-password data))
-               (:chat (identify :chat (string=-getf data :name)))
-               (:player (identify :player (string=-getf data :name)))
-               (:persona (identify :persona (string=-getf data :name)))
-               (t (format t "[!] %PARSE: CASE failed: ~S.~%" identifier)
-                  object))))))))
+          (null (switch (identifier :test #'string=)
+		  (:date (parse-date (string=-getf data :date)))
+		  (:message (%parse-message data))
+		  (:password (%parse-password data))
+		  (:chat (identify :chat (string=-getf data :name)))
+		  (:player (identify :player (string=-getf data :name)))
+		  (:persona (identify :persona (string=-getf data :name)))
+		  (t (format t "[!] %PARSE: CASE failed: ~S.~%" identifier)
+		     object))))))))
 
 (defun %parse-message (body)
   (let ((sender (string=-getf body :sender))
@@ -81,20 +81,20 @@
     (make-instance 'standard-password
 		   :%read-data (list key salt iters))))
 
-;; IDENTIFY
-(defun %identify (type key)
-  (multiple-value-bind (value found-p) (cache type key) 
-    (if found-p
-	value
-	(format t "[!] %IDENTIFY: not found: ~S ~S.~%" type key))))
+;; ;; IDENTIFY
+;; (defun %identify (type key)
+;;   (multiple-value-bind (value found-p) (cache type key) 
+;;     (if found-p
+;; 	value
+;; 	(format t "[!] %IDENTIFY: not found: ~S ~S.~%" type key))))
 
-;; CACHE
-(defun %cache (type key)
-  (declare (special *cache-lock* *cache-list*))
-  (with-lock-held (*cache-lock*)
-    (gethash key (gethash type *cache-list*))))
+;; ;; CACHE
+;; (defun %cache (type key)
+;;   (declare (special *cache-lock* *cache-list*))
+;;   (with-lock-held (*cache-lock*)
+;;     (gethash key (gethash type *cache-list*))))
 
-(defun (setf %cache) (new-value type key)
-  (declare (special *cache-lock* *cache-list*))
-  (with-lock-held (*cache-lock*)
-    (setf (gethash key (gethash type *cache-list*)) new-value)))
+;; (defun (setf %cache) (new-value type key)
+;;   (declare (special *cache-lock* *cache-list*))
+;;   (with-lock-held (*cache-lock*)
+;;     (setf (gethash key (gethash type *cache-list*)) new-value)))

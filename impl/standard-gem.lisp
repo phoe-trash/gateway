@@ -6,25 +6,25 @@
 (in-package #:gateway)
 
 (defclass standard-gem (gem)
-  ((%parent :accessor parent
-	    :initarg :parent
-	    :initform (error "No PARENT provided."))
+  ((%owner :accessor owner
+	   :initarg :owner
+	   :initform (error "No OWNER provided."))
    (%thread :accessor thread)))
 
 (defconstructor (standard-gem)
-  (check-type (parent standard-gem) (or crown jewel))
+  (check-type (owner standard-gem) (or crown jewel))
   (setf (thread standard-gem) (%make-gem-thread standard-gem)))
 
 (defmethod kill ((gem standard-gem))
-  (deletef (gems (parent gem)) gem)
+  (deletef (gems (owner gem)) gem)
   (unless (eq (current-thread) (thread gem))
     (destroy-thread (thread gem)))
   (values))
 
 (defun %make-gem-thread (gem)
-  (let ((parent (parent gem)))
+  (let ((owner (owner gem)))
     (make-thread (lambda () (%gem gem))
-		 :name (format nil "Gateway - gem for ~S" (type-of parent)))))
+		 :name (format nil "Gateway - gem for ~S" (type-of owner)))))
 
 (defun %gem (gem)
   (check-type gem gem)
@@ -36,7 +36,7 @@
 
 (defun %gem-function (gem)
   (restart-case
-      (typecase (parent gem)
+      (typecase (owner gem)
         (crown (loop (%gem-crown-loop gem)))
         (jewel (loop (%gem-jewel-loop gem))))
     (retry ()
@@ -53,7 +53,7 @@
 
 (macrolet
     ((clean (lock-fn conn-fn type)
-       `(let ((crown (parent gem)))
+       `(let ((crown (owner gem)))
           (with-lock-held ((,lock-fn crown))
             (let ((to-cleanup (remove-if #'alivep (,conn-fn crown))))
               (when to-cleanup
@@ -67,7 +67,7 @@
     (clean i-lock i-connections :i)))
 
 (defun %gem-crown-queue (gem)
-  (let* ((crown (parent gem))
+  (let* ((crown (owner gem))
          (queue (event-queue crown))
          (inner-queue (slot-value queue 'jpl-queues::queue))
          (lock (slot-value queue 'jpl-queues::lock)))
@@ -147,7 +147,7 @@
 ;;   nil)
 
 ;; (defun %gem-crown-i-conn (gem)
-;;   (let ((crown (parent gem)))
+;;   (let ((crown (owner gem)))
 ;;     (let ((connection (with-lock-held ((i-lock crown)) (find-if #'readyp (i-connections crown)))))
 ;;       (when connection
 ;;         (let ((object (receive connection)))
@@ -156,7 +156,7 @@
 ;;         t))))
 
 ;; (defun %gem-crown-e-conn (gem)
-;;   (let ((crown (parent gem)))
+;;   (let ((crown (owner gem)))
 ;;     (let ((connection (with-lock-held ((e-lock crown)) (find-if #'readyp (e-connections crown)))))
 ;;       (when connection
 ;;         (let ((object (receive connection)))
@@ -165,7 +165,7 @@
 ;;         t))))
 
 ;; (defun %gem-crown-n-conn (gem)
-;;   (let ((crown (parent gem)))
+;;   (let ((crown (owner gem)))
 ;;     (let ((connection (with-lock-held ((n-lock crown)) (find-if #'readyp (n-connections crown)))))
 ;;       (when connection
 ;;         (let ((object (receive connection)))
