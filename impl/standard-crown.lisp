@@ -42,6 +42,21 @@
    (%i-listener :accessor i-listener
                 :initform nil)))
 
+(defconstructor (standard-crown full)
+  (when full
+    (let* ((n-acceptor (make-instance 'standard-acceptor :owner standard-crown :port 0 :type :n)) 
+	   (i-acceptor (make-instance 'standard-acceptor :owner standard-crown :port 0 :type :i))
+	   (n-listener (make-instance 'standard-listener :owner standard-crown :type :n))
+	   (e-listener (make-instance 'standard-listener :owner standard-crown :type :e))
+	   (i-listener (make-instance 'standard-listener :owner standard-crown :type :i))
+	   (gem (make-instance 'standard-gem :parent standard-crown)))
+      (setf (n-acceptor standard-crown) n-acceptor
+	    (i-acceptor standard-crown) i-acceptor
+	    (n-listener standard-crown) n-listener
+	    (e-listener standard-crown) e-listener
+	    (i-listener standard-crown) i-listener
+	    (gems standard-crown) (list gem)))))
+
 (defmethod lookup ((crown standard-crown) key)
   (lookup (library crown) key))
 
@@ -51,33 +66,14 @@
 (defmethod kill ((crown standard-crown))
   (mapc #'kill (gems crown))
   (flet ((ckill (object) (when object (kill object)))
-         (mapckill (lock-fn conn-fn)
-           (with-lock-held ((funcall lock-fn crown))
-             (mapc #'kill (remove-if-not #'alivep (funcall conn-fn crown))))))
+	 (mapckill (lock-fn conn-fn)
+	   (with-lock-held ((funcall lock-fn crown))
+	     (mapc #'kill (remove-if-not #'alivep (funcall conn-fn crown))))))
     (mapcar #'ckill (list (n-acceptor crown) (i-acceptor crown)
-                          (n-listener crown) (e-listener crown) (i-listener crown)))
+			  (n-listener crown) (e-listener crown) (i-listener crown)))
     (mapckill #'n-lock #'n-connections)
     (mapckill #'e-lock #'e-connections)
     (mapckill #'i-lock #'i-connections)))
 
 (defmethod alivep ((crown standard-crown)) 
   (and (gems crown) (every #'alivep (gems crown))))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
