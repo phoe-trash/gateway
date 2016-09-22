@@ -40,12 +40,15 @@
   (funcall (generate-matcher (arglist function)) arguments))
 
 (defun generate-matcher (lambda-list)
-  (handler-bind ((style-warning #'muffle-warning))
-    (compile-lambda 
-     (let ((candidate-name (gensym)))
-       `(lambda (,candidate-name) 
-	  (match ,candidate-name
-	    ((lambda-list ,@lambda-list) t)))))))
+  (compile-lambda 
+   (let ((candidate-name (gensym)))
+     `(lambda (,candidate-name) 
+        (match ,candidate-name
+          ((lambda-list ,@(%clean-symbols lambda-list)) t))))))
+
+(defun %clean-symbols (lambda-list)
+  (flet ((fn (x) (if (member x lambda-list-keywords) x '_)))
+    (mapcar #'fn lambda-list)))
 
 (defun compile-lambda (lambda-expr)
   (compile nil lambda-expr))

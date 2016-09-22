@@ -84,11 +84,10 @@
     (check-type crown crown)
     (check-type connection connection)
     (check-type command cons)
-    (let ((hash-map
-            (ecase type
-              (:n *gem-n-handlers*)
-              (:e *gem-e-handlers*)
-              (:i *gem-i-handlers*))))
+    (let ((hash-map (ecase type
+                      (:n *gem-n-handlers*)
+                      (:e *gem-e-handlers*)
+                      (:i *gem-i-handlers*))))
       (%parse-entry crown connection command hash-map))))
 
 (defun %parse-entry (crown connection command hash-map)
