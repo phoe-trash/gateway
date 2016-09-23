@@ -10,9 +10,6 @@
   (format t "[!] SEXP: no method for ~S of type ~S. Bug?~%" object (type-of object))
   object)
 
-(defmethod sexp ((object list))
-  (mapcar #'sexp object))
-
 (defmethod sexp ((object integer))
   object)
 
@@ -21,6 +18,9 @@
 
 (defmethod sexp ((object symbol))
   object)
+
+(defmethod sexp ((object list))
+  (mapcar #'sexp object))
 
 (defun data-equal (object-1 object-2)
   (cond ((and (consp object-1) (consp object-2))

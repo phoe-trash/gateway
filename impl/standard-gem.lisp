@@ -88,7 +88,7 @@
                       (:e *gem-e-handlers*)
                       (:i *gem-i-handlers*)
 		      (t (error "Bad type: ~S" type)))))
-      (format t "PARSE-ENTRY: ~S~%~S ~S~%" command type hash-map)
+      ;;(format t "PARSE-ENTRY: ~S~%~S ~S~%" command type hash-map)
       (%parse-entry crown connection command hash-map))))
 
 (defun %parse-entry (crown connection command hash-map)

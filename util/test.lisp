@@ -233,7 +233,7 @@
       (mapc #'kill (list connection connection-1 connection-2 connection-3
                          aconnection-1 aconnection-2 aconnection-3)))))
 
-;;;; Integration test - TODO fix open-gateway
+;; Integration test - TODO fix open-gateway
 ;; (with-clean-config
 ;;   (let* 
 ;;       ((crown (make-instance 'standard-crown :full t))
@@ -248,7 +248,8 @@
 ;;     (format t "Ping 3!~%")
 ;;     (send connection-3 '(open gateway))
 ;;     (format t "Ping 4!~%")
-;;     (loop do (sleep 0.01) until (= 3 (length (e-connections crown))))
+;;     ;; (loop do (sleep 0.01) until (= 3 (length (e-connections crown))))
+;;     (sleep 1)
 ;;     (format t "Ping 5!~%")
 ;;     ;; TODO: finish
 ;;     (mapcar #'kill (list connection-1 connection-2 connection-3)) 
