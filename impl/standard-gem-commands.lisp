@@ -36,3 +36,15 @@
          (setf (lookup (library crown) `(auth ,username)) connection
                (auth connection) `(user ,username))
          (send connection `(ok (login ,username))))))
+
+(defcommand :logout (:e)
+    (crown connection)
+  (let ((username (second (auth connection))))
+    (cond ((null (auth connection))
+           (format t "[!] Gem: user not logged in.~%")
+           (send connection `(error :not-logged-in)))
+          (t
+           (format t "[~~] Gem: logging user ~S out.~%" username)
+           (setf (lookup (library crown) `(auth ,username)) nil
+                 (auth connection) nil)
+           (send connection `(ok (logout)))))))
