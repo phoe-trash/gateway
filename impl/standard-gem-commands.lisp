@@ -22,16 +22,17 @@
   (with-lock-held ((e-lock crown))
     (pushnew connection (e-connections crown))))
 
-(defcommand :login (:n :e)
+(defcommand :login (:e)
     (crown connection username password)
   (declare (ignore password))
-  (if (auth connection)
-      (send connection `(error :already-logged-in ,username)) 
-      (let* ((library (library crown))
-             (lookup (lookup library `(auth ,connection))))
-        (if lookup
-            (send connection `(error :username-taken ,username))
-            (progn
-              (setf (lookup library `(auth ,connection)) `(user ,username)
-                    (auth connection) `(user ,username))
-              (send connection `(ok (login ,username))))))))
+  (cond ((auth connection)
+         (format t "[!] Gem: user ~S already logged in.~%" username)
+         (send connection `(error :already-logged-in ,username)))
+        ((lookup (library crown) `(auth ,username))
+         (format t "[!] Gem: username ~S already taken.~%" username)
+         (send connection `(error :username-taken ,username)))
+        (t
+         (format t "[~~] Gem: logging user ~S in.~%" username)
+         (setf (lookup (library crown) `(auth ,username)) connection
+               (auth connection) `(user ,username))
+         (send connection `(ok (login ,username))))))

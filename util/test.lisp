@@ -273,6 +273,7 @@
 (with-clean-config
   (let* 
       ((crown (make-instance 'standard-crown :full t))
+       (library (library crown))
        (n-port (get-local-port (socket (n-acceptor crown))))
        (connection-1 (make-instance 'standard-connection :port n-port :type :client))
        (connection-2 (make-instance 'standard-connection :port n-port :type :client))
@@ -280,14 +281,17 @@
        (data-1 '(open-gateway))
        (data-2 `(login ,username "password-is-ignored")))
     (send connection-1 data-1)
+    (receive connection-1)
     (send connection-1 data-2)
     (loop do (sleep 0.01) until (= 1 (length (e-connections crown))))
-    (assert (data-equal (receive connection-1) `(ok ,data-1)))
     (assert (data-equal (receive connection-1) `(ok ,data-2)))
-    (assert (equal `(user ,username)
-                   (lookup (library crown) `(auth ,(car (e-connections crown))))))
+    (assert (equal (car (e-connections crown)) (lookup library `(auth ,username))))
     (send connection-1 data-2)
     (assert (data-equal (receive connection-1) `(error :already-logged-in ,username)))
+    (send connection-2 data-1)
+    (receive connection-2)
+    (send connection-2 data-2)
+    (assert (data-equal (receive connection-2) `(error :username-taken ,username)))
     (mapcar #'kill (list connection-1 connection-2))
     (kill crown)))
 
