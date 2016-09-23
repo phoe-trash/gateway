@@ -204,19 +204,13 @@
            (connection-1 (mk)) (aconnection-1 (amk))
            (connection-2 (mk)) (aconnection-2 (amk))
            (connection-3 (mk)) (aconnection-3 (amk))
-           (gem (make-instance 'standard-gem :owner crown))
-           (ping '(#:ping (#:test #:dummy 1234 "abcABC")))
-           (pong (cons '#:pong (cdr ping))))
+           (gem (make-instance 'standard-gem :owner crown)))
       (with-lock-held ((n-lock crown))
         (push aconnection-1 (n-connections crown)))
       (with-lock-held ((e-lock crown))
         (push aconnection-2 (e-connections crown)))
       (with-lock-held ((i-lock crown))
         (push aconnection-3 (i-connections crown)))
-      (enqueue (list :n aconnection-1 ping) queue)
-      (flet ((form (data) (format nil "~S" (sexp data))))
-        (let ((received-pong (receive connection-1))) 
-	  (assert (string= (form pong) (form received-pong)))))
       (kill connection-1)
       (kill connection-2)
       (kill connection-3)
@@ -233,7 +227,21 @@
       (mapc #'kill (list connection connection-1 connection-2 connection-3
                          aconnection-1 aconnection-2 aconnection-3)))))
 
-;; Integration test - TODO fix open-gateway
+;; PING command test
+(with-clean-config
+  (let* 
+      ((crown (make-instance 'standard-crown :full t))
+       (n-port (get-local-port (socket (n-acceptor crown))))
+       (connection (make-instance 'standard-connection :port n-port :type :client)) 
+       (ping '(#:ping (#:test #:dummy 1234 "abcABC")))
+       (pong (cons '#:pong (cdr ping))))
+    (send connection ping)
+    (loop do (sleep 0.01) until (= 1 (length (n-connections crown))))
+    (assert (data-equal (receive connection) pong)) 
+    (kill connection) 
+    (kill crown)))
+
+;; OPEN-GATEWAY command test
 (with-clean-config
   (let* 
       ((crown (make-instance 'standard-crown :full t))
@@ -259,6 +267,28 @@
     (assert (null (receive connection-4)))
     (assert (not (alivep connection-4)))
     (mapcar #'kill connections) 
+    (kill crown)))
+
+;; LOGIN command test
+(with-clean-config
+  (let* 
+      ((crown (make-instance 'standard-crown :full t))
+       (n-port (get-local-port (socket (n-acceptor crown))))
+       (connection-1 (make-instance 'standard-connection :port n-port :type :client))
+       (connection-2 (make-instance 'standard-connection :port n-port :type :client))
+       (username "test-user")
+       (data-1 '(open-gateway))
+       (data-2 `(login ,username "password-is-ignored")))
+    (send connection-1 data-1)
+    (send connection-1 data-2)
+    (loop do (sleep 0.01) until (= 1 (length (e-connections crown))))
+    (assert (data-equal (receive connection-1) `(ok ,data-1)))
+    (assert (data-equal (receive connection-1) `(ok ,data-2)))
+    (assert (equal `(user ,username)
+                   (lookup (library crown) `(auth ,(car (e-connections crown))))))
+    (send connection-1 data-2)
+    (assert (data-equal (receive connection-1) `(error :already-logged-in ,username)))
+    (mapcar #'kill (list connection-1 connection-2))
     (kill crown)))
 
 (finish-tests)
