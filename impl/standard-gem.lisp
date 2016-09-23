@@ -91,16 +91,17 @@
     (t (error "Bad type: ~S" type))))
 
 (defun %parse-entry (crown connection command hash-map type)
-  (destructuring-bind (command-word . arguments) command
-    (multiple-value-bind (function function-found-p) 
-	(gethash (symbol-name command-word) hash-map)
-      (cond ((not function-found-p)
-	     (%parse-entry-error :unknown-function connection command type))
-	    ((not (apply #'verify-arguments function (list* crown connection arguments)))
-	     (%parse-entry-error :malformed-arguments connection command type))
-	    (t
-	     (format t "[.] Applying function on command ~S.~%" command)
-	     (apply function crown connection arguments))))))
+  (flet ((err (error-type) (%parse-entry-error error-type connection command type)))
+    (destructuring-bind (command-word . arguments) command
+      (multiple-value-bind (function function-found-p) 
+	  (gethash (symbol-name command-word) hash-map)
+	(let ((args (list* function crown connection arguments)))
+	  (cond ((not function-found-p)
+		 (err :unknown-function))
+		((not (apply #'verify-arguments args))
+		 (err :malformed-arguments))
+		(t (format t "[.] Applying function on command ~S.~%" command)
+		   (apply function crown connection arguments))))))))
 
 (defun %parse-entry-error (error-type connection command type)
   (format t "[!] Gem: ~A error on ~S, command ~S.~%" error-type connection command)  
