@@ -10,25 +10,31 @@
 ;;;; STANDARD-ACCEPTOR unit test, types: :N :I
 (with-clean-config
   (flet ((do-test (type fn)
-           (macrolet ((mk () '(make-instance 'standard-connection :type :client :port port)))
-             (let* ((crown (make-instance 'standard-crown))
-                    (acceptor (make-instance 'standard-acceptor :port 0 :owner crown :type type))
-                    (port (get-local-port (socket acceptor)))
-                    (connection-1 (mk)) (connection-2 (mk)) (connection-3 (mk))
-                    (port-1 (get-local-port (socket connection-1)))
-                    (port-2 (get-local-port (socket connection-2)))
-                    (port-3 (get-local-port (socket connection-3)))
-                    (data '(dummy test object)))
-               (send connection-1 data) (send connection-2 data) (send connection-3 data)
-               (labels
-                   ((form (data) (format nil "~S" (sexp data)))
-                    (find-conn (port) (find port (funcall fn crown) :key (compose #'get-peer-port #'socket)))
-                    (test (port)
-                      (loop do (sleep 0.01) until (find-conn port))
-		      (let ((received-data (receive (find-conn port)))) 
-			(assert (data-equal (form data) (form received-data))))))
-                 (mapc #'test (list port-1 port-2 port-3)))
-               (mapc #'kill (list acceptor connection-1 connection-2 connection-3))))))
+	   (macrolet ((mk () '(make-instance 'standard-connection 
+			       :type :client :port port)))
+	     (let* ((crown (make-instance 'standard-crown))
+		    (acceptor (make-instance 'standard-acceptor 
+					     :port 0 :owner crown :type type))
+		    (port (get-local-port (socket acceptor)))
+		    (connection-1 (mk)) (connection-2 (mk)) (connection-3 (mk))
+		    (port-1 (get-local-port (socket connection-1)))
+		    (port-2 (get-local-port (socket connection-2)))
+		    (port-3 (get-local-port (socket connection-3)))
+		    (data '(dummy test object)))
+	       (send connection-1 data) 
+	       (send connection-2 data) 
+	       (send connection-3 data)
+	       (labels
+		   ((find-conn (port) 
+		      (find port (funcall fn crown) 
+			    :key (compose #'get-peer-port #'socket)))
+		    (test (port)
+		      (loop do (sleep 0.01) until (find-conn port))
+		      (let ((received-data (receive (find-conn port))))
+			(assert (data-equal (sexp data) (sexp received-data))))))
+		 (mapc #'test (list port-1 port-2 port-3)))
+	       (mapc #'kill (list acceptor connection-1 
+				  connection-2 connection-3))))))
     (do-test :n #'n-connections)
     (do-test :i #'i-connections)))
 
@@ -42,11 +48,10 @@
           ((listen (mkcn :type :listen :port 0))
            (client (mkcn :type :client :port (get-local-port (socket listen))))
            (accept (mkcn :type :accept :socket (socket listen))))
-        (labels ((form (data) (format nil "~S" (sexp data)))
-                 (test (x y data)
+        (labels ((test (x y data)
                    (send x data)
                    (assert (readyp y)) 
-                   (assert (data-equal (form (receive y)) (form data))))
+                   (assert (data-equal data (receive y))))
                  (test-case (data)
                    (test client accept data)
                    (test accept client data)))
@@ -76,7 +81,8 @@
   (assert (null (alivep crown))))
 
 ;;;; STANDARD-DATE unit test
-(flet ((mkdt (day sec nsec) (make-instance 'standard-date :day day :sec sec :nsec nsec)))
+(flet ((mkdt (day sec nsec) (make-instance 'standard-date 
+					   :day day :sec sec :nsec nsec)))
   (let* ((date-orig (mkdt 0 0 0)) (date-same (mkdt 0 0 0)) (date-nsec (mkdt 0 0 1))
          (date-sec (mkdt 0 1 0)) (date-min (mkdt 0 60 0)) (date-hour (mkdt 0 3600 0))
          (date-day (mkdt 1 0 0)) (date-month (mkdt 31 0 0)) (date-year (mkdt 365 0 0))
@@ -134,19 +140,22 @@
 ;;;; STANDARD-LISTENER unit test, types: :N :E :I
 (with-clean-config 
   (macrolet ((mk () '(make-instance 'standard-connection :type :client :port port))
-             (amk () '(make-instance 'standard-connection :type :accept :socket (socket connection)))
+             (amk () '(make-instance 'standard-connection :type :accept
+		       :socket (socket connection)))
              (dq () '(dequeue queue))
              (do-test (conn-fn lock-fn type)
                `(let* ((crown (make-instance 'standard-crown))
                        (queue (event-queue crown)) 
-                       (connection (make-instance 'standard-connection :port 0 :type :listen))
+                       (connection (make-instance 'standard-connection 
+						  :port 0 :type :listen))
                        (port (get-local-port (socket connection))) 
                        (connection-1 (mk)) (aconnection-1 (amk))
                        (connection-2 (mk)) (aconnection-2 (amk))
                        (connection-3 (mk)) (aconnection-3 (amk))
                        (conns (list connection-1 connection-2 connection-3))
                        (aconns (list aconnection-1 aconnection-2 aconnection-3)) 
-                       (listener (make-instance 'standard-listener :owner crown :type ,type))
+                       (listener (make-instance 'standard-listener 
+						:owner crown :type ,type))
                        (data '(dummy test object)))
                   (with-lock-held ((,lock-fn crown))
                     (setf (,conn-fn crown) aconns))
@@ -154,16 +163,17 @@
                   (send connection-2 (cons 'second data))
                   (send connection-3 (cons 'third data))
                   (loop do (sleep 0.01) until (= 3 (size queue)))
-                  (flet ((form (data) (format nil "~S" (sexp data))))
-                    (let ((queue-data (mapcar (compose #'form #'caddr) (list (dq) (dq) (dq))))
-                          (expected (mapcar #'form (list (cons 'first data) (cons 'second data)
-                                                         (cons 'third data)))))
-                      (flet ((find-data (x) (find x queue-data :test #'equal)))
-                        (assert (every #'identity (mapcar #'find-data expected))))))
-                  (kill listener)
-                  (mapc (lambda (x) (push x (,conn-fn crown))) conns)
-                  (mapc #'kill (cons connection conns))
-                  (mapc #'kill aconns))))
+		  (let ((queue-data (mapcar #'caddr 
+					    (list (dq) (dq) (dq))))
+			(expected (list (cons 'first data) 
+					(cons 'second data)
+					(cons 'third data))))
+		    (flet ((find-data (x) (find x queue-data :test #'data-equal)))
+		      (assert (every #'identity (mapcar #'find-data expected)))))
+		  (kill listener)
+		  (mapc (lambda (x) (push x (,conn-fn crown))) conns)
+		  (mapc #'kill (cons connection conns))
+		  (mapc #'kill aconns))))
     (do-test n-connections n-lock :n)
     (do-test e-connections e-lock :e)
     (do-test i-connections i-lock :i)))
@@ -185,7 +195,8 @@
 ;;;; STANDARD-GEM unit test
 (with-clean-config
   (macrolet ((mk () '(make-instance 'standard-connection :type :client :port port))
-             (amk () '(make-instance 'standard-connection :type :accept :socket (socket connection))))
+             (amk () '(make-instance 'standard-connection 
+		       :type :accept :socket (socket connection))))
     (let* ((crown (make-instance 'standard-crown))
            (queue (event-queue crown))
            (connection (make-instance 'standard-connection :port 0 :type :listen))
@@ -224,11 +235,12 @@
 
 ;;;; Integration test - TODO fix open-gateway
 ;; (with-clean-config
-;;   (let* ((crown (make-instance 'standard-crown :full t))
-;;          (n-port (get-local-port (socket (n-acceptor crown))))
-;;          (connection-1 (make-instance 'standard-connection :port n-port :type :client))
-;;          (connection-2 (make-instance 'standard-connection :port n-port :type :client))
-;;          (connection-3 (make-instance 'standard-connection :port n-port :type :client)))
+;;   (let* 
+;;       ((crown (make-instance 'standard-crown :full t))
+;;        (n-port (get-local-port (socket (n-acceptor crown))))
+;;        (connection-1 (make-instance 'standard-connection :port n-port :type :client))
+;;        (connection-2 (make-instance 'standard-connection :port n-port :type :client))
+;;        (connection-3 (make-instance 'standard-connection :port n-port :type :client)))
 ;;     (format t "Ping 1!~%")
 ;;     (send connection-1 '(open gateway))
 ;;     (format t "Ping 2!~%")

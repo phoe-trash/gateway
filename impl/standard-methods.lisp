@@ -19,20 +19,8 @@
 (defmethod sexp ((object string))
   object)
 
-;; (defmethod sexp ((object symbol))
-;;   (make-instance '%quasisymbol :symbol object))
-
-;; (defclass %quasisymbol () ((symbol :initarg :symbol :accessor %symbol)))
-
-;; (defprint %quasisymbol (princ (symbol-name (%symbol obj)) stream))
-
-;; (defun %dequasify (object)
-;;   (cond ((consp object)
-;; 	 (mapcar #'%dequasify object))
-;; 	((typep object '%quasisymbol)
-;; 	 (%symbol object))
-;; 	(t
-;; 	 object)))
+(defmethod sexp ((object symbol))
+  object)
 
 (defun data-equal (object-1 object-2)
   (cond ((and (consp object-1) (consp object-2))
