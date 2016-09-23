@@ -7,7 +7,7 @@
 
 ;; SEXP
 (defmethod sexp (object)
-  (format t "[!] SEXP: no method for ~S. Bug?~%" object)
+  (format t "[!] SEXP: no method for ~S of type ~S. Bug?~%" object (type-of object))
   object)
 
 (defmethod sexp ((object list))
