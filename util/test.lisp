@@ -295,4 +295,29 @@
     (mapcar #'kill (list connection-1 connection-2))
     (kill crown)))
 
+
+;; LOGOUT command test
+(with-clean-config
+  (let* 
+      ((crown (make-instance 'standard-crown :full t))
+       (n-port (get-local-port (socket (n-acceptor crown))))
+       (connection-1 (make-instance 'standard-connection :port n-port :type :client))
+       (username "test-user")
+       (data-1 '(open-gateway))
+       (data-2 '(logout))
+       (data-3 `(login ,username "password-is-ignored")))
+    (send connection-1 data-1)
+    (receive connection-1)
+    (send connection-1 data-2) 
+    (assert (data-equal (receive connection-1) `(error :not-logged-in))) 
+    (send connection-1 data-3)
+    (receive connection-1)
+    (loop do (sleep 0.01) until (= 1 (length (e-connections crown))))
+    (send connection-1 data-2) 
+    (assert (data-equal (receive connection-1) `(ok ,data-2)))
+    (send connection-1 data-2) 
+    (assert (data-equal (receive connection-1) `(error :not-logged-in))) 
+    (mapcar #'kill (list connection-1))
+    (kill crown)))
+
 (finish-tests)
