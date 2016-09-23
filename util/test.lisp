@@ -245,15 +245,15 @@
        (connections (list connection-1 connection-2 connection-3 connection-4)))
     (send connection-1 '(open-gateway "foo"))
     (send connection-2 '(open-gateway "bar"))
-    (send connection-3 '(open-gateway "baz"))
+    (send connection-3 '(open-gateway "baz" "quux"))
     (send connection-4 '(garbage input))
     (loop do (sleep 0.01) until (= 3 (length (e-connections crown))))
     (assert (data-equal (receive connection-1) '(ok (open-gateway "foo"))))
     (assert (data-equal (receive connection-2) '(ok (open-gateway "bar"))))
-    (assert (data-equal (receive connection-3) '(ok (open-gateway "baz"))))
+    (assert (data-equal (receive connection-3) '(ok (open-gateway "baz" "quux"))))
     (assert (data-equal (receive connection-4) '(error unknown-function (garbage input))))
+    (receive connection-4)
     (assert (not (alivep connection-4)))
-    ;; TODO: finish
     (mapcar #'kill connections) 
     (kill crown)))
 
