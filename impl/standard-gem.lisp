@@ -108,31 +108,31 @@
 	  error-type connection command)  
   (send connection `(error ,error-type ,command)))
 
-;; (defun parse-n-entry (crown connection command)
-;;   (check-type crown crown)
-;;   (check-type connection connection)
-;;   (check-type command cons)
-;;   (cond ((and (string= (first command) :open)
-;;               (string= (second command) :gateway))
-;;          (progn
-;; 	   (format t "[~~] Gem: accepting E-connection.~%")
-;; 	   (send connection (list 'ok command)) 
-;; 	   (with-lock-held ((n-lock crown))
-;; 	     (deletef (n-connections crown) connection))
-;; 	   (with-lock-held ((e-lock crown))
-;; 	     (pushnew connection (e-connections crown)))))
-;;         ((and (= 2 (length command))
-;;               (string= (first command) :ping))
-;;          (progn
-;; 	   (format t "[~~] Gem: ping-pong: ~S~%" command) 
-;; 	   (send connection (rplaca command 'pong))))
-;;         (t
-;;          (progn
-;; 	   (format t "[~~] Gem: killing N-connection.~%")
-;; 	   (send connection (list 'error 'wrong-greeting command)) 
-;; 	   (with-lock-held ((n-lock crown))
-;; 	     (deletef (n-connections crown) connection))
-;; 	   (kill connection)))))
+(defun parse-n-entry (crown connection command)
+  (check-type crown crown)
+  (check-type connection connection)
+  (check-type command cons)
+  (cond ((and (string= (first command) :open)
+              (string= (second command) :gateway))
+         (progn
+	   (format t "[~~] Gem: accepting E-connection.~%")
+	   (send connection (list 'ok command)) 
+	   (with-lock-held ((n-lock crown))
+	     (deletef (n-connections crown) connection))
+	   (with-lock-held ((e-lock crown))
+	     (pushnew connection (e-connections crown)))))
+        ((and (= 2 (length command))
+              (string= (first command) :ping))
+         (progn
+	   (format t "[~~] Gem: ping-pong: ~S~%" command) 
+	   (send connection (rplaca command 'pong))))
+        (t
+         (progn
+	   (format t "[~~] Gem: killing N-connection.~%")
+	   (send connection (list 'error 'wrong-greeting command)) 
+	   (with-lock-held ((n-lock crown))
+	     (deletef (n-connections crown) connection))
+	   (kill connection)))))
 
 ;; (defun parse-e-entry (crown connection command)
 ;;   (check-type crown crown)
