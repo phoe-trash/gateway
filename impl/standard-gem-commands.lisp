@@ -41,10 +41,23 @@
     (crown connection)
   (let ((username (second (auth connection))))
     (cond ((null (auth connection))
-           (format t "[!] Gem: user not logged in.~%")
+           (format t "[!] Gem: LOGOUT: user not logged in.~%")
            (send connection `(error :not-logged-in)))
           (t
            (format t "[~~] Gem: logging user ~S out.~%" username)
            (setf (lookup (library crown) `(auth ,username)) nil
                  (auth connection) nil)
            (send connection `(ok (logout)))))))
+
+(defcommand :emit (:e)
+    (crown connection message)
+  (cond ((null (auth connection)) 
+         (format t "[!] Gem: EMIT: user not logged in.~%")
+         (send connection `(error :not-logged-in)))
+        (t
+         (let ((username (second (auth connection))))
+           (format t "[!] Gem: Emit from ~S: ~S~%" username message)
+           (send connection `(ok (emit ,message)))
+           (mapcar (lambda (x) (send x `(emit ,username ,message)))
+                   (remove-if-not #'auth (e-connections crown)))))))
+

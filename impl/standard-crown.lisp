@@ -42,20 +42,23 @@
    (%i-listener :accessor i-listener
                 :initform nil)))
 
-(defconstructor (standard-crown full)
-  (when full
-    (let* ((n-acceptor (make-instance 'standard-acceptor :owner standard-crown :port 0 :type :n)) 
-	   (i-acceptor (make-instance 'standard-acceptor :owner standard-crown :port 0 :type :i))
-	   (n-listener (make-instance 'standard-listener :owner standard-crown :type :n))
-	   (e-listener (make-instance 'standard-listener :owner standard-crown :type :e))
-	   (i-listener (make-instance 'standard-listener :owner standard-crown :type :i))
-	   (gem (make-instance 'standard-gem :owner standard-crown)))
-      (setf (n-acceptor standard-crown) n-acceptor
-	    (i-acceptor standard-crown) i-acceptor
-	    (n-listener standard-crown) n-listener
-	    (e-listener standard-crown) e-listener
-	    (i-listener standard-crown) i-listener
-	    (gems standard-crown) (list gem)))))
+(defconstructor (standard-crown full (n-port 0) (i-port 0)
+                                (n-host "127.0.0.1") (i-host "127.0.0.1"))
+  (macrolet ((make (class &rest keys)
+               `(make-instance ,class :owner standard-crown ,@keys)))
+    (when full
+      (let* ((n-acceptor (make 'standard-acceptor :port n-port :host n-host :type :n)) 
+             (i-acceptor (make 'standard-acceptor :port i-port :host i-host :type :i))
+             (n-listener (make 'standard-listener :type :n))
+             (e-listener (make 'standard-listener :type :e))
+             (i-listener (make 'standard-listener :type :i))
+             (gem (make-instance 'standard-gem :owner standard-crown)))
+        (setf (n-acceptor standard-crown) n-acceptor
+              (i-acceptor standard-crown) i-acceptor
+              (n-listener standard-crown) n-listener
+              (e-listener standard-crown) e-listener
+              (i-listener standard-crown) i-listener
+              (gems standard-crown) (list gem))))))
 
 (defmethod lookup ((crown standard-crown) key)
   (lookup (library crown) key))

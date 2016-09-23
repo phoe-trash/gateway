@@ -295,7 +295,6 @@
     (mapcar #'kill (list connection-1 connection-2))
     (kill crown)))
 
-
 ;; LOGOUT command test
 (with-clean-config
   (let* 
@@ -318,6 +317,32 @@
     (send connection-1 data-2) 
     (assert (data-equal (receive connection-1) `(error :not-logged-in))) 
     (mapcar #'kill (list connection-1))
+    (kill crown)))
+
+;; EMIT command test
+(with-clean-config
+  (let* 
+      ((crown (make-instance 'standard-crown :full t))
+       (n-port (get-local-port (socket (n-acceptor crown))))
+       (connection-1 (make-instance 'standard-connection :port n-port :type :client))
+       (connection-2 (make-instance 'standard-connection :port n-port :type :client))
+       (connection-3 (make-instance 'standard-connection :port n-port :type :client))
+       (data-1 '(open-gateway))
+       (data-2 `(login "test-user1" "password-is-ignored"))
+       (data-3 `(login "test-user2" "password-is-ignored")) 
+       (data-4 '(emit "test-message")))
+    (send connection-1 data-1) (receive connection-1)
+    (send connection-2 data-1) (receive connection-2)
+    (send connection-3 data-1) (receive connection-3)
+    (send connection-1 data-2) (receive connection-1)
+    (send connection-2 data-3) (receive connection-2)
+    (loop do (sleep 0.01) until (= 3 (length (e-connections crown))))
+    (send connection-1 data-4)
+    (assert (data-equal (receive connection-1) `(ok ,data-4)))
+    (assert (data-equal (receive connection-1) `(emit "test-user1" "test-message")))
+    (assert (data-equal (receive connection-2) `(emit "test-user1" "test-message")))
+    (assert (not (readyp connection-3)))
+    (mapcar #'kill (list connection-1 connection-2 connection-3))
     (kill crown)))
 
 (finish-tests)
