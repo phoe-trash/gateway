@@ -88,26 +88,28 @@
 	(%parse-entry crown connection command type))))
 
 (defun %parse-entry (crown connection command type)
-  (let ((hash-map (case type
-		    (:n *gem-n-handlers*)
-		    (:e *gem-e-handlers*)
-		    (:i *gem-i-handlers*)
-		    (t (error "Bad type: ~S" type)))))
+  (flet ((err (type) (%parse-entry-error type connection command type)))
     (destructuring-bind (command-word . arguments) command
-      (multiple-value-bind (function function-found-p) 
-	  (gethash (symbol-name command-word) hash-map)
-	(cond ((not function-found-p)
-	       (%parse-entry-error :unknown-function connection type command))
-	      ((not (apply #'verify-arguments function 
-			   (list* crown connection arguments)))
-	       (%parse-entry-error :malformed-arguments connection type command))
-	      (t
-	       (format t "[.] Applying function on command ~S.~%" command)
-	       (apply function crown connection arguments)))))))
+      (let ((hash-map (%parse-get-hash-table type))
+	    (all-args (list* crown connection arguments)))
+	(multiple-value-bind (function function-found-p) 
+	    (gethash (symbol-name command-word) hash-map)
+	  (unless function-found-p
+	    (err :unknown-function))
+	  (unless (apply #'verify-arguments function all-args) 
+	    (err :malformed-arguments))
+	  (format t "[.] Applying function on command ~S.~%" command)
+	  (apply function crown connection arguments))))))
 
-(defun %parse-entry-error (error-type connection type command)
-  (format t "[!] ~A error on connection ~S, command ~S.~%"
-	  error-type connection command)  
+(defun %parse-get-hash-table (type)
+  (case type
+    (:n *gem-n-handlers*)
+    (:e *gem-e-handlers*)
+    (:i *gem-i-handlers*)
+    (t (error "Bad type: ~S" type))))
+
+(defun %parse-entry-error (error-type connection command type)
+  (format t "[!] Gem: ~A error on ~S, command ~S.~%" error-type connection command)  
   (send connection `(error ,error-type ,command))
   (when (eq type :n) (kill connection)))
 
