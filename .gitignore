@@ -6,6 +6,8 @@
 *.lisp-temp
 *.lx64fsl
 
+.__*
+
 # emacs
 *~
 \#*\#
