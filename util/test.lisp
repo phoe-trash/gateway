@@ -275,8 +275,6 @@
     (send connection-1 data-1) (receive connection-1)
     (send connection-1 data-2) 
     (assert (data-equal (receive connection-1) `(ok ,data-2)))
-    (send connection-1 data-2)
-    (assert (data-equal (receive connection-1) `(error :unknown-function ,data-2)))
     (receive connection-1) (assert (not (alivep connection-1)))
     (mapcar #'kill (list connection-1))
     (kill crown)))
