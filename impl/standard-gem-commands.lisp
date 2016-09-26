@@ -40,7 +40,7 @@
 	     (pushnew connection (n-connections crown)))
 	   (send connection `(ok (logout)))))))
 
-(defcommand :emit (:e)
+(defcommand :emit (:e :i)
     (crown connection message)
   (cond ((null (auth connection)) 
          (format t "[!] Gem: EMIT: user not logged in.~%")
