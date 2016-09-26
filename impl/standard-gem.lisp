@@ -107,7 +107,9 @@
 (defun %gem-crown-parse-error (error-type connection command type)
   (format t "[!] Gem: ~A error on ~S, command ~S.~%" error-type connection command)  
   (send connection `(error ,error-type ,command))
-  (when (eq type :n) (kill connection)))
+  (when (eq type :n)
+    (format t "[!] Gem: killing connection because of error.~%")
+    (kill connection)))
 
 
 

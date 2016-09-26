@@ -27,21 +27,18 @@
            (pushnew connection (e-connections crown)))
          (send connection `(ok (login ,username))))))
 
-(defcommand :logout (:n :e)
+(defcommand :logout (:e)
     (crown connection)
   (let ((username (second (auth connection))))
-    (cond ((null (auth connection))
-           (format t "[!] Gem: LOGOUT: user not logged in.~%")
-           (send connection `(error :not-logged-in)))
-          (t
-           (format t "[~~] Gem: logging user ~S out.~%" username)
-           (setf (lookup (library crown) `(auth ,username)) nil
-                 (auth connection) nil)
-           (with-lock-held ((e-lock crown))
-             (deletef (e-connections crown) connection))
-           (with-lock-held ((n-lock crown))
-             (pushnew connection (n-connections crown)))
-           (send connection `(ok (logout)))))))
+    (cond (t
+	   (format t "[~~] Gem: logging user ~S out.~%" username)
+	   (setf (lookup (library crown) `(auth ,username)) nil
+		 (auth connection) nil)
+	   (with-lock-held ((e-lock crown))
+	     (deletef (e-connections crown) connection))
+	   (with-lock-held ((n-lock crown))
+	     (pushnew connection (n-connections crown)))
+	   (send connection `(ok (logout)))))))
 
 (defcommand :emit (:e)
     (crown connection message)
