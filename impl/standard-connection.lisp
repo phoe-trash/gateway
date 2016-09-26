@@ -37,13 +37,19 @@
 	(setf (gethash standard-connection *connection-cache*)
 	      standard-connection)))))
 
+(defprint standard-connection
+  (print-unreadable-object (obj stream :type t)
+    (format stream "~{~D:~D:~D:~D~}:~D" 
+	    (coerce (get-peer-address (socket obj)) 'list)
+	    (get-peer-port (socket obj)))))
+
 (defmethod receive ((connection standard-connection))
   (when (alivep connection)
     (handler-case
-        (with-lock-held ((lock connection))
-          (safe-read (stream-of connection)))
+	(with-lock-held ((lock connection))
+	  (safe-read (stream-of connection)))
       (end-of-file ()
-        (kill connection)))))
+	(kill connection)))))
 
 (defmethod send ((connection standard-connection) object)
   (when (alivep connection)
