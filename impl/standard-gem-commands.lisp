@@ -30,14 +30,13 @@
 (defcommand :logout (:e)
     (crown connection)
   (let ((username (second (auth connection))))
-    (cond (t
-	   (format t "[~~] Gem: logging user ~S out.~%" username)
-	   (setf (lookup (library crown) `(auth ,username)) nil
-		 (auth connection) nil)
-	   (with-lock-held ((e-lock crown))
-	     (deletef (e-connections crown) connection))
-	   (send connection `(ok (logout)))
-	   (kill connection)))))
+    (format t "[~~] Gem: logging user ~S out.~%" username)
+    (setf (lookup (library crown) `(auth ,username)) nil
+	  (auth connection) nil)
+    (with-lock-held ((e-lock crown))
+      (deletef (e-connections crown) connection))
+    (send connection `(ok (logout)))
+    (kill connection)))
 
 (defcommand :emit (:e)
     (crown connection message)
