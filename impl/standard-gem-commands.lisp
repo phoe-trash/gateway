@@ -48,7 +48,9 @@
 
 (defcommand :online (:e)
     (crown connection)
-  (let ((names (mapcar (compose #'second #'auth) (e-connections crown))))
+  (let ((names (with-lock-held ((e-lock crown))
+                 (mapcar (compose #'second #'auth)
+                         (e-connections crown)))))
     (format t "[!] Gem: Whois from ~S.~%" connection)
     (send connection `(ok (whois)))
     (send connection `(whois ,@names))))

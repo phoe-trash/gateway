@@ -301,4 +301,9 @@
     (mapcar #'kill (list connection-1 connection-2 connection-3))
     (kill crown)))
 
+;; TODO rewrite all locks and incorporate them into custom accessors
+;; TODO implement passwords
+;; TODO implement dates
+;; TODO ONLINE test
+
 (finish-tests)

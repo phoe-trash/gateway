@@ -15,11 +15,12 @@
     (local-time::invalid-timestring ()
       (make-instance 'standard-date))))
 
-(defmethod date= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond)) 
+(defmethod date= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond))
   (flet ((%date= (date-1 date-2 unit)
 	   (check-type unit (member :year :month :day :hour :minute :second :nanosecond))
 	   (let ((units '(:year :month :day :hour :minute :second :nanosecond))) 
-	     (labels ((v (date) (multiple-value-list (local-time:decode-timestamp date)))
+	     (labels ((v (date) (multiple-value-list
+                                 (local-time:decode-timestamp date :timezone local-time:+utc-zone+)))
 		      (d (date) (subseq (nreverse (v date)) 4 (+ 5 (position unit units)))))
 	       (every #'= (d date-1) (d date-2))))))
     (if (eq unit :nanosecond)
