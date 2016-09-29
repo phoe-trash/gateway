@@ -154,53 +154,6 @@ Constructor arguments:
   (defgeneric msg (sender recipient contents &key date))
   (defgeneric message= (message-1 message-2)))
 
-(defprotocol player
-    (player () ()
-      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
-
-Constructor arguments:
-:NAME - a STRING.
-:EMAIL (optional) - a STRING.
-:PASSWORD - a PASSWORD or a passphrase (a STRING).
-"))
-  (defgeneric name (object))
-  (defgeneric email (object))
-  (defgeneric password (object))
-  (defgeneric connection (object))
-  (defgeneric personas (object))
-  (defgeneric add-persona (persona object))
-  (defgeneric delete-persona (persona object))
-  (defgeneric find-player (name)))
-
-(defprotocol persona
-    (persona () ()
-      (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
-
-Constructor arguments:
-:NAME - a STRING.
-:PLAYER - a PLAYER.
-:CHAT - a CHAT."))
-  (defgeneric name (object))
-  (defgeneric player (object))
-  (defgeneric chat (object))
-  (defgeneric find-persona (name)))
-
-(defprotocol message 
-    (message () () 
-      (:documentation "Must be SEXPABLE and IMMUTABLE.
-
-Constructor arguments:
-:SENDER - the sender of the message.
-:RECIPIENT - the recipient of the message.
-:DATE - object of type DATE.
-:CONTENTS - contents of the message (a STRING)."))
-  (defgeneric sender (object))
-  (defgeneric recipient (object))
-  (defgeneric date (object))
-  (defgeneric contents (object))
-  (defgeneric msg (sender recipient contents &key date))
-  (defgeneric message= (message-1 message-2)))
-
 (defprotocol chat
     (chat () ()
       (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
@@ -223,7 +176,12 @@ Constructor arguments:
   (defgeneric delete-persona (persona object)))
 
 (defprotocol gem
-    (gem () ()))
+    (gem () ()
+      (:documentation "Constructor arguments:
+:OWNER - a CROWN or a JEWEL.
+"))
+  (defgeneric owner (gem))
+  (defgeneric thread (gem)))
 
 (defprotocol jewel
     (jewel () ()))

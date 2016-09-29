@@ -38,11 +38,14 @@
      ,@body))
 
 ;;;; DEFPROTOCOL
-(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots &body class-options)
+(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots 
+				      &body class-options)
                        &body body)
   (declare (ignore protocol-name))
-  `(progn ,(when class-name `(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
-          ,@body))
+  `(progn 
+     ,(when class-name 
+	`(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
+     ,@body))
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 (eval-when (:compile-toplevel :load-toplevel :execute)
@@ -86,7 +89,8 @@
 		     (:e '*gem-e-handlers*)
 		     (:i '*gem-i-handlers*))))
 	  (cons elt (%defcommand-map rest))))))
-  (defmacro defcommand (command types (crown-var connection-var &rest arguments) &body body)
+  (defmacro defcommand (command types (crown-var connection-var &rest arguments) 
+			&body body)
     `(let* ((command-name (symbol-name ,command))
 	    (lambda (lambda (,crown-var ,connection-var,@arguments)
 		      ,@body))
