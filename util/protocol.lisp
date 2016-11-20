@@ -183,5 +183,29 @@ Constructor arguments:
   (defgeneric owner (gem))
   (defgeneric thread (gem)))
 
+(defprotocol timer
+    (timer () ()
+      (:documentation "Constructor arguments:
+:DELAY - delay between each timer ticks,
+:QUEUE - event queue to set updates to,
+:OWNER - a CROWN or a JEWEL.
+"))
+  (defgeneric delay (timer))
+  (defgeneric (setf delay) (timer)))
+
 (defprotocol jewel
-    (jewel () ()))
+    (jewel () ())
+  ;; EVENT QUEUE
+  (defgeneric event-queue (object))
+  (defgeneric gems (object))
+  (defgeneric timer (object))
+  ;; CONNECTION
+  (defgeneric connection (object))
+  ;; SHARDS
+  (defgeneric shards (object))
+  (defgeneric add-shard (jewel shard))
+  (defgeneric remove-shard (jewel shard))
+  (defgeneric 
+  ;; METHODS  
+  (defgeneric kill (object))
+  (defgeneric alivep (object)))

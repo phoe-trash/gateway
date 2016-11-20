@@ -305,5 +305,8 @@
 ;; TODO implement passwords
 ;; TODO implement dates
 ;; TODO ONLINE test
+;; TODO implement sane logging all around
+;; TODO implement logging into files
+;; TODO kill parse rules based on special variables and create a parser class instead
 
 (finish-tests)
