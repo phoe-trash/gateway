@@ -138,8 +138,8 @@ Constructor arguments:
   (defgeneric chat (object))
   (defgeneric find-persona (name)))
 
-(defprotocol message 
-    (message () () 
+(defprotocol message
+    (message () ()
       (:documentation "Must be SEXPABLE and IMMUTABLE.
 
 Constructor arguments:
@@ -217,6 +217,6 @@ Constructor arguments:
   (defgeneric shards-lock (object))
   (defgeneric add-shard (jewel shard))
   (defgeneric remove-shard (jewel shard))
-  ;; METHODS  
+  ;; METHODS
   (defgeneric kill (object))
   (defgeneric alivep (object)))
