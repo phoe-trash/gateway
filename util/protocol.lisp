@@ -193,6 +193,16 @@ Constructor arguments:
   (defgeneric delay (timer))
   (defgeneric (setf delay) (timer)))
 
+(defprotocol connector
+    (connector () ()
+      (:documentation "Constructor arguments:
+:HOST - host to try to connect to,
+:PORT - port to try to connect to,
+:COOKIE - magic cookie to expect from the crown.
+"))
+  (defgeneric alivep (object))
+  (defgeneric kill (object)))
+
 (defprotocol jewel
     (jewel () ())
   ;; EVENT QUEUE
@@ -201,11 +211,12 @@ Constructor arguments:
   (defgeneric timer (object))
   ;; CONNECTION
   (defgeneric connection (object))
+  (defgeneric connector (object))
   ;; SHARDS
   (defgeneric shards (object))
+  (defgeneric shards-lock (object))
   (defgeneric add-shard (jewel shard))
   (defgeneric remove-shard (jewel shard))
-  (defgeneric 
   ;; METHODS  
   (defgeneric kill (object))
   (defgeneric alivep (object)))
