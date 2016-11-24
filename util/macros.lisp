@@ -38,38 +38,38 @@
      ,@body))
 
 ;;;; DEFPROTOCOL
-(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots 
-				      &body class-options)
+(defmacro defprotocol (protocol-name (&optional class-name class-args class-slots
+                                      &body class-options)
                        &body body)
   (declare (ignore protocol-name))
-  `(progn 
-     ,(when class-name 
-	`(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
+  `(progn
+     ,(when class-name
+        `(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
      ,@body))
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defvar *config-vars* nil)
-  (defvar *cache-vars* nil)
-  (defmacro defconfig (var val &key cache doc)
-    `(progn (pushnew (list ',var ',val) *config-vars* :test #'equal) 
-	    (defvar ,var ,val ,doc)
-	    ,@(when cache
-		`((pushnew (list ',cache ',var) *cache-vars*)
-		  (setf (gethash ,cache *cache-list*) ,var)))))
-  (defmacro with-clean-config (&body body)
-    `(let ,*config-vars*
-       ;;TODO: use PROGV for dynamic binding
-       ;; reconstruct *CACHE-LIST*
-       (mapc (lambda (x) (setf (gethash (first x) *cache-list*) (second x)))
-	     (list ,@(mapcar (lambda (x) `(list ',(first x) ,(second x))) *cache-vars*)))
-       ,@body)))
+;; (eval-when (:compile-toplevel :load-toplevel :execute)
+;;   (defvar *config-vars* nil)
+;;   (defvar *cache-vars* nil)
+;;   (defmacro defconfig (var val &key cache doc)
+;;     `(progn (pushnew (list ',var ',val) *config-vars* :test #'equal)
+;; 	    (defvar ,var ,val ,doc)
+;; 	    ,@(when cache
+;; 		`((pushnew (list ',cache ',var) *cache-vars*)
+;; 		  (setf (gethash ,cache *cache-list*) ,var)))))
+;;   (defmacro with-clean-config (&body body)
+;;     `(let ,*config-vars*
+;;        ;; TODO: use PROGV for dynamic binding
+;;        ;; reconstruct *CACHE-LIST*
+;;        (mapc (lambda (x) (setf (gethash (first x) *cache-list*) (second x)))
+;; 	     (list ,@(mapcar (lambda (x) `(list ',(first x) ,(second x))) *cache-vars*)))
+;;        ,@body)))
 
 ;;;; WITH-CONNECTIONS
 (defmacro with-connections (connections &body body)
   `(let* ,connections
      (unwind-protect
-	  ,@body 
+          ,@body
        (mapcar #'kill (list ,@(mapcar #'first connections))))))
 
 ;;;; TESTING
@@ -80,20 +80,18 @@
   (make-thread (lambda () (format t "[~~] Finished running tests.~%"))))
 
 ;;;; DEFCOMMAND
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun %defcommand-map (args)
-    (when args
-      (destructuring-bind (first . rest) args
-	(let ((elt (ecase first
-		     (:n '*gem-n-handlers*)
-		     (:e '*gem-e-handlers*)
-		     (:i '*gem-i-handlers*))))
-	  (cons elt (%defcommand-map rest))))))
-  (defmacro defcommand (command types (crown-var connection-var &rest arguments) 
-			&body body)
-    `(let* ((command-name (symbol-name ,command))
-	    (lambda (lambda (,crown-var ,connection-var,@arguments)
-		      ,@body))
-	    (function (compile-lambda lambda)))
-       (flet ((hash-push (hash-table) (setf (gethash command-name hash-table) function)))
-	 (mapcar #'hash-push (list ,@(%defcommand-map types)))))))
+;; (eval-when (:compile-toplevel :load-toplevel :execute)
+;;   (defun %defcommand-map (args)
+;;     (when args
+;;       (destructuring-bind (first . rest) args
+;;         (let ((elt (ecase first
+;;                      (:n '*gem-n-handlers*)
+;;                      (:e '*gem-e-handlers*)
+;;                      (:i '*gem-i-handlers*))))
+;;           (cons elt (%defcommand-map rest))))))
+;;   (defmacro defcommand (command types (crown-var connection-var &rest arguments)
+;;                         &body body)
+;;     `(let* ((command-name (symbol-name ,command))
+;;             (function (compile nil (lambda (,crown-var ,connection-var ,@arguments) ,@body))))
+;;        (flet ((hash-push (hash-table) (setf (gethash command-name hash-table) function)))
+;;          (mapcar #'hash-push (list ,@(%defcommand-map types)))))))

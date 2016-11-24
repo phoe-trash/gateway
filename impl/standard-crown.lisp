@@ -42,17 +42,18 @@
    (%i-listener :accessor i-listener
                 :initform nil)))
 
-(defconstructor (standard-crown full (n-port 0) (i-port 0)
-                                (n-host "127.0.0.1") (i-host "127.0.0.1"))
+(defconstructor (standard-crown full
+                                (n-host "127.0.0.1") (n-port 0)
+                                (i-host "127.0.0.1") (i-port 0))
   (macrolet ((make (class &rest keys)
                `(make-instance ,class :owner standard-crown ,@keys)))
     (when full
-      (let* ((n-acceptor (make 'standard-acceptor :port n-port :host n-host :type :n)) 
-             (i-acceptor (make 'standard-acceptor :port i-port :host i-host :type :i))
-             (n-listener (make 'standard-listener :type :n))
-             (e-listener (make 'standard-listener :type :e))
-             (i-listener (make 'standard-listener :type :i))
-             (gem (make-instance 'standard-gem :owner standard-crown)))
+      (let ((n-acceptor (make 'standard-acceptor :port n-port :host n-host :type :n))
+            (i-acceptor (make 'standard-acceptor :port i-port :host i-host :type :i))
+            (n-listener (make 'standard-listener :type :n))
+            (e-listener (make 'standard-listener :type :e))
+            (i-listener (make 'standard-listener :type :i))
+            (gem (make-instance 'standard-gem :owner standard-crown)))
         (setf (n-acceptor standard-crown) n-acceptor
               (i-acceptor standard-crown) i-acceptor
               (n-listener standard-crown) n-listener
@@ -69,14 +70,14 @@
 (defmethod kill ((crown standard-crown))
   (mapc #'kill (gems crown))
   (flet ((ckill (object) (when object (kill object)))
-	 (mapckill (lock-fn conn-fn)
-	   (with-lock-held ((funcall lock-fn crown))
-	     (mapc #'kill (remove-if-not #'alivep (funcall conn-fn crown))))))
+         (mapckill (lock-fn conn-fn)
+           (with-lock-held ((funcall lock-fn crown))
+             (mapc #'kill (remove-if-not #'alivep (funcall conn-fn crown))))))
     (mapcar #'ckill (list (n-acceptor crown) (i-acceptor crown)
-			  (n-listener crown) (e-listener crown) (i-listener crown)))
+                          (n-listener crown) (e-listener crown) (i-listener crown)))
     (mapckill #'n-lock #'n-connections)
     (mapckill #'e-lock #'e-connections)
     (mapckill #'i-lock #'i-connections)))
 
-(defmethod alivep ((crown standard-crown)) 
-  (and (gems crown) (every #'alivep (gems crown))))
+(defmethod alivep ((crown standard-crown))
+  (and (gems crown) (some #'alivep (gems crown))))

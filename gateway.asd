@@ -10,15 +10,15 @@
   :author "Michał \"phoe\" Herda"
   :license "GPL3"
   :depends-on (#:alexandria
-	       #:closer-mop
-	       #:ironclad
-	       #:flexi-streams
-	       #:local-time
-	       #:1am
-	       #:secure-read
-	       #:bordeaux-threads
-	       #:usocket
-	       #:jpl-queues
+               #:closer-mop
+               #:ironclad
+               #:flexi-streams
+               #:local-time
+               #:1am
+               #:secure-read
+               #:bordeaux-threads
+               #:usocket
+               #:jpl-queues
                #:trivial-arguments
                #:trivia)
   #|
@@ -38,10 +38,10 @@
   |#
   :serial t
   :components ((:file "package")
-	       (:file "util/macros")
-	       (:file "util/constants")
-	       (:file "util/utils")
-	       (:file "util/protocol")
+               (:file "util/macros")
+               (:file "util/constants")
+               (:file "util/utils")
+               (:file "util/protocol")
                (:file "impl/standard-methods")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
@@ -50,6 +50,7 @@
                (:file "impl/standard-acceptor")
                (:file "impl/standard-listener")
                (:file "impl/standard-crown")
-               (:file "impl/standard-gem")
-               (:file "impl/standard-gem-commands")
-	       (:file "new")))
+               ;; (:file "impl/standard-gem")
+               ;; (:file "impl/standard-gem-commands")
+               ;; (:file "impl/standard-jewel")
+               (:file "new")))

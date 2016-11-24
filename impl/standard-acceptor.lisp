@@ -24,7 +24,8 @@
               (socket standard-acceptor) socket
               (thread standard-acceptor)
               (make-thread (lambda () (%acceptor standard-acceptor))
-                           :name (format nil "Gateway - ~A-acceptor for ~S" (symbol-name type) owner)))
+                           :name (format nil "Gateway - ~A-acceptor for ~S"
+                                         (symbol-name type) owner)))
       (error (e)
         (socket-close socket)
         (error e)))))
@@ -56,10 +57,10 @@
     (etypecase (owner acceptor)
       (crown
        (ecase type
-         (:n 
+         (:n
           (with-lock-held ((n-lock owner))
             (push connection (n-connections owner))))
-         (:i 
+         (:i
           (with-lock-held ((i-lock owner))
             (push connection (i-connections owner)))))))))
 

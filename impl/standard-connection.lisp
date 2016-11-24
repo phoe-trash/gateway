@@ -10,46 +10,53 @@
    (%stream :accessor stream-of)
    (%lock :accessor lock
           :initform (make-lock))
-   (%auth :accessor auth 
-	  :initarg :auth
+   (%auth :accessor auth
+          :initarg :auth
           :initform nil)))
 
 (defconstructor (standard-connection type (host "127.0.0.1") (port 65001) socket)
   (check-type type (member :listen :client :accept :ready))
   (check-type host string)
-  (check-type port (integer 0 65535))
+  (check-type port (unsigned-byte 16))
   (check-type socket (or null usocket))
   (with-lock-held ((lock standard-connection))
     (let* ((accepted-socket (when (eq type :accept) (socket-accept socket)))
-	   (socket (case type
-		     (:listen (socket-listen "127.0.0.1" port :reuseaddress t))
-		     (:client (socket-connect host port))
-		     (:accept accepted-socket)
-		     (:ready socket)))
-	   (stream (case type
-		     (:listen nil)
-		     (:client (socket-stream socket))
-		     (:accept (socket-stream accepted-socket))
-		     (:ready (socket-stream socket)))))
+           (socket (%standard-connection-socket host port type accepted-socket socket))
+           (stream (%standard-connection-stream type accepted-socket socket)))
       (setf (socket standard-connection) socket
-	    (stream-of standard-connection) stream)
-      (with-lock-held (*cache-lock*)
-	(setf (gethash standard-connection *connection-cache*)
-	      standard-connection)))))
+            (stream-of standard-connection) stream)
+      ;; (with-lock-held (*cache-lock*)
+      ;;   (setf (gethash standard-connection *connection-cache*)
+      ;;         standard-connection))
+      )))
+
+(defun %standard-connection-socket (host port type accepted-socket socket)
+  (case type
+    (:listen (socket-listen "127.0.0.1" port :reuseaddress t))
+    (:client (socket-connect host port))
+    (:accept accepted-socket)
+    (:ready socket)))
+
+(defun %standard-connection-stream (type accepted-socket socket)
+  (case type
+    (:listen nil)
+    (:client (socket-stream socket))
+    (:accept (socket-stream accepted-socket))
+    (:ready (socket-stream socket))))
 
 (defprint standard-connection
   (print-unreadable-object (obj stream :type t)
-    (format stream "~{~D:~D:~D:~D~}:~D" 
-	    (coerce (get-peer-address (socket obj)) 'list)
-	    (get-peer-port (socket obj)))))
+    (format stream "~{~D:~D:~D:~D~}:~D"
+            (coerce (get-peer-address (socket obj)) 'list)
+            (get-peer-port (socket obj)))))
 
 (defmethod receive ((connection standard-connection))
   (when (alivep connection)
     (handler-case
-	(with-lock-held ((lock connection))
-	  (safe-read (stream-of connection)))
+        (with-lock-held ((lock connection))
+          (safe-read (stream-of connection)))
       (end-of-file ()
-	(kill connection)))))
+        (kill connection)))))
 
 (defmethod send ((connection standard-connection) object)
   (when (alivep connection)
@@ -82,13 +89,14 @@
     (close (stream-of connection)))
   (when (socket connection)
     (socket-close (socket connection)))
-  (with-lock-held (*cache-lock*)
-    (remhash connection *connection-cache*))) 
+  ;; (with-lock-held (*cache-lock*)
+  ;;   (remhash connection *connection-cache*))
+  )
 
 (defun %unintern-all-symbols (sexp)
   (cond ((consp sexp)
-	 (mapcar #'%unintern-all-symbols sexp))
-	((symbolp sexp)
-	 (make-symbol (symbol-name sexp)))
-	(t
-	 sexp)))
+         (mapcar #'%unintern-all-symbols sexp))
+        ((symbolp sexp)
+         (make-symbol (symbol-name sexp)))
+        (t
+         sexp)))

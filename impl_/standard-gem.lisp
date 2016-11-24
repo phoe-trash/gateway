@@ -55,12 +55,12 @@
                 (mapc (lambda (x) (deletef (,conn-fn crown) x)) to-cleanup))))))
      (n-clean () '(clean n-lock n-connections :n))
      (e-clean () '(clean e-lock e-connections :e))
-     (i-clean () '(clean i-lock i-connections :i))) 
+     (i-clean () '(clean i-lock i-connections :i)))
   (defun %gem-crown-loop (gem)
     (or (%gem-crown-queue gem)
 	(i-clean)
 	(e-clean)
-	(n-clean) 
+	(n-clean)
 	(sleep 0.1))))
 
 (defun %gem-crown-queue (gem)
@@ -94,7 +94,7 @@
   (flet ((err (error-type)
            (%gem-crown-parse-error error-type connection command type)))
     (destructuring-bind (command-word . arguments) command
-      (multiple-value-bind (function function-found-p) 
+      (multiple-value-bind (function function-found-p)
 	  (gethash (symbol-name command-word) hash-map)
 	(let ((args (list* function crown connection arguments)))
 	  (cond ((not function-found-p)
@@ -105,7 +105,7 @@
 		   (apply function crown connection arguments))))))))
 
 (defun %gem-crown-parse-error (error-type connection command type)
-  (format t "[!] Gem: ~A error on ~S, command ~S.~%" error-type connection command)  
+  (format t "[!] Gem: ~A error on ~S, command ~S.~%" error-type connection command)
   (send connection `(error ,error-type ,command))
   (when (eq type :n)
     (format t "[!] Gem: killing connection because of error.~%")
