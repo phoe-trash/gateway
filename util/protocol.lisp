@@ -5,7 +5,24 @@
 
 (in-package #:gateway)
 
-(defprotocol sexpable () 
+(defprotocol password
+    (password () ()
+      (:documentation "Must be SEXPABLE and IMMUTABLE.
+
+Constructor arguments:
+:PASSPHRASE - a passphrase."))
+  (defgeneric password-matches-p (password passphrase))
+  (defgeneric make-password (passphrase)))
+
+
+
+
+
+
+
+
+
+(defprotocol sexpable ()
   (defgeneric sexp (object))
   (defun parse (sexp &optional parent)
     (%parse sexp parent)))
@@ -43,11 +60,11 @@
   (defgeneric n-acceptor (object))
   (defgeneric n-connections (object))
   (defgeneric n-lock (object))
-  (defgeneric n-listener (object)) 
+  (defgeneric n-listener (object))
   ;; E-CONNECTIONS
   (defgeneric e-connections (object))
   (defgeneric e-lock (object))
-  (defgeneric e-listener (object)) 
+  (defgeneric e-listener (object))
   ;; I-CONNECTIONS
   (defgeneric i-acceptor (object))
   (defgeneric i-connections (object))
@@ -72,7 +89,7 @@
     (date () ()
       (:documentation "Must be SEXPABLE and IMMUTABLE.
 
-The :UNIT argument must accepts arguments 
+The :UNIT argument must accepts arguments
 :YEAR, :MONTH, :DAY, :HOUR, :MINUTE, :SECOND, :NANOSECOND."))
   (defgeneric parse-date (string))
   (defgeneric date= (date-1 date-2 &key unit))
@@ -84,15 +101,6 @@ The :UNIT argument must accepts arguments
   (defgeneric date-min (&rest dates))
   (defgeneric date-max (&rest dates))
   (defgeneric now ()))
-
-(defprotocol password
-    (password () ()
-      (:documentation "Must be SEXPABLE and IMMUTABLE.
-
-Constructor arguments:
-:PASSPHRASE - a passphrase."))
-  (defgeneric password-matches-p (password passphrase))
-  (defgeneric make-password (passphrase)))
 
 (defprotocol connection
     (connection () ()
@@ -220,3 +228,7 @@ Constructor arguments:
   ;; METHODS
   (defgeneric kill (object))
   (defgeneric alivep (object)))
+
+
+
+
