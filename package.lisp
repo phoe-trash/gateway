@@ -7,30 +7,31 @@
   (:shadowing-import-from :closer-mop
    :standard-generic-function :defmethod :defgeneric :standard-method :standard-class)
   (:use #:common-lisp
-	#:closer-mop 
-	#:alexandria
-	#:1am
-	#:secure-read
-	#:bordeaux-threads
-	#:usocket
-	#:jpl-queues
+        #:closer-mop
+        #:alexandria
+        #:1am
+        #:secure-read
+        #:bordeaux-threads
+        #:usocket
+        #:jpl-queues
         #:trivial-arguments
-        #:trivia)
+        #:trivia
+        #:lparallel)
   #|
   (:use #:common-lisp
-	#:closer-mop
-	#:named-readtables
-	#:hu.dwim.defclass-star
-	#:cl-colors
-	#:jpl-queues
-	#:trivial-garbage
-	#:bordeaux-threads
-	#:alexandria
-	#:usocket
-	#:flexi-streams
-	#:iterate
-	#:local-time
-	#:1am)
+  #:closer-mop
+  #:named-readtables
+  #:hu.dwim.defclass-star
+  #:cl-colors
+  #:jpl-queues
+  #:trivial-garbage
+  #:bordeaux-threads
+  #:alexandria
+  #:usocket
+  #:flexi-streams
+  #:iterate
+  #:local-time
+  #:1am)
   |#
   )
 

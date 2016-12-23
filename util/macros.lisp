@@ -5,6 +5,10 @@
 
 (in-package #:gateway)
 
+;;;; DEFTEST
+(defmacro deftest (name &body body)
+  `(test ,name ,@body))
+
 ;;;; DEFINE-PROTOCOL-CLASS
 (defmacro define-protocol-class (name super-classes &optional slots &rest options)
   (let* ((sym-name (symbol-name name))
@@ -27,16 +31,6 @@
          (:documentation ,predicate-docstring))
        ',name)))
 
-;;;; DEFCONSTRUCTOR
-(defmacro defconstructor ((class . keys) &body body)
-  `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
-     ,@body))
-
-;;;; DEFPRINT
-(defmacro defprint (object &body body)
-  `(defmethod print-object ((obj ,object) stream)
-     ,@body))
-
 ;;;; DEFPROTOCOL
 (defmacro defprotocol (protocol-name (&optional class-name class-args class-slots
                                       &body class-options)
@@ -45,6 +39,16 @@
   `(progn
      ,(when class-name
         `(define-protocol-class ,class-name ,class-args ,class-slots ,@class-options))
+     ,@body))
+
+;;;; DEFCONSTRUCTOR
+(defmacro defconstructor ((class . keys) &body body)
+  `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
+     ,@body))
+
+;;;; DEFPRINT
+(defmacro defprint (object &body body)
+  `(defmethod print-object ((obj ,object) stream)
      ,@body))
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
@@ -66,18 +70,18 @@
 ;;        ,@body)))
 
 ;;;; WITH-CONNECTIONS
-(defmacro with-connections (connections &body body)
-  `(let* ,connections
-     (unwind-protect
-          ,@body
-       (mapcar #'kill (list ,@(mapcar #'first connections))))))
+;; (defmacro with-connections (connections &body body)
+;;   `(let* ,connections
+;;      (unwind-protect
+;;           ,@body
+;;        (mapcar #'kill (list ,@(mapcar #'first connections))))))
 
 ;;;; TESTING
-(defun begin-tests ()
-  (make-thread (lambda () (format t "~%[~~] Begin running tests.~%"))))
+;; (defun begin-tests ()
+;;   (make-thread (lambda () (format t "~%[~~] Begin running tests.~%"))))
 
-(defun finish-tests ()
-  (make-thread (lambda () (format t "[~~] Finished running tests.~%"))))
+;; (defun finish-tests ()
+;;   (make-thread (lambda () (format t "[~~] Finished running tests.~%"))))
 
 ;;;; DEFCOMMAND
 ;; (eval-when (:compile-toplevel :load-toplevel :execute)

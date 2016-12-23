@@ -65,3 +65,17 @@
 (defmethod make-password ((passphrase string))
   (check-type passphrase string)
   (make-instance 'standard-password :passphrase passphrase))
+
+(deftest test-standard-password
+  ;;;; STANDARD-PASSWORD unit test
+  ;;;; Commented out for speed, as password hashing takes time.
+  ;; (let ((wrong-passphrase "Wr0ng-Pas$w0rd"))
+  ;;   (flet ((check-password (passphrase)
+  ;;            (let ((password (make-password passphrase)))
+  ;;              (assert (password-matches-p password passphrase))
+  ;;              (assert (not (password-matches-p password wrong-passphrase))))))
+  ;;     (mapcar #'check-password
+  ;;             '("" "pass" "password-1" "password-2PassW0RD"
+  ;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
+  ;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
+  )

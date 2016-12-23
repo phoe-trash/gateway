@@ -1,31 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; new-protocol.lisp
+;;;; protocol.lisp
 
 (in-package #:gateway)
-
-(defprotocol password
-    (password () ()
-      (:documentation "Must be SEXPABLE and IMMUTABLE.
-
-Constructor arguments:
-:PASSPHRASE - a passphrase."))
-  (defgeneric password-matches-p (password passphrase))
-  (defgeneric make-password (passphrase)))
-
-
-
-
-
-
-
-
-
-(defprotocol sexpable ()
-  (defgeneric sexp (object))
-  (defun parse (sexp &optional parent)
-    (%parse sexp parent)))
 
 (defprotocol identifiable ()
   (defun identify (type key)
@@ -84,23 +62,6 @@ Constructor arguments:
     (library () ())
   (defgeneric lookup (library key))
   (defgeneric (setf lookup) (library new-value key)))
-
-(defprotocol date
-    (date () ()
-      (:documentation "Must be SEXPABLE and IMMUTABLE.
-
-The :UNIT argument must accepts arguments
-:YEAR, :MONTH, :DAY, :HOUR, :MINUTE, :SECOND, :NANOSECOND."))
-  (defgeneric parse-date (string))
-  (defgeneric date= (date-1 date-2 &key unit))
-  (defgeneric date/= (date-1 date-2 &key unit))
-  (defgeneric date< (date-1 date-2))
-  (defgeneric date<= (date-1 date-2 &key unit))
-  (defgeneric date> (date-1 date-2))
-  (defgeneric date>= (date-1 date-2 &key unit))
-  (defgeneric date-min (&rest dates))
-  (defgeneric date-max (&rest dates))
-  (defgeneric now ()))
 
 (defprotocol connection
     (connection () ()

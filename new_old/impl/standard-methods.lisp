@@ -22,13 +22,14 @@
 (defmethod sexp ((object list))
   (mapcar #'sexp object))
 
-(defun data-equal (object-1 object-2)
-  (cond ((and (consp object-1) (consp object-2))
-	 (every #'data-equal object-1 object-2))
-	((and (symbolp object-1) (symbolp object-2))
-	 (string= object-1 object-2))
-	(t
-	 (equal object-1 object-2))))
+(defvar %unsexp-data% (make-hash-table :test #'equalp))
+
+(defun %unsexp (sexp &optional parent)
+  (assert (proper-list-p sexp))
+  (assert (identity sexp))
+  (let* ((data-word (string (first sexp)))
+         (fn (gethash data-word %unsexp-data%)))
+    (funcall fn sexp parent)))
 
 ;; ;; PARSE
 ;; ;; TODO: refactor this into a full parser, elsewhere
