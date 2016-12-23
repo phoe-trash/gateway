@@ -22,6 +22,7 @@
 (defmethod sexp ((object list))
   (mapcar #'sexp object))
 
+;;;; UNSEXP
 (defvar %unsexp-data% (make-hash-table :test #'equalp))
 
 (defun %unsexp (sexp &optional parent)
