@@ -24,6 +24,6 @@ the original.
 |#
 (defprotocol sexpable ()
   (defgeneric sexp (object))
-  (defun parse (sexp &optional parent)
-    (%parse sexp parent)))
+  (defun unsexp (sexp &optional parent)
+    (%unsexp sexp parent)))
 

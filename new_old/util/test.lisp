@@ -7,51 +7,6 @@
 
 (begin-tests)
 
-;;;; STANDARD-DATE unit test
-(flet ((mkdt (day sec nsec)
-         (make-instance 'standard-date :day day :sec sec :nsec nsec)))
-  (let* ((date-orig (mkdt 0 0 0)) (date-same (mkdt 0 0 0)) (date-nsec (mkdt 0 0 1))
-         (date-sec (mkdt 0 1 0)) (date-min (mkdt 0 60 0)) (date-hour (mkdt 0 3600 0))
-         (date-day (mkdt 1 0 0)) (date-month (mkdt 31 0 0)) (date-year (mkdt 365 0 0))
-         (vars (list date-orig date-nsec date-sec date-min
-                     date-hour date-day date-year)))
-    (assert (date= date-orig date-same))
-    (assert (date= date-orig date-same :unit :nanosecond))
-    (assert (date= date-orig date-nsec :unit :second))
-    (assert (date= date-orig date-sec :unit :minute))
-    (assert (date= date-orig date-min :unit :hour))
-    (assert (date= date-orig date-hour :unit :day))
-    (assert (date= date-orig date-day :unit :month))
-    (assert (date= date-orig date-month :unit :year))
-    (assert (date/= date-orig date-nsec))
-    (assert (date/= date-orig date-sec))
-    (assert (date/= date-orig date-min))
-    (assert (date/= date-orig date-hour))
-    (assert (date/= date-orig date-day))
-    (assert (date/= date-orig date-month))
-    (assert (date/= date-orig date-year))
-    (assert (date/= date-orig date-sec :unit :nanosecond))
-    (assert (date/= date-orig date-min :unit :second))
-    (assert (date/= date-orig date-hour :unit :minute))
-    (assert (date/= date-orig date-day :unit :hour))
-    (assert (date/= date-orig date-month :unit :day))
-    (assert (date/= date-orig date-year :unit :month))
-    (assert (date< date-orig date-nsec))
-    (assert (date< date-nsec date-sec))
-    (assert (date< date-sec date-min))
-    (assert (date< date-min date-hour))
-    (assert (date< date-hour date-day))
-    (assert (date< date-day date-month))
-    (assert (date< date-month date-year))
-    (assert (date> date-nsec date-orig))
-    (assert (date> date-sec date-nsec))
-    (assert (date> date-min date-sec))
-    (assert (date> date-hour date-min))
-    (assert (date> date-day date-hour))
-    (assert (date> date-month date-day))
-    (assert (date> date-year date-month))
-    (assert (eq date-orig (apply #'date-min vars)))
-    (assert (eq date-year (apply #'date-max vars)))))
 
 ;;;; STANDARD-LIBRARY unit test
 (let* ((library (make-instance 'standard-library))
@@ -65,21 +20,6 @@
   (assert (= (lookup library '(a a 1)) number-2))
   (setf (lookup library '(a b 1)) number-3)
   (assert (= (lookup library '(a b 1)) number-3)))
-
-;;;; STANDARD-PASSWORD unit test
-(progn
- ;;;; Commented out for speed, as password hashing takes time.
-  ;; (let ((wrong-passphrase "Wr0ng-Pas$w0rd"))
-  ;;   (flet ((check-password (passphrase)
-  ;;            (let ((password (make-password passphrase)))
-  ;;              (assert (password-matches-p password passphrase))
-  ;;              (assert (not (password-matches-p password wrong-passphrase))))))
-  ;;     (mapcar #'check-password
-  ;;             '("" "pass" "password-1" "password-2PassW0RD"
-  ;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
-  ;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
-  )
-
 
 
 
