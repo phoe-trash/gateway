@@ -17,15 +17,12 @@ it. Each connection must also implement READYP generic function
 that evaluates to true if the connection has any data available
 for reading and to false otherwise.
 
-There are four types of connections:
-  :LISTEN - a server connection which acccepts incoming client
-connections.
-  :ACCEPT - an accepted incoming connection.
-  :CLIENT - an outgoing connection.
-  :READY - an established connection of any type.
+If :SOCKET is not supplied, the connection will attempt to
+create a socket on its own, connecting to the host and port
+provided in the constructor arguments.
 
 Constructor arguments:
-  :TYPE - one of :LISTEN, :ACCEPT, :CLIENT, :READY.
+  :SOCKET - a socket with an associated data stream.
   :HOST - hostname.
   :PORT - port.
 |#
@@ -34,11 +31,3 @@ Constructor arguments:
   (defgeneric data-send (connection object))
   (defgeneric data-receive (connection))
   (defgeneric readyp (connection)))
-
-#|
-Protocol class ACCEPTOR
-
-Must be KILLABLE.
-|#
-(defprotocol acceptor
-    (acceptor () ()))

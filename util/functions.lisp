@@ -24,7 +24,8 @@
 
 (defun peek-char-no-hang (&optional (input-stream *standard-input*)
                             (eof-error-p t) eof-value recursive-p)
-  (let ((character (read-char-no-hang input-stream eof-error-p eof-value recursive-p)))
+  (let ((character (read-char-no-hang input-stream eof-error-p
+                                      eof-value recursive-p)))
     (when character
       (unread-char character input-stream)
       character)))
@@ -32,7 +33,7 @@
 ;;;; UNINTERN-ALL-SYMBOLS
 (defun unintern-all-symbols (sexp)
   (cond ((consp sexp)
-         (mapcar #'%unintern-all-symbols sexp))
+         (mapcar #'unintern-all-symbols sexp))
         ((symbolp sexp)
          (make-symbol (symbol-name sexp)))
         (t
