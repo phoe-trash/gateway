@@ -14,7 +14,9 @@
                      :type integer)))
 
 (defconstructor (standard-password passphrase %read-data
-                                   (iteration-count 1000) (key-length 512) (salt-length 64))
+                                   (iteration-count 1000)
+                                   (key-length 512)
+                                   (salt-length 64))
   (if %read-data
       (progn (check-type %read-data cons)
              (assert (= (length %read-data) 3))

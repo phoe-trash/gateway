@@ -51,6 +51,33 @@
   `(defmethod print-object ((obj ,object) stream)
      ,@body))
 
+;;;; WAIT
+(defmacro wait ((timeout &key (step 0.1)) &body body)
+  (with-gensyms (begin-time end-time temp)
+    `(let* ((,begin-time (get-internal-real-time))
+            (,end-time (+ ,begin-time (* ,timeout internal-time-units-per-second))))
+       (loop
+         (let (,temp)
+           (cond ((progn (setf ,temp (progn ,@body))
+                         ,temp)
+                  (return ,temp))
+                 ((> (get-internal-real-time) ,end-time)
+                  (return nil))
+                 (t
+                  (sleep ,step))))))))
+
+;;;; FINALIZED-LET
+(defmacro finalized-let* ((&rest bindings) &body body)
+  (if bindings
+      `(let (,(first (first bindings)))
+         (unwind-protect
+              (progn (setf ,(first (first bindings))
+                           ,(second (first bindings)))
+                     (finalized-let* ,(rest bindings) ,@body))
+           (when ,(first (first bindings))
+             (progn ,@(cddr (first bindings))))))
+      `(progn ,@body)))
+
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 ;; (eval-when (:compile-toplevel :load-toplevel :execute)
 ;;   (defvar *config-vars* nil)

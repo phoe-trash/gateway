@@ -18,20 +18,23 @@
     (local-time::invalid-timestring ()
       (make-instance 'standard-date))))
 
-(defmethod date= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond))
+(defmethod date= ((date-1 standard-date) (date-2 standard-date)
+                  &key (unit :nanosecond))
   (flet ((%date= (date-1 date-2 unit)
-           (assert (member (type-of unit) *date-time-units*))
+           (assert (member unit *date-time-units*))
            (let ((units *date-time-units*))
              (labels ((v (date) (multiple-value-list
                                  (local-time:decode-timestamp
                                   date :timezone local-time:+utc-zone+)))
-                      (d (date) (subseq (nreverse (v date)) 4 (+ 5 (position unit units)))))
+                      (d (date) (subseq (nreverse (v date)) 4
+                                        (+ 5 (position unit units)))))
                (every #'= (d date-1) (d date-2))))))
     (if (eq unit :nanosecond)
         (local-time:timestamp= date-1 date-2)
         (%date= date-1 date-2 unit))))
 
-(defmethod date/= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond))
+(defmethod date/= ((date-1 standard-date) (date-2 standard-date)
+                   &key (unit :nanosecond))
   (not (date= date-1 date-2 :unit unit)))
 
 (defmethod date< ((date-1 standard-date) (date-2 standard-date))
@@ -40,10 +43,12 @@
 (defmethod date> ((date-1 standard-date) (date-2 standard-date))
   (local-time:timestamp> date-1 date-2))
 
-(defmethod date<= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond))
+(defmethod date<= ((date-1 standard-date) (date-2 standard-date)
+                   &key (unit :nanosecond))
   (or (date= date-1 date-2 :unit unit) (local-time:timestamp< date-1 date-2)))
 
-(defmethod date>= ((date-1 standard-date) (date-2 standard-date) &key (unit :nanosecond))
+(defmethod date>= ((date-1 standard-date) (date-2 standard-date)
+                   &key (unit :nanosecond))
   (or (date= date-1 date-2 :unit unit) (local-time:timestamp> date-1 date-2)))
 
 (defmethod date-min (&rest dates)

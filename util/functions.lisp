@@ -7,9 +7,9 @@
 
 (defun string=-getf (plist indicator)
   (loop for key in plist by #'cddr
-	for value in (rest plist) by #'cddr
-	when (and (string= key indicator))
-	  return value))
+        for value in (rest plist) by #'cddr
+        when (and (string= key indicator))
+          return value))
 
 (defun fformat (stream format-string &rest format-args)
   (apply #'format stream format-string format-args)
@@ -29,6 +29,15 @@
       (unread-char character input-stream)
       character)))
 
+;;;; UNINTERN-ALL-SYMBOLS
+(defun unintern-all-symbols (sexp)
+  (cond ((consp sexp)
+         (mapcar #'%unintern-all-symbols sexp))
+        ((symbolp sexp)
+         (make-symbol (symbol-name sexp)))
+        (t
+         sexp)))
+
 ;;;; DATA-EQUAL
 (defun data-equal (object-1 object-2)
   (cond ((and (consp object-1) (consp object-2))
@@ -44,12 +53,12 @@
 
 (defun generate-matcher (lambda-list)
   (labels ((clean-pred (x) (and (symbolp x) (not (member x lambda-list-keywords))))
-	   (clean-symbols (lambda-list) (substitute-if '_ #'clean-pred lambda-list)))
+           (clean-symbols (lambda-list) (substitute-if '_ #'clean-pred lambda-list)))
     (compile-lambda
      (let ((candidate-name (gensym)))
        `(lambda (,candidate-name)
-	  (match ,candidate-name
-	    ((lambda-list ,@(clean-symbols lambda-list)) t)))))))
+          (match ,candidate-name
+            ((lambda-list ,@(clean-symbols lambda-list)) t)))))))
 
 (defun verify-arguments (function &rest arguments)
   (funcall (generate-matcher (arglist function)) arguments))

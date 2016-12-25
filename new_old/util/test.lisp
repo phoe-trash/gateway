@@ -8,19 +8,6 @@
 (begin-tests)
 
 
-;;;; STANDARD-LIBRARY unit test
-(let* ((library (make-instance 'standard-library))
-       (maximum #.(expt 2 15))
-       (number-1 (random maximum))
-       (number-2 (random maximum))
-       (number-3 (random maximum)))
-  (setf (lookup library '(a a 1)) number-1)
-  (assert (= (lookup library '(a a 1)) number-1))
-  (setf (lookup library '(a a 1)) number-2)
-  (assert (= (lookup library '(a a 1)) number-2))
-  (setf (lookup library '(a b 1)) number-3)
-  (assert (= (lookup library '(a b 1)) number-3)))
-
 
 
 
@@ -75,7 +62,7 @@
                    (test client accept data)
                    (test accept client data)))
           (let ((test-cases '((1 2 3 4 5 6 7 8 9 0)
-                              (a b c d e f)
+                              (a b c d e f (g) ((((h i j k (l) m n)))))
                               (lorem ipsum dolor sit amet)
                               ("a" a "a" a "a" "b"))))
             (mapcar #'test-case test-cases)))))

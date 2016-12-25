@@ -13,7 +13,6 @@
         #:secure-read
         #:bordeaux-threads
         #:usocket
-        #:jpl-queues
         #:trivial-arguments
         #:trivia
         #:lparallel)

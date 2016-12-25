@@ -58,24 +58,6 @@
   (defgeneric alivep (object))
   (defgeneric kill (object)))
 
-(defprotocol library
-    (library () ())
-  (defgeneric lookup (library key))
-  (defgeneric (setf lookup) (library new-value key)))
-
-(defprotocol connection
-    (connection () ()
-      (:documentation "Constructor arguments:
-
-:TYPE - one of :LISTEN, :ACCEPT, :CLIENT.
-:HOST - hostname.
-:PORT - port."))
-  (defgeneric send (connection object))
-  (defgeneric receive (connection))
-  (defgeneric readyp (connection))
-  (defgeneric kill (object))
-  (defgeneric alivep (object)))
-
 (defprotocol player
     (player () ()
       (:documentation "Must be SEXPABLE, IDENTIFIABLE and MESSAGABLE.
