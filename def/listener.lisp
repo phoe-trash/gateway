@@ -14,4 +14,5 @@ Spawns a thread which monitors a group of connections for activity
 and pushes messages received from them onto a provided queue.
 |#
 (defprotocol listener
-    (listener () ()))
+    (listener () ())
+  (defgeneric notify (listener)))
