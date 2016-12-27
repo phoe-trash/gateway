@@ -10,7 +10,7 @@
   (format t "[!] SEXP: no method for ~S of type ~S. Bug?~%" object (type-of object))
   object)
 
-(defmethod sexp ((object integer))
+(defmethod sexp ((object number))
   object)
 
 (defmethod sexp ((object string))

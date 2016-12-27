@@ -13,37 +13,6 @@
 
 
 
-;;;; STANDARD-ACCEPTOR unit test, types: :N :I
-(with-clean-config
-    (flet ((do-test (type fn)
-             (macrolet ((mk () '(make-instance 'standard-connection
-                                 :type :client :port port)))
-               (let* ((crown (make-instance 'standard-crown))
-                      (acceptor (make-instance 'standard-acceptor
-                                               :port 0 :owner crown :type type))
-                      (port (get-local-port (socket acceptor)))
-                      (connection-1 (mk)) (connection-2 (mk)) (connection-3 (mk))
-                      (port-1 (get-local-port (socket connection-1)))
-                      (port-2 (get-local-port (socket connection-2)))
-                      (port-3 (get-local-port (socket connection-3)))
-                      (data '(dummy test object)))
-                 (send connection-1 data)
-                 (send connection-2 data)
-                 (send connection-3 data)
-                 (labels
-                     ((find-conn (port)
-                        (find port (funcall fn crown)
-                              :key (compose #'get-peer-port #'socket)))
-                      (test (port)
-                        (loop do (sleep 0.01) until (find-conn port))
-                        (let ((received-data (receive (find-conn port))))
-                          (assert (data-equal (sexp data) (sexp received-data))))))
-                   (mapc #'test (list port-1 port-2 port-3)))
-                 (mapc #'kill (list acceptor connection-1
-                                    connection-2 connection-3))))))
-      (do-test :n #'n-connections)
-      (do-test :i #'i-connections)))
-
 ;;;; STANDARD-CONNECTION unit test
 (with-clean-config
   (labels ((check-conns () (assert (null (maphash #'list *connection-cache*)))))

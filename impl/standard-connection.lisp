@@ -25,10 +25,11 @@
   (socket-stream (socket connection)))
 
 ;; (defprint standard-connection
-;;   (print-unreadable-object (obj stream :type t)
-;;     (format stream "~{~D:~D:~D:~D~}:~D"
-;;             (coerce (get-peer-address (socket obj)) 'list)
-;;             (get-peer-port (socket obj)))))
+;;   (print-unreadable-object (obj stream :type t :identity t)
+;;     ;; (format stream "~{~D:~D:~D:~D~}:~D"
+;;     ;;         (coerce (get-peer-address (socket obj)) 'list)
+;;     ;;         (get-peer-port (socket obj)))
+;;     ))
 
 (defmacro with-connection ((connection &optional error-return-value) &body body)
   `(when (alivep ,connection)
