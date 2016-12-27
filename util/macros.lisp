@@ -52,7 +52,7 @@
      ,@body))
 
 ;;;; WAIT
-(defmacro wait ((timeout &key (step 0.1)) &body body)
+(defmacro wait ((&optional (timeout 0.5) (step 0.01)) &body body)
   (with-gensyms (begin-time end-time temp)
     `(let* ((,begin-time (get-internal-real-time))
             (,end-time (+ ,begin-time (* ,timeout internal-time-units-per-second))))

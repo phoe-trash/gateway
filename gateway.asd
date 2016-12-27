@@ -36,6 +36,7 @@
                (:file "def/connection")
                (:file "def/acceptor")
                ;; IMPL
+               (:file "impl/sexp")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
                (:file "impl/standard-library")

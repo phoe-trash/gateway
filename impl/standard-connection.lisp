@@ -63,6 +63,15 @@
     (socket-close (socket connection)))
   (values))
 
+(defun make-connection-pair ()
+  (let* ((socket-listen (socket-listen "127.0.0.1" 0))
+         (port (get-local-port socket-listen))
+         (socket-connect (socket-connect "127.0.0.1" port))
+         (socket-accept (socket-accept socket-listen)))
+    (socket-close socket-listen)
+    (values (make-instance 'standard-connection :socket socket-connect)
+            (make-instance 'standard-connection :socket socket-accept))))
+
 (deftest test-standard-connection
   (finalized-let*
       ((socket-listen (socket-listen "127.0.0.1" 0)

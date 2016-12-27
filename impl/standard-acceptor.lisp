@@ -20,11 +20,10 @@
          (name (format nil "Acceptor for ~{~D.~D.~D.~D~}:~D"
                        (coerce (get-local-name socket) 'list)
                        (get-local-port socket)))
-         (fn (lambda () (%acceptor-loop-1 standard-acceptor)))
-         (thread (make-thread fn :name (cat "Gateway - " name))))
+         (fn (lambda () (%acceptor-loop-1 standard-acceptor))))
     (setf (socket standard-acceptor) socket
           (name standard-acceptor) name
-          (thread standard-acceptor) thread)))
+          (thread standard-acceptor) (make-thread fn :name (cat "Gateway - " name)))))
 
 (defun %acceptor-loop-1 (acceptor)
   (format t "[~~] ~A: starting.~%" (name acceptor))
