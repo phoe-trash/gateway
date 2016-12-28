@@ -7,8 +7,7 @@
 
 (defclass standard-connection (connection)
   ((%socket :accessor socket)
-   (%lock :accessor lock
-          :initform (make-lock))))
+   (%lock :accessor lock)))
 
 (defconstructor (standard-connection (host "127.0.0.1") (port 65001) socket)
   (unless socket

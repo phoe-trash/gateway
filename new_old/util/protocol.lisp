@@ -18,14 +18,6 @@
 (defprotocol messagable ()
   (defgeneric send-message (message recipient)))
 
-(defprotocol acceptor
-    (acceptor () ())
-  (defgeneric socket (object))
-  (defgeneric thread (object))
-  (defgeneric owner (object))
-  (defgeneric kill (object))
-  (defgeneric alivep (object)))
-
 (defprotocol crown
     (crown () ())
   ;; LIBRARY
@@ -51,12 +43,6 @@
   ;; METHODS
   (defgeneric kill (object))
   (defgeneric alivep (object)))
-
-(defprotocol listener
-    (listener () ())
-  (defgeneric owner (object))
-  (defgeneric alivep (object))
-  (defgeneric kill (object)))
 
 (defprotocol player
     (player () ()

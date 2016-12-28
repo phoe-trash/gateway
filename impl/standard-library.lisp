@@ -9,7 +9,7 @@
   ((%hash-table :accessor hash-table-of
                 :initform (make-hash-table :test #'equal))
    (%lock :accessor lock
-          :initform (make-lock))))
+          :initform (make-lock "STANDARD-LIBRARY"))))
 
 (defmethod lookup ((library standard-library) key)
   (with-lock-held ((lock library))
