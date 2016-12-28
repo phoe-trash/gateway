@@ -69,7 +69,7 @@
 (deftest test-standard-listener
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))
-         (data-pusher (lambda (x) x))
+         (data-pusher (lambda (x) (declare (ignore x))))
          (listener (make-instance 'standard-listener
                                   :conn-getter conn-getter :conn-pusher conn-pusher
                                   :data-pusher data-pusher)))
@@ -77,7 +77,7 @@
     (kill listener)
     (is (wait () (deadp listener))))
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
-         (sample-data '(foo bar baz quux))
+         (sample-data-1 '(#:foo #:bar #:baz #:quux)) (sample-data-2 '(1 2 3 #:quux))
          (conn-getter (lambda () (with-lock-held (lock) connections)))
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x) (with-lock-held (lock) (push x data)))))
@@ -94,14 +94,16 @@
         (push (first conns-1) connections)
         (push (first conns-2) connections)
         (notify listener)
-        (data-send (second conns-1) sample-data)
-        (data-send (second conns-2) sample-data))
-      (flet ((output-present-p (connection)
+        (data-send (second conns-1) sample-data-1)
+        (data-send (second conns-1) sample-data-2)
+        (data-send (second conns-2) sample-data-1))
+      (flet ((output-present-p (connection output)
                (wait () (with-lock-held (lock)
-                          (member (list connection sample-data)
+                          (member (list connection output)
                                   data :test #'data-equal)))))
-        (is (output-present-p (first conns-1)))
-        (is (output-present-p (first conns-2)))))))
+        (is (output-present-p (first conns-1) sample-data-1))
+        (is (output-present-p (first conns-1) sample-data-2))
+        (is (output-present-p (first conns-2) sample-data-1))))))
 
 ;; Oh goodness, I remember the days when I've had no idea what a closure was
 ;; and how a function can be an object.

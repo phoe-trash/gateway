@@ -76,8 +76,8 @@
   ;;            (let ((password (make-password passphrase)))
   ;;              (assert (password-matches-p password passphrase))
   ;;              (assert (not (password-matches-p password wrong-passphrase))))))
-  ;;     (mapcar #'check-password
+  ;;     (mapc #'check-password
   ;;             '("" "pass" "password-1" "password-2PassW0RD"
   ;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
   ;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
-  )
+  (values))
