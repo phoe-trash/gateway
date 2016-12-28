@@ -5,14 +5,6 @@
 
 (in-package #:gateway)
 
-(begin-tests)
-
-
-
-
-
-
-
 ;;;; STANDARD-CONNECTION unit test
 (with-clean-config
   (labels ((check-conns () (assert (null (maphash #'list *connection-cache*)))))
@@ -54,47 +46,6 @@
   (assert (i-lock crown))
   (assert (null (i-listener crown)))
   (assert (null (alivep crown))))
-
-;;;; STANDARD-LISTENER unit test, types: :N :E :I
-(with-clean-config
-    (macrolet ((mk () '(make-instance 'standard-connection :type :client :port port))
-               (amk () '(make-instance 'standard-connection :type :accept
-                         :socket (socket connection)))
-               (dq () '(dequeue queue))
-               (do-test (conn-fn lock-fn type)
-                 `(let* ((crown (make-instance 'standard-crown))
-                         (queue (event-queue crown))
-                         (connection (make-instance 'standard-connection
-                                                    :port 0 :type :listen))
-                         (port (get-local-port (socket connection)))
-                         (connection-1 (mk)) (aconnection-1 (amk))
-                         (connection-2 (mk)) (aconnection-2 (amk))
-                         (connection-3 (mk)) (aconnection-3 (amk))
-                         (conns (list connection-1 connection-2 connection-3))
-                         (aconns (list aconnection-1 aconnection-2 aconnection-3))
-                         (listener (make-instance 'standard-listener
-                                                  :owner crown :type ,type))
-                         (data '(dummy test object)))
-                    (with-lock-held ((,lock-fn crown))
-                      (setf (,conn-fn crown) aconns))
-                    (send connection-1 (cons 'first data))
-                    (send connection-2 (cons 'second data))
-                    (send connection-3 (cons 'third data))
-                    (loop do (sleep 0.01) until (= 3 (size queue)))
-                    (let ((queue-data (mapcar #'caddr
-                                              (list (dq) (dq) (dq))))
-                          (expected (list (cons 'first data)
-                                          (cons 'second data)
-                                          (cons 'third data))))
-                      (flet ((find-data (x) (find x queue-data :test #'data-equal)))
-                        (assert (every #'identity (mapcar #'find-data expected)))))
-                    (kill listener)
-                    (mapc (lambda (x) (push x (,conn-fn crown))) conns)
-                    (mapc #'kill (cons connection conns))
-                    (mapc #'kill aconns))))
-      (do-test n-connections n-lock :n)
-      (do-test e-connections e-lock :e)
-      (do-test i-connections i-lock :i)))
 
 ;;;; STANDARD-GEM unit test
 (with-clean-config
@@ -212,5 +163,3 @@
 ;; TODO implement sane logging all around
 ;; TODO implement logging into files
 ;; TODO kill parse rules based on special variables and create a parser class instead
-
-(finish-tests)

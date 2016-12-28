@@ -79,7 +79,7 @@
       ((socket-listen (socket-listen "127.0.0.1" 0)
                       (socket-close socket-listen))
        (port (get-local-port socket-listen))
-       (connection-1 (make-instance 'standard-connection) :port port
+       (connection-1 (make-instance 'standard-connection :port port)
                      (kill connection-1)
                      (is (not (alivep connection-1))))
        (socket-accept (socket-accept socket-listen))
@@ -97,5 +97,5 @@
                (test-case (data)
                  (test connection-1 connection-2 data)
                  (test connection-2 connection-1 data)))
-        (mapcar #'test-case test-cases)))))
+        (mapc #'test-case test-cases)))))
 
