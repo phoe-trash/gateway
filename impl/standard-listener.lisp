@@ -19,7 +19,6 @@
                  :initarg :data-pusher
                  :initform (error "Must define a data pusher function."))))
 
-
 (defconstructor (standard-listener)
   (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
     (let ((name "Gateway - Listener")
@@ -103,3 +102,7 @@
                                   data :test #'data-equal)))))
         (is (output-present-p (first conns-1)))
         (is (output-present-p (first conns-2)))))))
+
+;; Oh goodness, I remember the days when I've had no idea what a closure was
+;; and how a function can be an object.
+;; ~phoe, 28 Dec 2016
