@@ -66,6 +66,13 @@
                  (t
                   (sleep ,step))))))))
 
+;;;; WAIT-UNTIL
+(defmacro wait-until (form &optional (step 0.01))
+  (with-gensyms (result)
+    `(loop for ,result = ,form
+           if ,result return ,result
+             else (sleep ,step))))
+
 ;;;; FINALIZED-LET
 (defmacro finalized-let* ((&rest bindings) &body body)
   (if bindings

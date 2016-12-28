@@ -19,7 +19,9 @@
   (check-type socket usocket)
   (with-lock-held ((lock standard-connection))
     (setf (socket standard-connection)
-          (change-class socket 'standard-socket :owner standard-connection))))
+          (change-class socket 'standard-socket :owner standard-connection)
+          (lock standard-connection)
+          (make-lock (format nil "STANDARD-CONNECTION ~A:~D" host port)))))
 
 (defmethod stream-of ((connection standard-connection))
   (socket-stream (socket connection)))
@@ -77,7 +79,7 @@
       ((socket-listen (socket-listen "127.0.0.1" 0)
                       (socket-close socket-listen))
        (port (get-local-port socket-listen))
-       (connection-1 (make-instance 'standard-connection :port port)
+       (connection-1 (make-instance 'standard-connection) :port port
                      (kill connection-1)
                      (is (not (alivep connection-1))))
        (socket-accept (socket-accept socket-listen))
@@ -90,7 +92,7 @@
                         ("a" a "a" a "a" "b"))))
       (labels ((test (x y data)
                  (data-send x data)
-                 (is (wait (0.5 :step 0.01) (readyp y)))
+                 (is (wait () (readyp y)))
                  (is (data-equal data (data-receive y))))
                (test-case (data)
                  (test connection-1 connection-2 data)
