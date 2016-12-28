@@ -16,11 +16,10 @@
     (setf socket (change-class (socket-connect host port) 'standard-socket
                                :owner standard-connection)))
   (check-type socket usocket)
-  (with-lock-held ((lock standard-connection))
-    (setf (socket standard-connection)
-          (change-class socket 'standard-socket :owner standard-connection)
-          (lock standard-connection)
-          (make-lock (format nil "STANDARD-CONNECTION ~A:~D" host port)))))
+  (setf (socket standard-connection)
+        (change-class socket 'standard-socket :owner standard-connection)
+        (lock standard-connection)
+        (make-lock (format nil "STANDARD-CONNECTION ~A:~D" host port))))
 
 (defmethod stream-of ((connection standard-connection))
   (socket-stream (socket connection)))
