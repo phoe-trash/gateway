@@ -68,42 +68,38 @@
   (values))
 
 (deftest test-standard-listener
-  (let* ((getter (lambda ()))
-         (pusher (lambda (x) (kill x)))
+  (let* ((conn-getter (lambda ()))
+         (conn-pusher (lambda (x) (kill x)))
+         (data-pusher (lambda (x) x))
          (listener (make-instance 'standard-listener
-                                  :conn-getter getter :conn-pusher pusher
-                                  :data-pusher pusher)))
+                                  :conn-getter conn-getter :conn-pusher conn-pusher
+                                  :data-pusher data-pusher)))
     (is (alivep listener))
     (kill listener)
-    (is (wait () (not (alivep listener)))))
+    (is (wait () (deadp listener))))
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
          (sample-data '(foo bar baz quux))
          (conn-getter (lambda () (with-lock-held (lock) connections)))
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x) (with-lock-held (lock) (push x data)))))
-    (finalized-let* ((listener (make-instance 'standard-listener
-                                              :conn-getter conn-getter
-                                              :conn-pusher conn-pusher
-                                              :data-pusher data-pusher)
-                               (kill listener)
-                               (is (wait () (not (alivep listener)))))
-                     (connections-1 (multiple-value-list (make-connection-pair))
-                                    (mapc #'kill connections-1)
-                                    (is (wait () (every (compose #'not #'alivep)
-                                                        connections-1))))
-                     (connections-2 (multiple-value-list (make-connection-pair))
-                                    (mapc #'kill connections-2)
-                                    (is (wait () (every (compose #'not #'alivep)
-                                                        connections-2)))))
+    (finalized-let*
+        ((listener (make-instance 'standard-listener
+                                  :conn-getter conn-getter :conn-pusher conn-pusher
+                                  :data-pusher data-pusher)
+                   (kill listener) (is (wait () (deadp listener))))
+         (conns-1 (multiple-value-list (make-connection-pair))
+                  (mapc #'kill conns-1) (is (wait () (every #'deadp conns-1))))
+         (conns-2 (multiple-value-list (make-connection-pair))
+                  (mapc #'kill conns-2) (is (wait () (every #'deadp conns-2)))))
       (with-lock-held (lock)
-        (push (first connections-1) connections)
-        (push (first connections-2) connections)
+        (push (first conns-1) connections)
+        (push (first conns-2) connections)
         (notify listener)
-        (data-send (second connections-1) sample-data)
-        (data-send (second connections-2) sample-data))
+        (data-send (second conns-1) sample-data)
+        (data-send (second conns-2) sample-data))
       (flet ((output-present-p (connection)
                (wait () (with-lock-held (lock)
                           (member (list connection sample-data)
                                   data :test #'data-equal)))))
-        (is (output-present-p (first connections-1)))
-        (is (output-present-p (first connections-2)))))))
+        (is (output-present-p (first conns-1)))
+        (is (output-present-p (first conns-2)))))))

@@ -44,7 +44,7 @@
   (let* ((socket (socket acceptor))
          (accept (socket-accept (wait-for-input socket)))
          (connection (make-instance 'standard-connection :socket accept)))
-    (format t "[~~] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
+    (format t "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
             (name acceptor)
             (coerce (get-peer-address accept) 'list) (get-peer-port accept))
     (funcall (pusher acceptor) connection)))
@@ -62,12 +62,12 @@
   (let ((acceptor (make-instance 'standard-acceptor :pusher (lambda (x) x))))
     (is (alivep acceptor))
     (kill acceptor)
-    (is (wait () (not (alivep acceptor)))))
+    (is (wait () (deadp acceptor))))
   (let* ((connections nil)
          (pusher (lambda (x) (push x connections))))
     (finalized-let* ((acceptor (make-instance 'standard-acceptor :pusher pusher)
                                (kill acceptor)
-                               (is (wait () (not (alivep acceptor)))))
+                               (is (wait () (deadp acceptor))))
                      (host (get-local-address (socket acceptor)))
                      (port (get-local-port (socket acceptor)))
                      (socket-1 (socket-connect host port)

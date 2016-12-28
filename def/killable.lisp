@@ -18,4 +18,5 @@ serving its purpose.
 |#
 (defprotocol killable ()
   (defgeneric kill (object))
-  (defgeneric alivep (object)))
+  (defgeneric alivep (object))
+  (defun deadp (object) (not (alivep object))))
