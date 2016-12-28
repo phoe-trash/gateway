@@ -13,6 +13,9 @@
 (defmethod sexp ((object standard-date))
   (sexp `(#:date ,(format nil "~A" object))))
 
+(defunsexp date ((datestring #:date))
+  (parse-date datestring))
+
 (defmethod parse-date ((datestring string))
   (handler-case (change-class (local-time:parse-timestring datestring) 'standard-date)
     (local-time::invalid-timestring ()
