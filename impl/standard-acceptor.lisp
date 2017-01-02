@@ -28,6 +28,11 @@
           (coerce (get-local-name socket) 'list)
           (get-local-port socket)))
 
+(defun %make-acceptor (host port pusher)
+  (make-instance 'standard-acceptor
+                 :host host :port port
+                 :pusher pusher))
+
 (defun %acceptor-loop (acceptor)
   (with-thread-handlers (acceptor)
     (let* ((socket (socket acceptor))

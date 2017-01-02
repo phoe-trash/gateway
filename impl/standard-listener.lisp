@@ -42,6 +42,12 @@
             (t
              (format t "[.] ~A: got a notification.~%" (name listener)))))))
 
+(defun %make-listener (getter pusher data-pusher)
+  (make-instance 'standard-listener
+                 :conn-getter getter
+                 :conn-pusher pusher
+                 :data-pusher data-pusher))
+
 (defmethod notify ((listener standard-listener))
   (fformat (socket-stream (socket (connection listener))) "()~%"))
 

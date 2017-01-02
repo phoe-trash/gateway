@@ -15,7 +15,8 @@
         #:usocket
         #:trivial-arguments
         #:trivia
-        #:lparallel)
+        #:lparallel
+        #:lparallel.queue)
   #|
   (:use #:common-lisp
   #:closer-mop
