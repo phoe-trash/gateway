@@ -11,6 +11,12 @@
         when (and (string= key indicator))
           return value))
 
+(defun data-getf (plist indicator)
+  (loop for key in plist by #'cddr
+        for value in (rest plist) by #'cddr
+        when (and (symbolp key) (string= key indicator))
+          return value))
+
 (defun fformat (stream format-string &rest format-args)
   (apply #'format stream format-string format-args)
   (force-output stream))

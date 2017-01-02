@@ -13,7 +13,7 @@
 (defmethod sexp ((object standard-date))
   (sexp `(#:date ,(format nil "~A" object))))
 
-(defunsexp date ((datestring #:date))
+(defunsexp date ((datestring #:date)) ()
   (parse-date datestring))
 
 (defmethod parse-date ((datestring string))
@@ -23,18 +23,18 @@
 
 (defmethod date= ((date-1 standard-date) (date-2 standard-date)
                   &key (unit :nanosecond))
-  (flet ((%date= (date-1 date-2 unit)
-           (assert (member unit *date-time-units*))
-           (let ((units *date-time-units*))
-             (labels ((v (date) (multiple-value-list
-                                 (local-time:decode-timestamp
-                                  date :timezone local-time:+utc-zone+)))
-                      (d (date) (subseq (nreverse (v date)) 4
-                                        (+ 5 (position unit units)))))
-               (every #'= (d date-1) (d date-2))))))
-    (if (eq unit :nanosecond)
-        (local-time:timestamp= date-1 date-2)
-        (%date= date-1 date-2 unit))))
+  (assert (member unit *date-time-units*))
+  (if (eq unit :nanosecond)
+      (local-time:timestamp= date-1 date-2)
+      (every #'= (%date-elts date-1 unit) (%date-elts date-2 unit))))
+
+(defun %date=-decode (date)
+  (multiple-value-list (local-time:decode-timestamp
+                        date :timezone local-time:+utc-zone+)))
+
+(defun %date-elts (date unit)
+  (subseq (nreverse (%date=-decode date)) 4
+          (+ 5 (position unit *date-time-units*))))
 
 (defmethod date/= ((date-1 standard-date) (date-2 standard-date)
                    &key (unit :nanosecond))
