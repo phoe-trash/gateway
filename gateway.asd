@@ -30,12 +30,14 @@
                ;; DEF
                (:file "def/sexpable")
                (:file "def/killable")
+               (:file "def/named")
                (:file "def/date")
                (:file "def/password")
                (:file "def/library")
                (:file "def/connection")
                (:file "def/acceptor")
                (:file "def/listener")
+               (:file "def/crown")
                ;; IMPL
                (:file "impl/sexp")
                (:file "impl/standard-date")
@@ -45,5 +47,6 @@
                (:file "impl/standard-connection")
                (:file "impl/standard-acceptor")
                (:file "impl/standard-listener")
+               (:file "impl/standard-crown")
                ;; OTHER
                (:file "new")))

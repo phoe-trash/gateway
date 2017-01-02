@@ -5,6 +5,11 @@
 
 (in-package #:gateway)
 
+#|
+Protocol class CROWN
+
+
+|#
 (defprotocol crown
     (crown () ())
   ;; DATA AND THREADS
@@ -27,5 +32,3 @@
   ;; METHODS
   (defgeneric kill (object))
   (defgeneric alivep (object)))
-
-

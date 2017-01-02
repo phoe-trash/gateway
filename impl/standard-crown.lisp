@@ -10,25 +10,25 @@
    (%queue :accessor queue)
    (%n-acceptor :accessor n-acceptor)
    (%n-connections :accessor n-connections :initform ())
-   (%n-lock :accessor n-lock :initform (make-lock (%crown-lock-name "N")))
+   (%n-lock :accessor n-lock :initform (%crown-lock "N"))
    (%n-listener :accessor n-listener)
    (%e-connections :accessor e-connections :initform ())
-   (%e-lock :accessor e-lock :initform (make-lock (%crown-lock-name "E")))
+   (%e-lock :accessor e-lock :initform (%crown-lock "E"))
    (%e-listener :accessor e-listener)
    (%i-acceptor :accessor i-acceptor)
    (%i-connections :accessor i-connections :initform ())
-   (%i-lock :accessor i-lock :initform (make-lock (%crown-lock-name "I")))
+   (%i-lock :accessor i-lock :initform (%crown-lock "I"))
    (%i-listener :accessor i-listener)))
 
-(defun %crown-lock-name (string)
-  (format nil "Gateway - Crown ~A-lock" string))
+(defun %crown-lock (string)
+  (make-lock (format nil "Gateway - Crown ~A-lock" string)))
 
 (defconstructor (standard-crown new
                                 (n-host "127.0.0.1") (n-port 0)
                                 (i-host "127.0.0.1") (i-port 0))
   (if new
       (%crown-constructor-new standard-crown n-host n-port i-host i-port)
-      (error "Constructing from existing data implemented yet.")))
+      (error "Constructing from existing data not implemented yet.")))
 
 (defun %crown-constructor-new (crown n-host n-port i-host i-port)
   (setf (values (library crown) (queue crown)
