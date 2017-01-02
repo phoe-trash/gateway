@@ -11,7 +11,7 @@
   (defvar *date-time-units* '(:year :month :day :hour :minute :second :nanosecond)))
 
 (defmethod sexp ((object standard-date))
-  (sexp `(#:date ,(format nil "~A" object))))
+  (sexp `(#:date #:date ,(format nil "~A" object))))
 
 (defunsexp date ((datestring #:date)) ()
   (parse-date datestring))
@@ -28,13 +28,13 @@
       (local-time:timestamp= date-1 date-2)
       (every #'= (%date-elts date-1 unit) (%date-elts date-2 unit))))
 
-(defun %date=-decode (date)
-  (multiple-value-list (local-time:decode-timestamp
-                        date :timezone local-time:+utc-zone+)))
-
 (defun %date-elts (date unit)
   (subseq (nreverse (%date=-decode date)) 4
           (+ 5 (position unit *date-time-units*))))
+
+(defun %date=-decode (date)
+  (multiple-value-list
+   (local-time:decode-timestamp date :timezone local-time:+utc-zone+)))
 
 (defmethod date/= ((date-1 standard-date) (date-2 standard-date)
                    &key (unit :nanosecond))
@@ -105,4 +105,5 @@
       (is (date> d-month d-day))
       (is (date> d-year d-month))
       (is (eq d-orig (apply #'date-min vars)))
-      (is (eq d-year (apply #'date-max vars))))))
+      (is (eq d-year (apply #'date-max vars)))
+      (is (date= d-orig (unsexp (sexp d-orig)))))))
