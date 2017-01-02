@@ -8,7 +8,7 @@
 #|
 Protocol class LISTENER
 
-Must be KILLABLE.
+Must be KILLABLE and NAMED.
 
 Spawns a thread which monitors a group of connections for activity
 and pushes messages received from them onto a provided queue.

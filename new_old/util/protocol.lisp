@@ -20,12 +20,9 @@
 
 (defprotocol crown
     (crown () ())
-  ;; LIBRARY
-  (defgeneric lookup (crown key))
-  (defgeneric (setf lookup) (new-value crown key))
-  ;; EVENT QUEUE
-  (defgeneric event-queue (object))
-  (defgeneric gems (object))
+  ;; DATA AND THREADS
+  (defgeneric library (crown))
+  (defgeneric queue (object))
   ;; N-CONNECTIONS
   (defgeneric n-acceptor (object))
   (defgeneric n-connections (object))

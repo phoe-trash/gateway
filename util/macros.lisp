@@ -85,6 +85,30 @@
              (progn ,@(cddr (first bindings))))))
       `(progn ,@body)))
 
+;;;; WITH-THREAD-HANDLERS
+(defmacro with-thread-handlers ((symbol) &body body)
+  `(labels
+       ((%loop-1 (,symbol)
+          (format t "[~~] ~A: starting.~%" (name ,symbol))
+          (unwind-protect
+               (%loop-2 ,symbol)
+            (kill ,symbol)
+            (format t "[!] ~A: killed.~%" (name ,symbol))))
+        (%loop-2 (,symbol)
+          (restart-case
+              (loop (%loop-3 ,symbol))
+            (retry ()
+              :report %report
+              (format t "[!] ~A: restarted.~%" (name ,symbol))
+              (%loop-2 ,symbol))))
+        (%loop-3 (,symbol)
+          ,@body)
+        (%report (stream)
+          (format stream
+                  "Abort the current iteration and send the ~A back to its loop."
+                  (string-downcase (string ',symbol)))))
+     (%loop-1 ,symbol)))
+
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 ;; (eval-when (:compile-toplevel :load-toplevel :execute)
 ;;   (defvar *config-vars* nil)

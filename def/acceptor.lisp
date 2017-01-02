@@ -8,7 +8,7 @@
 #|
 Protocol class ACCEPTOR
 
-Must be KILLABLE.
+Must be KILLABLE and NAMED.
 
 Spawns a thread which accepts new connections on the
 provided host and port.

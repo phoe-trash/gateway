@@ -19,40 +19,28 @@
                  :initarg :data-pusher
                  :initform (error "Must define a data pusher function."))))
 
-(defconstructor (standard-listener)
+(defconstructor (standard-listener (name ""))
   (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
-    (let ((name "Gateway - Listener")
-          (fn (lambda () (%listener-loop-1 standard-listener))))
+    (let ((fn (lambda () (%listener-loop standard-listener))))
       (funcall (conn-pusher standard-listener) connection-1)
-      (setf (name standard-listener) "Gateway - Listener"
+      (setf (name standard-listener) (%listener-constructor-name name)
             (connection standard-listener) connection-2
             (thread standard-listener) (make-thread fn :name name)))))
 
-(defun %listener-loop-1 (listener)
-  (format t "[~~] ~A: starting.~%" (name listener))
-  (unwind-protect
-       (%listener-loop-2 listener)
-    (kill listener)
-    (format t "[!] ~A: killed.~%" (name listener))))
+(defun %listener-constructor-name (name)
+  (format nil "Gateway - ~AListener" name))
 
-(defun %listener-loop-2 (listener)
-  (restart-case
-      (loop (%listener-loop-3 listener))
-    (retry ()
-      :report "Abort the current iteration and send the listener back to its loop."
-      (format t "[!] ~A: restarted.~%" (name listener))
-      (%listener-loop-2 listener))))
-
-(defun %listener-loop-3 (listener)
-  (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
-         (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
-         (connection (owner socket))
-         (data (data-receive connection)))
-    (cond (data
-           (format t "[.] ~A: got data, ~S.~%" (name listener) data)
-           (funcall (data-pusher listener) (list connection data)))
-          (t
-           (format t "[.] ~A: got notified.~%" (name listener))))))
+(defun %listener-loop (listener)
+  (with-thread-handlers (listener)
+    (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
+           (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
+           (connection (owner socket))
+           (data (data-receive connection)))
+      (cond (data
+             (format t "[.] ~A: got data, ~S.~%" (name listener) data)
+             (funcall (data-pusher listener) (list connection data)))
+            (t
+             (format t "[.] ~A: got a notification.~%" (name listener)))))))
 
 (defmethod notify ((listener standard-listener))
   (fformat (socket-stream (socket (connection listener))) "()~%"))
