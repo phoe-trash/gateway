@@ -36,15 +36,18 @@
 
 (defmethod password-matches-p ((password standard-password) (passphrase string))
   (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))
-	 (key (derive-key passphrase :salt salt
-				     :iteration-count (iteration-count password)
-				     :key-length (key-length password))))
+         (key (derive-key passphrase :salt salt
+                                     :iteration-count (iteration-count password)
+                                     :key-length (key-length password))))
     (string= key (key-of password))))
 
 (defmethod sexp ((password standard-password))
   (sexp `(#:password #:key ,(key-of password)
-		     #:salt ,(salt password)
-		     #:iters ,(iteration-count password))))
+                     #:salt ,(salt password)
+                     #:iters ,(iteration-count password))))
+
+(defunsexp password ((key #:key) (salt #:salt) (iters #:iters)) ()
+  (make-instance 'standard-password :%read-data (list key salt iters)))
 
 (defun derive-key (passphrase &key salt
                                 (iteration-count 1000)
@@ -80,4 +83,5 @@
   ;;             '("" "pass" "password-1" "password-2PassW0RD"
   ;;               "password-2ĄŚÐΩŒĘ®ĘŒ®ÐÆąęea
   ;; ÆŃ±¡¿¾   £¼‰‰ę©œ»æśððæś"))))
-  (values))
+  (let ((password (make-password "foo")))
+    (is (password-matches-p (unsexp (sexp password)) "foo"))))
