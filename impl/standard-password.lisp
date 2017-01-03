@@ -71,6 +71,8 @@
   (check-type passphrase string)
   (make-instance 'standard-password :passphrase passphrase))
 
+
+
 (deftest test-standard-password
   ;;;; Commented out for speed, as password hashing takes time.
   ;; (let ((wrong-passphrase "Wr0ng-Pas$w0rd"))

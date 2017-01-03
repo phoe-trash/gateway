@@ -109,7 +109,7 @@
 
 (deftest test-standard-crown-multi-connection
   (flet ((connect (host port)
-           (make-instance 'standard-connection :host host :port port))) 
+           (make-instance 'standard-connection :host host :port port)))
     (multiple-value-bind (crown n-host n-port i-host i-port)
         (%make-crown-with-listed-ports)
       (declare (ignore i-host i-port))
@@ -121,5 +121,5 @@
                             (connection-3 (connect n-host n-port)
                                           (kill connection-3)))
              (is (wait () (= 4 (length (n-connections crown))))))
-        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
+        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO 
         (kill crown)))))

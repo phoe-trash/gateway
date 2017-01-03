@@ -19,6 +19,8 @@
   (with-lock-held ((lock library))
     (setf (gethash key (hash-table-of library)) new-value)))
 
+
+
 (deftest test-standard-library
   (let* ((library (make-instance 'standard-library))
          (maximum #.(expt 2 15))

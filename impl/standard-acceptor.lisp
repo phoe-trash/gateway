@@ -58,6 +58,8 @@
     (kill acceptor)
     (is (wait () (deadp acceptor)))))
 
+
+
 (deftest test-standard-acceptor
   (let* ((connections nil)
          (pusher (lambda (x) (push x connections))))

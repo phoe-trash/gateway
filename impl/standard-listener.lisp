@@ -60,6 +60,8 @@
     (destroy-thread (thread listener)))
   (values))
 
+
+
 (deftest test-standard-listener-death
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))

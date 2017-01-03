@@ -76,6 +76,8 @@
     (values (make-instance 'standard-connection :socket socket-connect)
             (make-instance 'standard-connection :socket socket-accept))))
 
+
+
 (deftest test-standard-connection
   (finalized-let*
       ((socket-listen (socket-listen "127.0.0.1" 0)

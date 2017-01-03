@@ -63,6 +63,8 @@
 (defun %now ()
   (change-class (local-time:now) 'standard-date))
 
+
+
 (deftest test-standard-date
   (flet ((mkdt (d s ns) (make-instance 'standard-date :day d :sec s :nsec ns)))
     (let* ((d-orig (mkdt 0 0 0)) (d-same (mkdt 0 0 0)) (d-nsec (mkdt 0 0 1))
