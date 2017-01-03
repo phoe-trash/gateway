@@ -60,7 +60,7 @@
     (destroy-thread (thread listener)))
   (values))
 
-(deftest test-standard-listener
+(deftest test-standard-listener-death
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))
          (data-pusher (lambda (x) (declare (ignore x))))
@@ -69,7 +69,9 @@
                                   :data-pusher data-pusher)))
     (is (alivep listener))
     (kill listener)
-    (is (wait () (deadp listener))))
+    (is (wait () (deadp listener)))))
+
+(deftest test-standard-listener
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
          (sample-data-1 '(#:foo #:bar #:baz #:quux)) (sample-data-2 '(1 2 3 #:quux))
          (conn-getter (lambda () (with-lock-held (lock) connections)))

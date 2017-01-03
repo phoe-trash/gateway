@@ -52,11 +52,13 @@
     (destroy-thread (thread acceptor)))
   (values))
 
-(deftest test-standard-acceptor
+(deftest test-standard-acceptor-death
   (let ((acceptor (make-instance 'standard-acceptor :pusher (lambda (x) x))))
     (is (alivep acceptor))
     (kill acceptor)
-    (is (wait () (deadp acceptor))))
+    (is (wait () (deadp acceptor)))))
+
+(deftest test-standard-acceptor
   (let* ((connections nil)
          (pusher (lambda (x) (push x connections))))
     (finalized-let* ((acceptor (make-instance 'standard-acceptor :pusher pusher)

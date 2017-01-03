@@ -31,6 +31,10 @@
 ;;     ;;         (get-peer-port (socket obj)))
 ;;     ))
 
+(defun %host-to-string (vector)
+  (format nil "~{~D.~D.~D.~D~}"
+          (coerce vector 'list)))
+
 (defmacro with-connection ((connection &optional error-return-value) &body body)
   `(when (alivep ,connection)
      (handler-case

@@ -63,18 +63,63 @@
                        (i-acceptor crown) (i-listener crown))))
 
 (defmethod kill ((crown standard-crown))
-  (mapc #'kill (list (n-acceptor crown) (n-listener crown) (e-listener crown)
-                     (i-acceptor crown) (i-listener crown)))
+  (let ((elements (list (n-acceptor crown) (n-listener crown) (e-listener crown)
+                        (i-acceptor crown) (i-listener crown))))
+    (mapc #'kill elements))
   (values))
 
-(deftest test-standard-crown
+(defun %make-crown-with-listed-ports ()
   (let* ((crown (make-instance 'standard-crown :new t))
-         (elements (list (n-acceptor crown) (n-listener crown)
-                         (e-listener crown) (i-acceptor crown)
-                         (i-listener crown))))
+         (n-socket (socket (n-acceptor crown)))
+         (i-socket (socket (i-acceptor crown))))
+    (values crown
+            (%host-to-string (get-local-address n-socket)) (get-local-port n-socket)
+            (%host-to-string (get-local-address i-socket)) (get-local-port i-socket))))
+
+
+
+(deftest test-standard-crown-death
+  (let* ((crown (make-instance 'standard-crown :new t))
+         (elements (list (n-acceptor crown) (n-listener crown) (e-listener crown)
+                         (i-acceptor crown) (i-listener crown))))
     (kill crown)
     (is (wait () (deadp crown)))
-    (is (wait () (every #'deadp elements))))
-  ;; (let* ((crown (make-instance 'standard-crown :new t))
-  ;;        ()))
-  )
+    (is (wait () (every #'deadp elements)))))
+
+(deftest test-standard-crown-single-connections
+  (flet ((connect (host port)
+           (make-instance 'standard-connection :host host :port port)))
+    (multiple-value-bind (crown n-host n-port i-host i-port)
+        (%make-crown-with-listed-ports)
+      (unwind-protect
+           (progn
+             (is (wait () (= 1 (length (n-connections crown)))))
+             (is (wait () (= 1 (length (e-connections crown)))))
+             (is (wait () (= 1 (length (i-connections crown)))))
+             (finalized-let* ((connection (connect n-host n-port)
+                                          (kill connection)))
+               (is (wait () (= 2 (length (n-connections crown))))))
+             ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
+             (finalized-let* ((connection (connect i-host i-port)
+                                          (kill connection)))
+               (is (wait () (= 2 (length (i-connections crown))))))
+             ;; (is (wait () (= 1 (length (i-connections crown))))) ;; TODO
+             )
+        (kill crown)))))
+
+(deftest test-standard-crown-multi-connection
+  (flet ((connect (host port)
+           (make-instance 'standard-connection :host host :port port))) 
+    (multiple-value-bind (crown n-host n-port i-host i-port)
+        (%make-crown-with-listed-ports)
+      (declare (ignore i-host i-port))
+      (unwind-protect
+           (finalized-let* ((connection-1 (connect n-host n-port)
+                                          (kill connection-1))
+                            (connection-2 (connect n-host n-port)
+                                          (kill connection-2))
+                            (connection-3 (connect n-host n-port)
+                                          (kill connection-3)))
+             (is (wait () (= 4 (length (n-connections crown))))))
+        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
+        (kill crown)))))

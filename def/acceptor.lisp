@@ -14,4 +14,6 @@ Spawns a thread which accepts new connections on the
 provided host and port.
 |#
 (defprotocol acceptor
-    (acceptor () ()))
+    (acceptor () ())
+  (defmethod socket (object))
+  (defmethod thread (object)))
