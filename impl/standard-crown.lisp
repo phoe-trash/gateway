@@ -57,3 +57,24 @@
    (lambda (x) (with-lock-held ((e-lock crown)) (push x (e-connections crown))))
    (lambda (x) (with-lock-held ((i-lock crown)) (push x (i-connections crown))))
    (lambda (x) (push-queue x (queue crown)))))
+
+(defmethod alivep ((crown standard-crown))
+  (some #'alivep (list (n-acceptor crown) (n-listener crown) (e-listener crown)
+                       (i-acceptor crown) (i-listener crown))))
+
+(defmethod kill ((crown standard-crown))
+  (mapc #'kill (list (n-acceptor crown) (n-listener crown) (e-listener crown)
+                     (i-acceptor crown) (i-listener crown)))
+  (values))
+
+(deftest test-standard-crown
+  (let* ((crown (make-instance 'standard-crown :new t))
+         (elements (list (n-acceptor crown) (n-listener crown)
+                         (e-listener crown) (i-acceptor crown)
+                         (i-listener crown))))
+    (kill crown)
+    (is (wait () (deadp crown)))
+    (is (wait () (every #'deadp elements))))
+  ;; (let* ((crown (make-instance 'standard-crown :new t))
+  ;;        ()))
+  )
