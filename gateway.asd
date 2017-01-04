@@ -55,6 +55,6 @@
                (:file "impl/standard-crown")
                (:file "impl/standard-gem")
                ;; COMMANDS
-               (:file "impl/commands/clean-connections")
+               (:file "commands/clean-connections")
                ;; OTHER
                (:file "new")))
