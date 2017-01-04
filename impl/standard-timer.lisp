@@ -7,20 +7,18 @@
 
 (defclass standard-timer (timer)
   ((%thread :accessor thread)
-   (%events :accessor events :initarg :events :initform ())
+   (%arguments :accessor arguments :initarg :arguments :initform ())
    (%tick :accessor tick)
-   (%pusher :accessor pusher)
+   (%handler :accessor handler)
    (%paused :accessor pausedp)))
 
-(defconstructor (standard-timer tick pusher pausedp)
+(defconstructor (standard-timer tick handler pausedp)
   (cond ((null tick)
          (setf tick 0.1))
-        ((and (numberp tick) (not (floatp tick)))
-         (setf tick (float tick)))
         ((not (floatp tick))
-         (error "Tick value must be a number.")))
+         (setf tick (float tick))))
   (setf (tick standard-timer) tick
-        (pusher standard-timer) pusher
+        (handler standard-timer) handler
         (pausedp standard-timer) pausedp
         (thread standard-timer)
         (make-thread (curry #'%timer-loop standard-timer)
@@ -54,7 +52,7 @@
     (let (before-time after-time time-diff ms)
       (setf before-time (get-internal-real-time))
       (unless (pausedp timer)
-        (mapc (pusher timer) (events timer)))
+        (mapc (handler timer) (arguments timer)))
       (setf after-time (get-internal-real-time)
             time-diff (float (* (- after-time before-time)
                                 internal-time-units-per-second))
@@ -62,29 +60,29 @@
       (unless (negative-real-p ms)
         (sleep ms)))))
 
-(defun %make-timer (events tick pusher)
-  (make-instance 'standard-timer :events events :tick tick :pusher pusher))
+(defun %make-timer (arguments tick handler)
+  (make-instance 'standard-timer :arguments arguments :tick tick :handler handler))
 
 
 
 (deftest test-standard-timer-death
-  (let* ((pusher (lambda (x) (declare (ignore x))))
-         (timer (make-instance 'standard-timer :pusher pusher)))
+  (let* ((handler (lambda (x) (declare (ignore x))))
+         (timer (make-instance 'standard-timer :handler handler)))
     (is (alivep timer))
     (kill timer)
     (is (wait () (deadp timer)))))
 
 (deftest test-standard-timer-speed
   (finalized-let* ((count 0)
-                   (pusher (lambda (x) (incf count x)))
-                   (timer (%make-timer '(1) 0.001 pusher)
+                   (handler (lambda (x) (incf count x)))
+                   (timer (%make-timer '(1) 0.001 handler)
                           (kill timer)))
     (is (wait () (> count 100)))))
 
 (deftest test-standard-timer-pause
   (finalized-let* ((count 0)
-                   (pusher (lambda (x) (incf count x)))
-                   (timer (%make-timer '(1) 0.001 pusher)
+                   (handler (lambda (x) (incf count x)))
+                   (timer (%make-timer '(1) 0.001 handler)
                           (kill timer)))
     (is (wait () (> count 100)))
     (pause timer)
@@ -98,7 +96,7 @@
 (deftest test-standard-timer
   (finalized-let*
       ((elements ())
-       (pusher (lambda (x) (unless ( < 10 (length elements)) (push x elements))))
-       (timer (%make-timer '(foo bar) 0.01 pusher)
+       (handler (lambda (x) (unless ( < 10 (length elements)) (push x elements))))
+       (timer (%make-timer '(foo bar) 0.01 handler)
               (kill timer)))
     (is (wait () (equal elements '(bar foo bar foo bar foo bar foo bar foo))))))
