@@ -73,8 +73,10 @@
          (n-socket (socket (n-acceptor crown)))
          (i-socket (socket (i-acceptor crown))))
     (values crown
-            (%host-to-string (get-local-address n-socket)) (get-local-port n-socket)
-            (%host-to-string (get-local-address i-socket)) (get-local-port i-socket))))
+            (%host-to-string (get-local-address n-socket))
+            (get-local-port n-socket)
+            (%host-to-string (get-local-address i-socket))
+            (get-local-port i-socket))))
 
 (defun %make-crown ()
   (make-instance 'standard-crown :new t))
@@ -124,5 +126,5 @@
                             (connection-3 (connect n-host n-port)
                                           (kill connection-3)))
              (is (wait () (= 4 (length (n-connections crown))))))
-        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO 
+        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
         (kill crown)))))

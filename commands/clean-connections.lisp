@@ -14,6 +14,9 @@ Arguments:
 * LOCK: a lock to be held, or NIL if no lock is required.
 * GETTER: a function of no arguments to retrieve the connections.
 * SETTER: a function of one argument to set the connections.
+
+TODO rename commands to operations, since commands will be textual
+SEXPs sent between client and server.
 |#
 (defcommand clean-connections (:lock :getter :setter)
   (with-lock-held ((or lock (make-lock)))

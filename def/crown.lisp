@@ -8,7 +8,7 @@
 #|
 Protocol class CROWN
 
-
+TODO add timer and gems
 |#
 (defprotocol crown
     (crown () ())
