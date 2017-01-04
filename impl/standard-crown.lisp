@@ -76,6 +76,9 @@
             (%host-to-string (get-local-address n-socket)) (get-local-port n-socket)
             (%host-to-string (get-local-address i-socket)) (get-local-port i-socket))))
 
+(defun %make-crown ()
+  (make-instance 'standard-crown :new t))
+
 
 
 (deftest test-standard-crown-death

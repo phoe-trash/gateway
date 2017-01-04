@@ -31,6 +31,7 @@
                (:file "def/sexpable")
                (:file "def/killable")
                (:file "def/named")
+               (:file "def/command")
                (:file "def/date")
                (:file "def/password")
                (:file "def/library")
@@ -39,8 +40,10 @@
                (:file "def/listener")
                (:file "def/timer")
                (:file "def/crown")
+               (:file "def/gem")
                ;; IMPL
                (:file "impl/sexp")
+               (:file "impl/commands")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
                (:file "impl/standard-library")
@@ -50,5 +53,8 @@
                (:file "impl/standard-listener")
                (:file "impl/standard-timer")
                (:file "impl/standard-crown")
+               (:file "impl/standard-gem")
+               ;; COMMANDS
+               (:file "impl/commands/clean-connections")
                ;; OTHER
                (:file "new")))

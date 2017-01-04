@@ -19,8 +19,9 @@
           return value))
 
 (defun %data-getf-let-list (keyword-list gensym)
-  (flet ((fn (x) `(,(first x) (data-getf ,gensym ',(second x)))))
-    (mapcar #'fn keyword-list)))
+  (flet ((fn (x) `(,(first x) (data-getf ,gensym ',(or (second x) (first x)))))
+         (listify (x) (if (listp x) x (list (intern (string x) :gateway) x))))
+    (mapcar #'fn (mapcar #'listify keyword-list))))
 
 ;;;; DATA-EQUAL
 (defun data-equal (object-1 object-2)

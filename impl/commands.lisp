@@ -9,12 +9,13 @@
 
 (defvar %command-data% (make-hash-table))
 
-(defun %execute (command)
-  (assert (proper-list-p command))
+(defun %execute (command plist)
+  (assert (proper-list-p plist))
   (assert (identity command))
-  (let* ((data-word (string (first command)))
-         (fn (gethash data-word %command-data%)))
-    (funcall fn (cdr sexp))))
+  (let* ((fn (gethash command %command-data%)))
+    (if (null fn)
+        (error "Command ~S not found." command)
+        (funcall fn plist))))
 
 (defmacro defcommand (name keyword-list &body body)
   (let* ((gensym-sexp (gensym "COMMAND"))
@@ -25,18 +26,3 @@
              (declare (ignorable ,@args))
              (let ,let-list
                ,@body)))))
-
-#|
-Command CLEAN-CONNECTIONS
-
-This command cleans a list of connections from dead ones.
-
-Arguments:
-* LOCK: a lock to be held, or NIL if no lock is required.
-* GETTER: a function of no arguments to retrieve the connections.
-* SETTER: a function of one argument to set the connections.
-|#
-(defcommand clean-connections (lock getter setter)
-  (with-lock-held ((or lock (make-lock)))
-    (let ((result (delete-if #'deadp (funcall getter))))
-      (funcall setter result))))
