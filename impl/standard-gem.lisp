@@ -54,7 +54,7 @@
 
 (deftest test-standard-gem-death
   (let* ((getter (lambda () (loop (sleep 1))))
-         (pusher (lambda (x) x))
+         (pusher (lambda (x) (declare (ignore x))))
          (gem (%make-gem getter pusher pusher nil)))
     (is (alivep gem))
     (kill gem)
@@ -65,7 +65,7 @@
       ((data '(0 1 2 3 4 5 6 7 8 9))
        (accepted-data ())
        (getter (lambda () (if data (pop data) (loop (sleep 1)))))
-       (pusher (lambda (x) x))
+       (pusher (lambda (x) (declare (ignore x))))
        (handler (lambda (x) (push x accepted-data)))
        (gem (%make-gem getter pusher handler nil)
             (kill gem)))
