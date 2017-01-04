@@ -48,6 +48,7 @@
                (:file "impl/standard-connection")
                (:file "impl/standard-acceptor")
                (:file "impl/standard-listener")
+               (:file "impl/standard-timer")
                (:file "impl/standard-crown")
                ;; OTHER
                (:file "new")))

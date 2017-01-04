@@ -59,8 +59,13 @@
             time-diff (float (* (- after-time before-time)
                                 internal-time-units-per-second))
             ms (- (tick timer) time-diff))
-      (unless (> 0 ms)
+      (unless (negative-real-p ms)
         (sleep ms)))))
+
+(defun %make-timer (events tick pusher)
+  (make-instance 'standard-timer :events events :tick tick :pusher pusher))
+
+
 
 (deftest test-standard-timer-death
   (let* ((pusher (lambda (x) (declare (ignore x))))
@@ -69,11 +74,32 @@
     (kill timer)
     (is (wait () (deadp timer)))))
 
-(deftest test-standard-timer-quantity
+(deftest test-standard-timer-speed
   (finalized-let* ((count 0)
                    (pusher (lambda (x) (incf count x)))
-                   (timer (make-instance 'standard-timer
-                                         :events '(1)
-                                         :tick 0.001 :pusher pusher)
+                   (timer (%make-timer '(1) 0.001 pusher)
                           (kill timer)))
     (is (wait () (> count 100)))))
+
+(deftest test-standard-timer-pause
+  (finalized-let* ((count 0)
+                   (pusher (lambda (x) (incf count x)))
+                   (timer (%make-timer '(1) 0.001 pusher)
+                          (kill timer)))
+    (is (wait () (> count 100)))
+    (pause timer)
+    (let ((temp-count count))
+      (sleep 0.01)
+      (is (= count temp-count))
+      (unpause timer)
+      (sleep 0.01)
+      (is (wait () (> count temp-count))))))
+
+(deftest test-standard-timer
+  (finalized-let* ((elements ())
+                   (pusher (lambda (x) (unless ( < 10 (length elements))
+                                         (push x elements))))
+                   (timer (%make-timer '(foo bar) 0.01 pusher)
+                          (kill timer)))
+    (is (wait () (equal elements
+                        '(bar foo bar foo bar foo bar foo bar foo))))))
