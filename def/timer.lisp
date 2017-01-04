@@ -8,13 +8,22 @@
 #|
 Protocol class TIMER
 
-This is a class that accepts a list of events in the form ()
+Must be KILLABLE and NAMED.
+
+This is a class that accepts a list of events that are repeatedly
+pushed using a provided pusher function.
 |#
 (defprotocol timer
     (timer () ())
+  (defgeneric name (object))
+  (defgeneric pausedp (object))
+  (defgeneric (setf pausedp) (new-value object))
   (defgeneric thread (object))
   (defgeneric events (object))
-  (defgeneric (setf events) (object))
+  (defgeneric (setf events) (new-value object))
   (defgeneric tick (object))
-  (defgeneric (setf tick) (object))
-  (defgeneric pusher (object)))
+  (defgeneric pusher (object))
+  (defgeneric pause (object))
+  (defgeneric unpause (object))
+  (defgeneric alivep (object))
+  (defgeneric kill (object)))
