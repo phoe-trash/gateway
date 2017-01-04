@@ -96,10 +96,9 @@
       (is (wait () (> count temp-count))))))
 
 (deftest test-standard-timer
-  (finalized-let* ((elements ())
-                   (pusher (lambda (x) (unless ( < 10 (length elements))
-                                         (push x elements))))
-                   (timer (%make-timer '(foo bar) 0.01 pusher)
-                          (kill timer)))
-    (is (wait () (equal elements
-                        '(bar foo bar foo bar foo bar foo bar foo))))))
+  (finalized-let*
+      ((elements ())
+       (pusher (lambda (x) (unless ( < 10 (length elements)) (push x elements))))
+       (timer (%make-timer '(foo bar) 0.01 pusher)
+              (kill timer)))
+    (is (wait () (equal elements '(bar foo bar foo bar foo bar foo bar foo))))))
