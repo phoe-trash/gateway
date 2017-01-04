@@ -5,6 +5,7 @@
 
 (in-package #:gateway)
 
+;;;; DATA=-GETF
 (defun string=-getf (plist indicator)
   (loop for key in plist by #'cddr
         for value in (rest plist) by #'cddr
@@ -17,6 +18,21 @@
         when (and (symbolp key) (string= key indicator))
           return value))
 
+(defun %data-getf-let-list (keyword-list gensym)
+  (flet ((fn (x) `(,(first x) (data-getf ,gensym ',(or (second x) (first x)))))
+         (listify (x) (if (listp x) x (list (intern (string x) :gateway) x))))
+    (mapcar #'fn (mapcar #'listify keyword-list))))
+
+;;;; DATA-EQUAL
+(defun data-equal (object-1 object-2)
+  (cond ((and (consp object-1) (consp object-2))
+         (every #'data-equal object-1 object-2))
+        ((and (symbolp object-1) (symbolp object-2))
+         (string= object-1 object-2))
+        (t
+         (equal object-1 object-2))))
+
+;;;; VARIA
 (defun fformat (stream format-string &rest format-args)
   (apply #'format stream format-string format-args)
   (force-output stream))
@@ -44,15 +60,6 @@
          (make-symbol (symbol-name sexp)))
         (t
          sexp)))
-
-;;;; DATA-EQUAL
-(defun data-equal (object-1 object-2)
-  (cond ((and (consp object-1) (consp object-2))
-         (every #'data-equal object-1 object-2))
-        ((and (symbolp object-1) (symbolp object-2))
-         (string= object-1 object-2))
-        (t
-         (equal object-1 object-2))))
 
 ;;;; ARGLIST VERIFICATION
 (defun compile-lambda (lambda-expr)

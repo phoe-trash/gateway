@@ -37,13 +37,9 @@
          (gensym-parent (gensym "PARENT"))
          (parent-list (if (car parent) (list (car parent)) (list gensym-parent)))
          (args (cons gensym-sexp parent-list))
-         (let-list (%defunsexp-let-list keyword-list gensym-sexp)))
+         (let-list (%data-getf-let-list keyword-list gensym-sexp)))
     `(setf (gethash (string ',name) %unsexp-data%)
            (lambda ,args
              (declare (ignorable ,@args))
              (let ,let-list
                ,@body)))))
-
-(defun %defunsexp-let-list (keyword-list gensym)
-  (flet ((fn (x) `(,(first x) (data-getf ,gensym ',(second x)))))
-    (mapcar #'fn keyword-list)))

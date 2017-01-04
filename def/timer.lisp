@@ -10,8 +10,10 @@ Protocol class TIMER
 
 Must be KILLABLE and NAMED.
 
-This is a class that accepts a list of events that are repeatedly
-pushed using a provided pusher function.
+Each timer during construction accepts a handler function and
+a list of arguments. During every cycle of the timer, the handler
+function is called with each of the arguments by means of
+(MAPC HANDLER ARGUMENTS).
 |#
 (defprotocol timer
     (timer () ())
@@ -19,10 +21,13 @@ pushed using a provided pusher function.
   (defgeneric pausedp (object))
   (defgeneric (setf pausedp) (new-value object))
   (defgeneric thread (object))
-  (defgeneric events (object))
-  (defgeneric (setf events) (new-value object))
+  (defgeneric (setf thread) (new-value object))
+  (defgeneric arguments (object))
+  (defgeneric (setf arguments) (new-value object))
   (defgeneric tick (object))
-  (defgeneric pusher (object))
+  (defgeneric (setf tick) (new-value object))
+  (defgeneric handler (object))
+  (defgeneric (setf handler) (new-value object))
   (defgeneric pause (object))
   (defgeneric unpause (object))
   (defgeneric alivep (object))
