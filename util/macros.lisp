@@ -7,7 +7,10 @@
 
 ;;;; DEFTEST
 (defmacro deftest (name &body body)
-  `(test ,name ,@body))
+  `(progn
+     (1am:test ,name
+       (bt:join-thread (make-thread (lambda () (note "[T] ~A~%" ',name))))
+       ,@body)))
 
 ;;;; DEFINE-PROTOCOL-CLASS
 (defmacro define-protocol-class (name super-classes &optional slots &rest options)
@@ -24,7 +27,8 @@
          (setf (documentation the-class 'type) "Gateway protocol class")
          (defmethod initialize-instance :after ((object ,name) &key &allow-other-keys)
            (when (eq (class-of object) the-class)
-             (error "~S is a protocol class and thus can't be instantiated." ',name))))
+             (error "~S is a protocol class and thus can't be instantiated."
+                    ',name))))
        (defgeneric ,protocol-predicate (object)
          (:method ((object t)) nil)
          (:method ((object ,name)) t)
@@ -43,7 +47,8 @@
 
 ;;;; DEFCONSTRUCTOR
 (defmacro defconstructor ((class . keys) &body body)
-  `(defmethod initialize-instance :after ((,class ,class) &key ,@keys &allow-other-keys)
+  `(defmethod initialize-instance :after ((,class ,class)
+                                          &key ,@keys &allow-other-keys)
      ,@body))
 
 ;;;; DEFPRINT
@@ -89,24 +94,24 @@
 (defmacro with-thread-handlers ((symbol) &body body)
   `(labels
        ((%loop-1 (,symbol)
-          (format t "[~~] ~A: starting.~%" (name ,symbol))
+          (note "[~~] ~A: starting.~%" (name ,symbol))
           (unwind-protect
                (%loop-2 ,symbol)
             (kill ,symbol)
-            (format t "[!] ~A: killed.~%" (name ,symbol))))
+            (note "[!] ~A: killed.~%" (name ,symbol))))
         (%loop-2 (,symbol)
           (restart-case
               (loop (%loop-3 ,symbol))
             (retry ()
               :report %report
-              (format t "[!] ~A: restarted.~%" (name ,symbol))
+              (note "[!] ~A: restarted.~%" (name ,symbol))
               (%loop-2 ,symbol))))
         (%loop-3 (,symbol)
           ,@body)
         (%report (stream)
-          (format stream
-                  "Abort the current iteration and send the ~A back to its loop."
-                  (string-downcase (string ',symbol)))))
+          (fformat stream
+                   "Abort the current iteration and send the ~A back to its loop."
+                   (string-downcase (string ',symbol)))))
      (%loop-1 ,symbol)))
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG

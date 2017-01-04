@@ -21,7 +21,8 @@
 
 (defconstructor (standard-listener (name ""))
   (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
-    (let ((fn (lambda () (%listener-loop standard-listener))))
+    (let ((fn (lambda () (loop until (funcall (conn-getter standard-listener)))
+                (%listener-loop standard-listener))))
       (funcall (conn-pusher standard-listener) connection-1)
       (setf (name standard-listener) (%listener-constructor-name name)
             (connection standard-listener) connection-2
@@ -37,10 +38,10 @@
            (connection (owner socket))
            (data (data-receive connection)))
       (cond (data
-             (format t "[.] ~A: got data, ~S.~%" (name listener) data)
+             (note "[.] ~A: got data, ~S.~%" (name listener) data)
              (funcall (data-pusher listener) (list connection data)))
             (t
-             (format t "[.] ~A: got a notification.~%" (name listener)))))))
+             (note "[.] ~A: got a notification.~%" (name listener)))))))
 
 (defun %make-listener (getter pusher data-pusher)
   (make-instance 'standard-listener
@@ -55,9 +56,9 @@
   (thread-alive-p (thread listener)))
 
 (defmethod kill ((listener standard-listener))
-  (kill (connection listener))
   (unless (eq (current-thread) (thread listener))
     (destroy-thread (thread listener)))
+  (kill (connection listener))
   (values))
 
 

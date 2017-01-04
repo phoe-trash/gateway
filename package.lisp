@@ -4,12 +4,12 @@
 ;;;; package.lisp
 
 (defpackage #:gateway
-  (:shadowing-import-from :closer-mop
-   :standard-generic-function :defmethod :defgeneric :standard-method :standard-class)
+  (:shadowing-import-from #:closer-mop
+                          #:standard-generic-function #:defmethod #:defgeneric
+                          #:standard-method #:standard-class)
   (:use #:common-lisp
         #:closer-mop
         #:alexandria
-        #:1am
         #:secure-read
         #:bordeaux-threads
         #:usocket
@@ -17,6 +17,8 @@
         #:trivia
         #:lparallel
         #:lparallel.queue)
+  (:shadowing-import-from #:1am
+                          #:is #:signals #:*tests*)
   #|
   (:use #:common-lisp
   #:closer-mop
@@ -34,4 +36,3 @@
   #:1am)
   |#
   )
-

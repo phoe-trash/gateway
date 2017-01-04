@@ -41,7 +41,7 @@
          (with-lock-held ((lock ,connection))
            ,@body)
        (error (e)
-         (format t "[!] Connection: ~A~%" e)
+         (note "[!] Connection: ~A~%" e)
          (kill ,connection)
          ,error-return-value))))
 
@@ -104,4 +104,3 @@
                  (test connection-2 connection-1 data)))
         (mapc #'test-case test-cases)
         (values)))))
-

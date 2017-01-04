@@ -38,7 +38,7 @@
     (let* ((socket (socket acceptor))
            (accept (socket-accept (wait-for-input socket)))
            (connection (make-instance 'standard-connection :socket accept)))
-      (format t "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
+      (note "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
               (name acceptor)
               (coerce (get-peer-address accept) 'list) (get-peer-port accept))
       (funcall (pusher acceptor) connection))))
@@ -47,9 +47,9 @@
   (thread-alive-p (thread acceptor)))
 
 (defmethod kill ((acceptor standard-acceptor))
-  (socket-close (socket acceptor))
   (unless (eq (current-thread) (thread acceptor))
     (destroy-thread (thread acceptor)))
+  (socket-close (socket acceptor))
   (values))
 
 

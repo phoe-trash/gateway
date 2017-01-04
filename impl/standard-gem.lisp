@@ -33,7 +33,7 @@
       (handler-case
           (funcall (handler gem) message)
         (error (e)
-          (format t "[!] Gem: ~A~%" e)
+          (note "[!] Gem: ~A~%" e)
           (if (push-on-error-p gem)
               (funcall (pusher gem) message)
               (error e)))))))
@@ -86,4 +86,3 @@
     (is (wait () (equal rejected-data '(9 7 5 3 1))))
     (is (equal accepted-data '(8 6 4 2 0)))
     (is (null data))))
-

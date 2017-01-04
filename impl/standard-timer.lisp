@@ -14,7 +14,7 @@
 
 (defconstructor (standard-timer tick handler pausedp)
   (cond ((null tick)
-         (setf tick 0.1))
+         (setf tick 100.0))
         ((not (floatp tick))
          (setf tick (float tick))))
   (setf (tick standard-timer) tick
@@ -72,7 +72,7 @@
       (setf after-time (get-internal-real-time)
             time-diff (float (* (- after-time before-time)
                                 internal-time-units-per-second))
-            ms (- (tick timer) time-diff))
+            ms (/ (- (tick timer) time-diff) 1000.0))
       (unless (negative-real-p ms)
         (sleep ms)))))
 
@@ -90,36 +90,31 @@
 
 (deftest test-standard-timer-speed
   (finalized-let* ((count 0)
-                   <<<<<<< HEAD
-                   (pusher (lambda (x) (incf count x)))
-                   (timer (make-instance 'standard-timer
-                                         :events '(1)
-                                         :tick 1.0 :pusher pusher)
-                          =======
-                          (handler (lambda (x) (incf count x)))
-                          (timer (%make-timer '(1) 0.001 handler)
-                                 >>>>>>> 802ab160ec5e33a5b7dfaa581988c9583e02f80b
-                                 (kill timer)))
-                   (is (wait () (> count 100)))))
+                   (handler (lambda (x) (incf count x)))
+                   (timer (%make-timer '(1) 1.0 handler)
+                          (kill timer)))
+    (is (wait () (> count 100)))))
 
-  (deftest test-standard-timer-pause
-    (finalized-let* ((count 0)
-                     (handler (lambda (x) (incf count x)))
-                     (timer (%make-timer '(1) 0.001 handler)
-                            (kill timer)))
-      (is (wait () (> count 100)))
-      (pause timer)
-      (let ((temp-count count))
-        (sleep 0.01)
-        (is (= count temp-count))
-        (unpause timer)
-        (sleep 0.01)
-        (is (wait () (> count temp-count))))))
+(deftest test-standard-timer-pause
+  (finalized-let* ((count 0)
+                   (handler (lambda (x) (incf count x)))
+                   (timer (%make-timer '(1) 1.0 handler)
+                          (kill timer)))
+    (is (wait () (> count 100)))
+    (pause timer)
+    (let ((temp-count count))
+      (sleep 0.01)
+      (is (= count temp-count))
+      (unpause timer)
+      (sleep 0.01)
+      (is (wait () (> count temp-count))))))
 
-  (deftest test-standard-timer
-    (finalized-let*
-        ((elements ())
-         (handler (lambda (x) (unless ( < 10 (length elements)) (push x elements))))
-         (timer (%make-timer '(foo bar) 0.01 handler)
-                (kill timer)))
-      (is (wait () (equal elements '(bar foo bar foo bar foo bar foo bar foo))))))
+(deftest test-standard-timer
+  (finalized-let*
+      ((elements ())
+       (handler (lambda (x) (unless (<= 10 (length elements))
+                              (push x elements))))
+       (timer (%make-timer '(foo bar) 10.0 handler)
+              (kill timer)))
+    (is (wait () (equal elements '(bar foo bar foo bar
+                                   foo bar foo bar foo))))))

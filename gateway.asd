@@ -34,6 +34,7 @@
                (:file "def/command")
                (:file "def/date")
                (:file "def/password")
+               (:file "def/logger")
                (:file "def/library")
                (:file "def/connection")
                (:file "def/acceptor")
@@ -46,6 +47,7 @@
                (:file "impl/commands")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
+               (:file "impl/standard-logger")
                (:file "impl/standard-library")
                (:file "impl/standard-socket")
                (:file "impl/standard-connection")
@@ -57,4 +59,5 @@
                ;; COMMANDS
                (:file "commands/clean-connections")
                ;; OTHER
-               (:file "new")))
+               ;; (:file "new")
+               ))
