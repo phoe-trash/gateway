@@ -14,7 +14,7 @@
 
 (defconstructor (standard-timer tick pusher pausedp)
   (cond ((null tick)
-         (setf tick 0.1))
+         (setf tick 100))
         ((and (numberp tick) (not (floatp tick)))
          (setf tick (float tick)))
         ((not (floatp tick))
@@ -30,7 +30,7 @@
   (%timer-name timer))
 
 (defun %timer-name (timer)
-  (format nil "Gateway - timer (~F ms)" (* 1000 (tick timer))))
+  (format nil "Gateway - timer (~F ms)" (tick timer)))
 
 (defmethod pause ((timer standard-timer))
   (unless (pausedp timer)
@@ -48,6 +48,22 @@
 (defmethod kill ((timer standard-timer))
   (unless (eq (current-thread) (thread timer))
     (destroy-thread (thread timer))))
+
+;; (defun %timer-loop (timer)
+;;   (with-thread-handlers (timer)
+;;     (declare (optimize speed))
+;;     (let ((before-time 0) (after-time 0) (time-diff 0.0) (ms 0.0))
+;;       (declare (type integer before-time after-time)
+;;                (type single-float time-diff ms))
+;;       (setf before-time (get-internal-real-time))
+;;       (unless (pausedp timer)
+;;         (mapc (the function (pusher timer)) (events timer)))
+;;       (setf after-time (get-internal-real-time)
+;;             time-diff (float (* (- after-time before-time)
+;;                                 (float internal-time-units-per-second)))
+;;             ms (* (- (the single-float (tick timer)) time-diff) 1/1000))
+;;       (unless (> 0 ms)
+;;         (sleep ms)))))
 
 (defun %timer-loop (timer)
   (with-thread-handlers (timer)
@@ -74,6 +90,6 @@
                    (pusher (lambda (x) (incf count x)))
                    (timer (make-instance 'standard-timer
                                          :events '(1)
-                                         :tick 0.001 :pusher pusher)
+                                         :tick 1.0 :pusher pusher)
                           (kill timer)))
     (is (wait () (> count 100)))))
