@@ -37,6 +37,7 @@
                (:file "def/connection")
                (:file "def/acceptor")
                (:file "def/listener")
+               (:file "def/timer")
                (:file "def/crown")
                ;; IMPL
                (:file "impl/sexp")
