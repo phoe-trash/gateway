@@ -74,6 +74,25 @@
     (kill listener)
     (is (wait () (deadp listener)))))
 
+(deftest test-standard-listener-dead-connection
+  (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
+         (conn-getter (lambda () (with-lock-held (lock) connections)))
+         (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
+         (data-pusher (lambda (x) (with-lock-held (lock) (push x data)))))
+    (finalized-let*
+        ((listener (make-instance 'standard-listener
+                                  :conn-getter conn-getter :conn-pusher conn-pusher
+                                  :data-pusher data-pusher)
+                   (kill listener) (is (wait () (deadp listener))))
+         (conns (multiple-value-list (make-connection-pair))
+                (mapc #'kill conns) (is (wait () (every #'deadp conns)))))
+      (with-lock-held (lock)
+        (push (first conns) connections)
+        (notify listener)
+        (is (alivep (first conns)))
+        (kill (second conns))
+        (is (wait () (deadp (first conns))))))))
+
 (deftest test-standard-listener
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
          (sample-data-1 '(#:foo #:bar #:baz #:quux)) (sample-data-2 '(1 2 3 #:quux))

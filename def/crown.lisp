@@ -15,18 +15,26 @@ TODO add timer and gems
   ;; DATA AND THREADS
   (defgeneric library (crown))
   (defgeneric queue (object))
+  (defgeneric timer (object))
+  (defgeneric gems (object))
+  (defgeneric (setf gems) (new-value object))
+  (defgeneric operations (object))
+  (defgeneric (setf operations) (new-value object))
   ;; N-CONNECTIONS
   (defgeneric n-acceptor (object))
   (defgeneric n-connections (object))
+  (defgeneric (setf n-connections) (new-value object))
   (defgeneric n-lock (object))
   (defgeneric n-listener (object))
   ;; E-CONNECTIONS
   (defgeneric e-connections (object))
+  (defgeneric (setf e-connections) (new-value object))
   (defgeneric e-lock (object))
   (defgeneric e-listener (object))
   ;; I-CONNECTIONS
   (defgeneric i-acceptor (object))
   (defgeneric i-connections (object))
+  (defgeneric (setf i-connections) (new-value object))
   (defgeneric i-lock (object))
   (defgeneric i-listener (object))
   ;; METHODS

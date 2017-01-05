@@ -8,6 +8,9 @@
 (defclass standard-crown (crown)
   ((%library :accessor library)
    (%queue :accessor queue)
+   (%timer :accessor timer)
+   (%gems :accessor gems :initform ())
+   (%operations :accessor operations :initform ())
    (%n-acceptor :accessor n-acceptor)
    (%n-connections :accessor n-connections :initform ())
    (%n-lock :accessor n-lock :initform (%crown-lock "N"))
@@ -20,9 +23,6 @@
    (%i-lock :accessor i-lock :initform (%crown-lock "I"))
    (%i-listener :accessor i-listener)))
 
-(defun %crown-lock (string)
-  (make-lock (format nil "Gateway - Crown ~A-lock" string)))
-
 (defconstructor (standard-crown new
                                 (n-host "127.0.0.1") (n-port 0)
                                 (i-host "127.0.0.1") (i-port 0))
@@ -31,22 +31,20 @@
       (error "Constructing from existing data not implemented yet.")))
 
 (defun %crown-constructor-new (crown n-host n-port i-host i-port)
-  (setf (values (library crown) (queue crown)
-                (n-acceptor crown) (i-acceptor crown)
-                (n-listener crown) (e-listener crown) (i-listener crown))
-        (%crown-constructor-objects crown n-host n-port i-host i-port)))
-
-(defun %crown-constructor-objects (crown n-host n-port i-host i-port)
   (destructuring-bind (n-getter e-getter i-getter
-                       n-pusher e-pusher i-pusher data-pusher)
+                       n-pusher e-pusher i-pusher
+                       data-getter data-pusher data-handler)
       (%crown-constructor-lambdas crown)
-    (values (make-instance 'standard-library)
-            (make-queue)
-            (%make-acceptor n-host n-port n-pusher)
-            (%make-acceptor i-host i-port i-pusher)
-            (%make-listener n-getter n-pusher data-pusher)
-            (%make-listener e-getter e-pusher data-pusher)
-            (%make-listener i-getter i-pusher data-pusher))))
+    (setf  (library crown) (make-instance 'standard-library)
+           (queue crown) (make-queue)
+           (n-acceptor crown) (%make-acceptor n-host n-port n-pusher)
+           (i-acceptor crown) (%make-acceptor i-host i-port i-pusher)
+           (n-listener crown) (%make-listener n-getter n-pusher data-pusher)
+           (e-listener crown) (%make-listener e-getter e-pusher data-pusher)
+           (i-listener crown) (%make-listener i-getter i-pusher data-pusher)
+           (operations crown) (%crown-standard-operations crown)
+           (timer crown) (%make-timer (operations crown) 50.0 data-pusher)
+           (gems crown) (list (%make-gem data-getter data-pusher data-handler nil)))))
 
 (defun %crown-constructor-lambdas (crown)
   (list
@@ -56,16 +54,34 @@
    (lambda (x) (with-lock-held ((n-lock crown)) (push x (n-connections crown))))
    (lambda (x) (with-lock-held ((e-lock crown)) (push x (e-connections crown))))
    (lambda (x) (with-lock-held ((i-lock crown)) (push x (i-connections crown))))
-   (lambda (x) (push-queue x (queue crown)))))
+   (lambda () (pop-queue (queue crown)))
+   (lambda (x) (push-queue x (queue crown)))
+   (lambda (x) (apply #'execute x))))
+
+(defun %crown-standard-operations (crown)
+  `((clean-connections :lock ,(n-lock crown)
+                       :getter ,(curry #'n-connections crown)
+                       :setter ,(lambda (x) (setf (n-connections crown) x)))
+    (clean-connections :lock ,(e-lock crown)
+                       :getter ,(curry #'e-connections crown)
+                       :setter ,(lambda (x) (setf (e-connections crown) x)))
+    (clean-connections :lock ,(i-lock crown)
+                       :getter ,(curry #'i-connections crown)
+                       :setter ,(lambda (x) (setf (i-connections crown) x)))))
+
+(defun %crown-lock (string)
+  (make-lock (format nil "Gateway - Crown ~A-lock" string)))
 
 (defmethod alivep ((crown standard-crown))
-  (some #'alivep (list (n-acceptor crown) (n-listener crown) (e-listener crown)
-                       (i-acceptor crown) (i-listener crown))))
+  (some #'alivep (list* (n-acceptor crown) (n-listener crown) (e-listener crown)
+                        (i-acceptor crown) (i-listener crown) (timer crown)
+                        (gems crown))))
 
 (defmethod kill ((crown standard-crown))
   (let ((elements (list (n-acceptor crown) (n-listener crown) (e-listener crown)
-                        (i-acceptor crown) (i-listener crown))))
-    (mapc #'kill elements))
+                        (i-acceptor crown) (i-listener crown) (timer crown))))
+    (mapc #'kill elements)
+    (mapc #'kill (gems crown)))
   (values))
 
 (defun %make-crown-with-listed-ports ()
@@ -85,8 +101,9 @@
 
 (deftest test-standard-crown-death
   (let* ((crown (make-instance 'standard-crown :new t))
-         (elements (list (n-acceptor crown) (n-listener crown) (e-listener crown)
-                         (i-acceptor crown) (i-listener crown))))
+         (elements (list* (n-acceptor crown) (n-listener crown) (e-listener crown)
+                          (i-acceptor crown) (i-listener crown) (timer crown)
+                          (gems crown))))
     (kill crown)
     (is (wait () (deadp crown)))
     (is (wait () (every #'deadp elements)))))
@@ -104,11 +121,11 @@
              (finalized-let* ((connection (connect n-host n-port)
                                           (kill connection)))
                (is (wait () (= 2 (length (n-connections crown))))))
-             ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
+             (is (wait () (= 1 (length (n-connections crown)))))
              (finalized-let* ((connection (connect i-host i-port)
                                           (kill connection)))
                (is (wait () (= 2 (length (i-connections crown))))))
-             ;; (is (wait () (= 1 (length (i-connections crown))))) ;; TODO
+             (is (wait () (= 1 (length (i-connections crown)))))
              )
         (kill crown)))))
 
@@ -126,5 +143,5 @@
                             (connection-3 (connect n-host n-port)
                                           (kill connection-3)))
              (is (wait () (= 4 (length (n-connections crown))))))
-        ;; (is (wait () (= 1 (length (n-connections crown))))) ;; TODO
+        (is (wait () (= 1 (length (n-connections crown)))))
         (kill crown)))))

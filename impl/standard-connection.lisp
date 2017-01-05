@@ -32,8 +32,7 @@
 ;;     ))
 
 (defun %host-to-string (vector)
-  (format nil "~{~D.~D.~D.~D~}"
-          (coerce vector 'list)))
+  (format nil "~{~D.~D.~D.~D~}" (coerce vector 'list)))
 
 (defmacro with-connection ((connection &optional error-return-value) &body body)
   `(when (alivep ,connection)
@@ -60,12 +59,21 @@
 
 (defmethod alivep ((connection standard-connection))
   (with-lock-held ((lock connection))
+    (%alivep connection)
     (open-stream-p (stream-of connection))))
+
+(defun %alivep (connection)
+  (handler-case
+      (peek-char-no-hang (stream-of connection))
+    (error () (%connection-kill connection))))
 
 (defmethod kill ((connection standard-connection))
   (with-lock-held ((lock connection))
-    (socket-close (socket connection)))
+    (%connection-kill connection))
   (values))
+
+(defun %connection-kill (connection)
+  (socket-close (socket connection)))
 
 (defun make-connection-pair ()
   (let* ((socket-listen (socket-listen "127.0.0.1" 0))
@@ -76,7 +84,14 @@
     (values (make-instance 'standard-connection :socket socket-connect)
             (make-instance 'standard-connection :socket socket-accept))))
 
-
+(deftest test-standard-connection-death
+  (finalized-let* ((conns (multiple-value-list (make-connection-pair))
+                          (mapc #'kill conns)))
+    (is (alivep (first conns)))
+    (is (alivep (second conns)))
+    (kill (first conns))
+    (is (deadp (first conns)))
+    (is (deadp (second conns)))))
 
 (deftest test-standard-connection
   (finalized-let*
