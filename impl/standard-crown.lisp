@@ -33,17 +33,18 @@
 (defun %crown-constructor-new (crown n-host n-port i-host i-port)
   (destructuring-bind (n-getter e-getter i-getter
                        n-pusher e-pusher i-pusher
-                       data-getter data-pusher data-handler)
+                       data-getter data-pusher data-handler
+                       sexp-data-pusher)
       (%crown-constructor-lambdas crown)
     (setf  (library crown) (make-instance 'standard-library)
            (queue crown) (make-queue)
            (n-acceptor crown) (%make-acceptor n-host n-port n-pusher)
            (i-acceptor crown) (%make-acceptor i-host i-port i-pusher)
-           (n-listener crown) (%make-listener n-getter n-pusher data-pusher)
-           (e-listener crown) (%make-listener e-getter e-pusher data-pusher)
-           (i-listener crown) (%make-listener i-getter i-pusher data-pusher)
+           (n-listener crown) (%make-listener n-getter n-pusher sexp-data-pusher)
+           (e-listener crown) (%make-listener e-getter e-pusher sexp-data-pusher)
+           (i-listener crown) (%make-listener i-getter i-pusher sexp-data-pusher)
            (operations crown) (%crown-standard-operations crown)
-           (timer crown) (%make-timer (operations crown) 50.0 data-pusher)
+           (timer crown) (%make-timer (operations crown) 200.0 data-pusher)
            (gems crown) (list (%make-gem data-getter data-pusher data-handler nil)))))
 
 (defun %crown-constructor-lambdas (crown)
@@ -56,7 +57,8 @@
    (lambda (x) (with-lock-held ((i-lock crown)) (push x (i-connections crown))))
    (lambda () (pop-queue (queue crown)))
    (lambda (x) (push-queue x (queue crown)))
-   (lambda (x) (apply #'execute x))))
+   (lambda (x) (apply #'execute-operation x))
+   (lambda (x) (push-queue `(execute-command :data ,x :crown ,crown) (queue crown)))))
 
 (defun %crown-standard-operations (crown)
   `((clean-connections :lock ,(n-lock crown)

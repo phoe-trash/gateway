@@ -32,6 +32,7 @@
                (:file "def/killable")
                (:file "def/named")
                (:file "def/operation")
+               (:file "def/command")
                (:file "def/date")
                (:file "def/password")
                (:file "def/logger")
@@ -45,6 +46,7 @@
                ;; IMPL
                (:file "impl/sexp")
                (:file "impl/operations")
+               (:file "impl/commands")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
                (:file "impl/standard-logger")

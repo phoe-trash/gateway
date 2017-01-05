@@ -28,5 +28,9 @@ Arguments:
                    (setter (lambda (x) (setf (n-connections crown) x))))
     (is (wait () (= 1 (length (n-connections crown)))))
     (mapc #'kill (n-connections crown))
-    (execute 'clean-connections :lock lock :getter getter :setter setter)
+    (execute-operation 'clean-connections :lock lock :getter getter :setter setter)
     (is (= 0 (length (n-connections crown))))))
+
+(defoperation execute-command (:data :crown)
+  (destructuring-bind (connection command) data
+    (execute-command crown command connection)))

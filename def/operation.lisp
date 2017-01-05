@@ -12,5 +12,5 @@ An operation is a message in form of an S-expression describing a task
 to be done by gems. Each operation may contain arbitrary Lisp objects.
 |#
 (defprotocol operation ()
-  (defun execute (operation &rest plist)
-    (%execute operation plist)))
+  (defun execute-operation (operation &rest plist)
+    (%execute-operation operation plist)))

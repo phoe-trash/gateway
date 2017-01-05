@@ -9,7 +9,7 @@
 
 (defvar %operation-data% (make-hash-table))
 
-(defun %execute (operation plist)
+(defun %execute-operation (operation plist)
   (assert (proper-list-p plist))
   (assert (identity operation))
   (let* ((fn (gethash operation %operation-data%)))
