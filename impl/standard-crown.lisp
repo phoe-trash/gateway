@@ -129,8 +129,7 @@
              (finalized-let* ((connection (connect i-host i-port)
                                           (kill connection)))
                (is (wait () (= 2 (length (i-connections crown))))))
-             (is (wait () (= 1 (length (i-connections crown)))))
-             )
+             (is (wait () (= 1 (length (i-connections crown))))))
         (kill crown)))))
 
 (deftest test-standard-crown-multi-connection

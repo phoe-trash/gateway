@@ -75,6 +75,9 @@
 (defun %connection-kill (connection)
   (socket-close (socket connection)))
 
+(defun %make-connection (host port)
+  (make-instance 'standard-connection :host host :port port))
+
 (defun make-connection-pair ()
   (let* ((socket-listen (socket-listen "127.0.0.1" 0))
          (port (get-local-port socket-listen))
