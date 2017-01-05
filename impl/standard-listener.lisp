@@ -78,7 +78,7 @@
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))
          (conn-getter (lambda () (with-lock-held (lock) connections)))
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
-         (data-pusher (lambda (x) (with-lock-held (lock) (push x data)))))
+         (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
         ((listener (make-instance 'standard-listener
                                   :conn-getter conn-getter :conn-pusher conn-pusher
@@ -98,7 +98,7 @@
          (sample-data-1 '(#:foo #:bar #:baz #:quux)) (sample-data-2 '(1 2 3 #:quux))
          (conn-getter (lambda () (with-lock-held (lock) connections)))
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
-         (data-pusher (lambda (x) (with-lock-held (lock) (push x data)))))
+         (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
         ((listener (make-instance 'standard-listener
                                   :conn-getter conn-getter :conn-pusher conn-pusher
@@ -117,8 +117,8 @@
         (data-send (second conns-2) sample-data-1))
       (flet ((output-present-p (connection output)
                (wait () (with-lock-held (lock)
-                          (member (list connection output)
-                                  data :test #'data-equal)))))
+                          (member (list connection output) data
+                                  :test #'data-equal)))))
         (is (output-present-p (first conns-1) sample-data-1))
         (is (output-present-p (first conns-1) sample-data-2))
         (is (output-present-p (first conns-2) sample-data-1))))))
