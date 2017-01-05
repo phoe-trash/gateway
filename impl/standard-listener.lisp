@@ -80,9 +80,7 @@
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
-        ((listener (make-instance 'standard-listener
-                                  :conn-getter conn-getter :conn-pusher conn-pusher
-                                  :data-pusher data-pusher)
+        ((listener (%make-listener conn-getter conn-pusher data-pusher)
                    (kill listener) (is (wait () (deadp listener))))
          (conns (multiple-value-list (make-connection-pair))
                 (mapc #'kill conns) (is (wait () (every #'deadp conns)))))
@@ -100,9 +98,7 @@
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
-        ((listener (make-instance 'standard-listener
-                                  :conn-getter conn-getter :conn-pusher conn-pusher
-                                  :data-pusher data-pusher)
+        ((listener (%make-listener conn-getter conn-pusher data-pusher)
                    (kill listener) (is (wait () (deadp listener))))
          (conns-1 (multiple-value-list (make-connection-pair))
                   (mapc #'kill conns-1) (is (wait () (every #'deadp conns-1))))
