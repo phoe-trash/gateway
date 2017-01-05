@@ -31,7 +31,7 @@
                (:file "def/sexpable")
                (:file "def/killable")
                (:file "def/named")
-               (:file "def/command")
+               (:file "def/operation")
                (:file "def/date")
                (:file "def/password")
                (:file "def/logger")
@@ -44,7 +44,7 @@
                (:file "def/gem")
                ;; IMPL
                (:file "impl/sexp")
-               (:file "impl/commands")
+               (:file "impl/operations")
                (:file "impl/standard-date")
                (:file "impl/standard-password")
                (:file "impl/standard-logger")
@@ -56,8 +56,8 @@
                (:file "impl/standard-timer")
                (:file "impl/standard-crown")
                (:file "impl/standard-gem")
-               ;; COMMANDS
-               (:file "commands/clean-connections")
+               ;; OPERATIONS
+               (:file "operations/clean-connections")
                ;; OTHER
                ;; (:file "new")
                ))

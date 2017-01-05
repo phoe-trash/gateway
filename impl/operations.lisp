@@ -1,27 +1,27 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; commands.lisp
+;;;; operations.lisp
 
 (in-package #:gateway)
 
-;;;; COMMANDS
+;;;; OPERATIONS
 
-(defvar %command-data% (make-hash-table))
+(defvar %operation-data% (make-hash-table))
 
-(defun %execute (command plist)
+(defun %execute (operation plist)
   (assert (proper-list-p plist))
-  (assert (identity command))
-  (let* ((fn (gethash command %command-data%)))
+  (assert (identity operation))
+  (let* ((fn (gethash operation %operation-data%)))
     (if (null fn)
-        (error "Command ~S not found." command)
+        (error "Operation ~S not found." operation)
         (funcall fn plist))))
 
-(defmacro defcommand (name keyword-list &body body)
-  (let* ((gensym-sexp (gensym "COMMAND"))
+(defmacro defoperation (name keyword-list &body body)
+  (let* ((gensym-sexp (gensym "OPERATION"))
          (args (list gensym-sexp))
          (let-list (%data-getf-let-list keyword-list gensym-sexp)))
-    `(setf (gethash ',name %command-data%)
+    `(setf (gethash ',name %operation-data%)
            (lambda ,args
              (declare (ignorable ,@args))
              (let ,let-list

@@ -80,8 +80,6 @@
 ;;;; TESTING
 
 (defun run ()
-  (flet ((note (string)
-           (bt:join-thread (make-thread (lambda () (note string))))))
-    (note "~%[T] Beginning tests.~%")
-    (1am:run)
-    (note "[T] Finished tests.~%~%")))
+  (note "~%[T] Beginning tests.~%")
+  (1am:run)
+  (note "[T] Finished tests.~%~%"))
