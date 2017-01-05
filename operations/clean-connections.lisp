@@ -30,7 +30,3 @@ Arguments:
     (mapc #'kill (n-connections crown))
     (execute-operation 'clean-connections :lock lock :getter getter :setter setter)
     (is (= 0 (length (n-connections crown))))))
-
-(defoperation execute-command (:data :crown)
-  (destructuring-bind (connection command) data
-    (execute-command crown command connection)))

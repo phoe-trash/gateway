@@ -36,10 +36,10 @@
     (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
            (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
            (connection (owner socket))
-           (data (data-receive connection)))
-      (cond (data
-             (note "[.] ~A: got data, ~S.~%" (name listener) data)
-             (funcall (data-pusher listener) (list connection data)))
+           (command (data-receive connection)))
+      (cond (command
+             (note "[.] ~A: got a command, ~S.~%" (name listener) command)
+             (funcall (data-pusher listener) connection command))
             (t
              (note "[.] ~A: got a notification.~%" (name listener)))))))
 

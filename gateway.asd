@@ -60,6 +60,10 @@
                (:file "impl/standard-gem")
                ;; OPERATIONS
                (:file "operations/clean-connections")
+               (:file "operations/execute-command")
+               ;; COMMANDS
+               ;; (:file "commands/login")
+               ;; (:file "commands/logout")
                ;; OTHER
                ;; (:file "new")
                ))

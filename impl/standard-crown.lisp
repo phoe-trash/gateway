@@ -58,7 +58,9 @@
    (lambda () (pop-queue (queue crown)))
    (lambda (x) (push-queue x (queue crown)))
    (lambda (x) (apply #'execute-operation x))
-   (lambda (x) (push-queue `(execute-command :data ,x :crown ,crown) (queue crown)))))
+   (lambda (connection command)
+     (push-queue `(execute-command :crown ,crown :command ,command :connection ,connection)
+                 (queue crown)))))
 
 (defun %crown-standard-operations (crown)
   `((clean-connections :lock ,(n-lock crown)
