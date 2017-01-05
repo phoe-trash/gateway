@@ -67,9 +67,7 @@
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))
          (data-pusher (lambda (x) (declare (ignore x))))
-         (listener (make-instance 'standard-listener
-                                  :conn-getter conn-getter :conn-pusher conn-pusher
-                                  :data-pusher data-pusher)))
+         (listener (%make-listener conn-getter conn-pusher data-pusher)))
     (is (alivep listener))
     (kill listener)
     (is (wait () (deadp listener)))))
