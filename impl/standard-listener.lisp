@@ -26,7 +26,8 @@
       (funcall (conn-pusher standard-listener) connection-1)
       (setf (name standard-listener) (%listener-constructor-name name)
             (connection standard-listener) connection-2
-            (thread standard-listener) (make-thread fn :name name)))))
+            (thread standard-listener)
+            (make-thread fn :name (name standard-listener))))))
 
 (defun %listener-constructor-name (name)
   (format nil "Gateway - ~AListener" name))

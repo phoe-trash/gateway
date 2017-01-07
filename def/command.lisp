@@ -13,6 +13,5 @@ which has come from a remote client. Each command may contain arbitrary
 SEXPABLE objects in their SEXP form.
 |#
 (defprotocol command ()
-  (defun execute-command (owner command connection)
-    (%execute-command owner command connection)))
-
+  (defun execute-command (owner connection command plist)
+    (%execute-command owner connection command plist)))

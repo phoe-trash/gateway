@@ -15,7 +15,7 @@
   (let* ((fn (gethash operation %operation-data%)))
     (if (null fn)
         (error "Operation ~S not found." operation)
-        (progn (note "[G] Executing operation ~A.~%" operation)
+        (progn ;;(note "[G] Executing operation ~A.~%" operation)
                (funcall fn plist)))))
 
 (defmacro defoperation (name keyword-list &body body)

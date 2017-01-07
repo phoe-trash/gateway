@@ -9,6 +9,9 @@
   ((%socket :accessor socket)
    (%thread :accessor thread)
    (%name :accessor name)
+   (%notifier :accessor notifier
+              :initarg :notifier
+              :initform (error "Must define a notifier function."))
    (%pusher :accessor pusher
             :initarg :pusher
             :initform (error "Must define a pusher function."))))
@@ -28,10 +31,10 @@
           (coerce (get-local-name socket) 'list)
           (get-local-port socket)))
 
-(defun %make-acceptor (host port pusher)
+(defun %make-acceptor (host port pusher notifier)
   (make-instance 'standard-acceptor
                  :host host :port port
-                 :pusher pusher))
+                 :pusher pusher :notifier notifier))
 
 (defun %acceptor-loop (acceptor)
   (with-thread-handlers (acceptor)
@@ -41,7 +44,8 @@
       (note "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
               (name acceptor)
               (coerce (get-peer-address accept) 'list) (get-peer-port accept))
-      (funcall (pusher acceptor) connection))))
+      (funcall (pusher acceptor) connection)
+      (funcall (notifier acceptor)))))
 
 (defmethod alivep ((acceptor standard-acceptor))
   (thread-alive-p (thread acceptor)))
@@ -55,15 +59,17 @@
 
 
 (deftest test-standard-acceptor-death
-  (let ((acceptor (make-instance 'standard-acceptor :pusher (lambda (x) x))))
+  (let ((acceptor (make-instance 'standard-acceptor :pusher (lambda (x) x)
+                                 :notifier (lambda () ()))))
     (is (alivep acceptor))
     (kill acceptor)
     (is (wait () (deadp acceptor)))))
 
 (deftest test-standard-acceptor
   (let* ((connections nil)
-         (pusher (lambda (x) (push x connections))))
-    (finalized-let* ((acceptor (make-instance 'standard-acceptor :pusher pusher)
+         (pusher (lambda (x) (push x connections)))
+         (notifier (lambda () ())))
+    (finalized-let* ((acceptor (%make-acceptor "127.0.0.1" 0 pusher notifier)
                                (kill acceptor)
                                (is (wait () (deadp acceptor))))
                      (host (get-local-address (socket acceptor)))

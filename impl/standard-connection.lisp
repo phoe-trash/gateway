@@ -46,7 +46,8 @@
 
 (defmethod data-receive ((connection standard-connection))
   (with-connection (connection)
-    (safe-read (stream-of connection))))
+    (when (%connection-readyp connection)
+    (safe-read (stream-of connection)))))
 
 (defmethod data-send ((connection standard-connection) object)
   (with-connection (connection)
@@ -55,7 +56,10 @@
 
 (defmethod readyp ((connection standard-connection))
   (with-connection (connection)
-    (peek-char-no-hang (stream-of connection))))
+    (%connection-readyp connection)))
+
+(defun %connection-readyp (connection)
+  (peek-char-no-hang (stream-of connection)))
 
 (defmethod alivep ((connection standard-connection))
   (with-lock-held ((lock connection))

@@ -17,4 +17,5 @@ Arguments:
 * CONNECTION: the connection from which the command was received.
 |#
 (defoperation execute-command (:crown :command :connection)
-  (execute-command crown command connection))
+  (destructuring-bind (command . plist) command
+    (execute-command crown connection command plist)))
