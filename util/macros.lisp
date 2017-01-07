@@ -129,9 +129,8 @@
          (kill ,crown-var)))))
 
 (defun %with-crown-and-connections-list (connections host port)
-  (mapcar (lambda (x) `(,x (%make-connection ,host ,port)
-                           (kill ,x)))
-          connections))
+  (flet ((generate (x) `(,x (%make-connection ,host ,port) (kill ,x))))
+    (mapcar #'generate connections)))
 
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
