@@ -28,7 +28,7 @@
   (%timer-name timer))
 
 (defun %timer-name (timer)
-  (format nil "Gateway - timer (~F ms)" (tick timer)))
+  (format nil "Gateway - Timer (~F ms)" (tick timer)))
 
 (defmethod pause ((timer standard-timer))
   (unless (pausedp timer)
@@ -46,22 +46,6 @@
 (defmethod kill ((timer standard-timer))
   (unless (eq (current-thread) (thread timer))
     (destroy-thread (thread timer))))
-
-;; (defun %timer-loop (timer)
-;;   (with-thread-handlers (timer)
-;;     (declare (optimize speed))
-;;     (let ((before-time 0) (after-time 0) (time-diff 0.0) (ms 0.0))
-;;       (declare (type integer before-time after-time)
-;;                (type single-float time-diff ms))
-;;       (setf before-time (get-internal-real-time))
-;;       (unless (pausedp timer)
-;;         (mapc (the function (pusher timer)) (events timer)))
-;;       (setf after-time (get-internal-real-time)
-;;             time-diff (float (* (- after-time before-time)
-;;                                 (float internal-time-units-per-second)))
-;;             ms (* (- (the single-float (tick timer)) time-diff) 1/1000))
-;;       (unless (> 0 ms)
-;;         (sleep ms)))))
 
 (defun %timer-loop (timer)
   (with-thread-handlers (timer)

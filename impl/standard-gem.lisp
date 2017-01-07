@@ -28,7 +28,6 @@
           (thread standard-gem) (make-thread fn :name name))))
 
 (defun %gem-loop (gem)
-  (declare (optimize (debug 3) (speed 0) (safety 3)))
   (with-thread-handlers (gem)
     (let ((message (funcall (getter gem))))
       (handler-case

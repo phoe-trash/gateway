@@ -50,9 +50,12 @@
 
 (defun %crown-constructor-lambdas (crown)
   (list
-   (lambda () (with-lock-held ((n-lock crown)) (n-connections crown)))
-   (lambda () (with-lock-held ((e-lock crown)) (e-connections crown)))
-   (lambda () (with-lock-held ((i-lock crown)) (i-connections crown)))
+   (lambda () (with-lock-held ((n-lock crown))
+                (remove-if #'deadp (n-connections crown))))
+   (lambda () (with-lock-held ((e-lock crown))
+                (remove-if #'deadp (e-connections crown))))
+   (lambda () (with-lock-held ((i-lock crown))
+                (remove-if #'deadp (i-connections crown))))
    (lambda (x) (with-lock-held ((n-lock crown)) (push x (n-connections crown))))
    (lambda (x) (with-lock-held ((e-lock crown)) (push x (e-connections crown))))
    (lambda (x) (with-lock-held ((i-lock crown)) (push x (i-connections crown))))
@@ -62,7 +65,8 @@
    (lambda (x) (push-queue x (queue crown)))
    (lambda (x) (apply #'execute-operation x))
    (lambda (connection command)
-     (push-queue `(execute-command :crown ,crown :command ,command :connection ,connection)
+     (push-queue `(execute-command :crown ,crown :command ,command
+                                   :connection ,connection)
                  (queue crown)))))
 
 (defun %crown-standard-operations (crown)
@@ -115,7 +119,7 @@
     (is (wait () (deadp crown)))
     (is (wait () (every #'deadp elements)))))
 
-(deftest test-standard-crown-single-connections
+(deftest test-standard-crown-single-connection
   (flet ((connect (host port) (%make-connection host port)))
     (multiple-value-bind (crown n-host n-port i-host i-port)
         (%make-crown-with-listed-ports)

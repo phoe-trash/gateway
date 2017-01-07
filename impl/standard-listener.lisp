@@ -34,15 +34,28 @@
 
 (defun %listener-loop (listener)
   (with-thread-handlers (listener)
-    (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
-           (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
-           (connection (owner socket))
-           (command (data-receive connection)))
-      (cond (command
-             (note "[.] ~A: got a command, ~S.~%" (name listener) command)
-             (funcall (data-pusher listener) connection command))
-            (t
-             (note "[.] ~A: got a notification.~%" (name listener)))))))
+    (handler-case
+        (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
+               (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
+               (connection (owner socket))
+               (command (data-receive connection)))
+          (cond (command
+                 (note "[.] ~A: got a command, ~S.~%" (name listener) command)
+                 (funcall (data-pusher listener) connection command))
+                (t
+                 (note "[.] ~A: got a notification.~%" (name listener)))))
+      (stream-error (e)
+        (%listener-handle-stream-error listener e)))))
+
+(defun %listener-handle-stream-error (listener condition)
+  (note "[!] ~A: stream error: ~A" (name listener) condition)
+  (let* ((connections (funcall (conn-getter listener)))
+         (stream (stream-error-stream condition))
+         (predicate (lambda (x) (eq stream (socket-stream (socket x)))))
+         (connection (find-if predicate connections)))
+    (when connection
+      (kill connection)
+      (note "[!] ~A: killed the offending connection." (name listener)))))
 
 (defun %make-listener (getter pusher data-pusher)
   (make-instance 'standard-listener
@@ -67,7 +80,7 @@
 (deftest test-standard-listener-death
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))
-         (data-pusher (lambda (x) (declare (ignore x))))
+         (data-pusher (lambda (x y) (declare (ignore x  y))))
          (listener (%make-listener conn-getter conn-pusher data-pusher)))
     (is (alivep listener))
     (kill listener)

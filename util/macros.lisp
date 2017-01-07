@@ -57,7 +57,7 @@
      ,@body))
 
 ;;;; WAIT
-(defmacro wait ((&optional (timeout 0.5) (step 0.01)) &body body)
+(defmacro wait ((&optional (timeout 2) (step 0.01)) &body body)
   (with-gensyms (begin-time end-time temp)
     `(let* ((,begin-time (get-internal-real-time))
             (,end-time (+ ,begin-time (* ,timeout internal-time-units-per-second))))
@@ -132,6 +132,17 @@
   (flet ((generate (x) `(,x (%make-connection ,host ,port) (kill ,x))))
     (mapcar #'generate connections)))
 
+(defun %reporting-debugger-hook (condition value)
+  (declare (ignore value))
+  (note "[!] DEBUGGER ENTERED:~%~A~%" condition)
+  (sb-debug:print-backtrace)
+  (let ((*debugger-hook* #'swank:swank-debugger-hook))
+    (swank:swank-debugger-hook condition *debugger-hook*)))
+
+(setf *debugger-hook* #'%reporting-debugger-hook)
+
+(setf *default-special-bindings*
+      (list (cons '*debugger-hook* #'%reporting-debugger-hook)))
 
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 ;; (eval-when (:compile-toplevel :load-toplevel :execute)

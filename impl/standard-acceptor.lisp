@@ -24,10 +24,10 @@
          (fn (curry #'%acceptor-loop standard-acceptor)))
     (setf (socket standard-acceptor) socket
           (name standard-acceptor) name
-          (thread standard-acceptor) (make-thread fn :name (cat "Gateway - " name)))))
+          (thread standard-acceptor) (make-thread fn :name name))))
 
 (defun %acceptor-constructor-name (socket)
-  (format nil "Acceptor for ~{~D.~D.~D.~D~}:~D"
+  (format nil "Gateway - Acceptor for ~{~D.~D.~D.~D~}:~D"
           (coerce (get-local-name socket) 'list)
           (get-local-port socket)))
 
