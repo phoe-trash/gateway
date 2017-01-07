@@ -15,6 +15,9 @@
    (%conn-pusher :accessor conn-pusher
                  :initarg :conn-pusher
                  :initform (error "Must define a connection pusher function."))
+   (%conn-cleaner :accessor conn-cleaner
+                  :initarg :conn-cleaner
+                  :initform (lambda ()))
    (%data-pusher :accessor data-pusher
                  :initarg :data-pusher
                  :initform (error "Must define a data pusher function."))))
@@ -48,20 +51,22 @@
         (%listener-handle-stream-error listener e)))))
 
 (defun %listener-handle-stream-error (listener condition)
-  (note "[!] ~A: stream error: ~A" (name listener) condition)
+  (note "[!] ~A: stream error: ~A~%" (name listener) condition)
   (let* ((connections (funcall (conn-getter listener)))
          (stream (stream-error-stream condition))
          (predicate (lambda (x) (eq stream (socket-stream (socket x)))))
          (connection (find-if predicate connections)))
     (when connection
       (kill connection)
-      (note "[!] ~A: killed the offending connection." (name listener)))))
+      (note "[!] ~A: killed the offending connection.~%" (name listener))
+      (funcall (conn-cleaner listener)))))
 
-(defun %make-listener (getter pusher data-pusher)
+(defun %make-listener (getter pusher data-pusher cleaner)
   (make-instance 'standard-listener
                  :conn-getter getter
                  :conn-pusher pusher
-                 :data-pusher data-pusher))
+                 :data-pusher data-pusher
+                 :conn-cleaner cleaner))
 
 (defmethod notify ((listener standard-listener))
   (fformat (socket-stream (socket (connection listener))) "()~%"))
@@ -81,7 +86,7 @@
   (let* ((conn-getter (lambda ()))
          (conn-pusher (lambda (x) (kill x)))
          (data-pusher (lambda (x y) (declare (ignore x  y))))
-         (listener (%make-listener conn-getter conn-pusher data-pusher)))
+         (listener (%make-listener conn-getter conn-pusher data-pusher conn-getter)))
     (is (alivep listener))
     (kill listener)
     (is (wait () (deadp listener)))))
@@ -92,7 +97,7 @@
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
-        ((listener (%make-listener conn-getter conn-pusher data-pusher)
+        ((listener (%make-listener conn-getter conn-pusher data-pusher conn-getter)
                    (kill listener) (is (wait () (deadp listener))))
          (conns (multiple-value-list (make-connection-pair))
                 (mapc #'kill conns) (is (wait () (every #'deadp conns)))))
@@ -110,7 +115,7 @@
          (conn-pusher (lambda (x) (with-lock-held (lock) (push x connections))))
          (data-pusher (lambda (x y) (with-lock-held (lock) (push (list x y) data)))))
     (finalized-let*
-        ((listener (%make-listener conn-getter conn-pusher data-pusher)
+        ((listener (%make-listener conn-getter conn-pusher data-pusher conn-getter)
                    (kill listener) (is (wait () (deadp listener))))
          (conns-1 (multiple-value-list (make-connection-pair))
                   (mapc #'kill conns-1) (is (wait () (every #'deadp conns-1))))
