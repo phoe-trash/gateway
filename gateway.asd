@@ -62,6 +62,7 @@
                (:file "operations/clean-connections")
                (:file "operations/execute-command")
                ;; COMMANDS
+               (:file "commands/ping")
                ;; (:file "commands/login")
                ;; (:file "commands/logout")
                ;; OTHER
