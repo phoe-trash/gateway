@@ -30,25 +30,3 @@
              (declare (ignorable ,@args))
              (let ,let-list
                ,@body)))))
-
-(defcommand login (owner connection)
-            (:username :password)
-  (check-type owner crown))
-
-(defcommand ping (owner connection)
-            (:data)
-  (note "[C] Got pinged with data ~S.~%" data)
-  (data-send connection (list :pong :data data)))
-
-(deftest test-command-ping
-  (multiple-value-bind (crown n-host n-port i-host i-port)
-      (%make-crown-with-listed-ports)
-    (declare (ignore i-host i-port))
-    (unwind-protect
-         (finalized-let* ((connection (%make-connection n-host n-port)
-                                      (kill connection)))
-           (data-send connection '(:ping :data (1 2 3 4 5)))
-           (wait () (readyp connection))
-           (is (wait () (data-equal (data-receive connection)
-                                    '(:pong :data (1 2 3 4 5))))))
-      (kill crown))))

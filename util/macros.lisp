@@ -114,6 +114,26 @@
                    (string-downcase (string ',symbol)))))
      (%loop-1 ,symbol)))
 
+;;;; WITH-CROWN-AND-CONNECTIONS
+(defmacro with-crown-and-connections (crown-var n-connections i-connections &body body)
+  (with-gensyms (n-host n-port i-host i-port)
+    `(multiple-value-bind (,crown-var ,n-host ,n-port ,i-host ,i-port)
+         (%make-crown-with-listed-ports)
+       (declare (ignore ,@(unless n-connections (list n-host n-port))
+                        ,@(unless i-connections (list i-host i-port))))
+       (unwind-protect
+            (finalized-let*
+                (,@(%with-crown-and-connections-list n-connections n-host n-port)
+                 ,@(%with-crown-and-connections-list i-connections i-host i-port))
+              ,@body)
+         (kill ,crown-var)))))
+
+(defun %with-crown-and-connections-list (connections host port)
+  (mapcar (lambda (x) `(,x (%make-connection ,host ,port)
+                           (kill ,x)))
+          connections))
+
+
 ;;;; DEFCONFIG / WITH-CLEAN-CONFIG
 ;; (eval-when (:compile-toplevel :load-toplevel :execute)
 ;;   (defvar *config-vars* nil)
