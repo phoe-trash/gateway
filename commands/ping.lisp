@@ -25,14 +25,7 @@ Arguments:
       (is (wait () (data-equal (data-receive connection)
                                (cons :pong data)))))))
 
-(define-condition gateway-condition () ())
-
-(define-condition already-logged-in (gateway-condition)
-  ((auth :accessor already-logged-in-auth
-         :initarg :auth
-         :initform (error "Must provide previous auth."))))
-
-(defcommand login (owner connection) (:username :password)
-  (let ((auth (auth connection)))
-    (if auth
-        (signal 'already-logged-in :auth auth))))
+;; (defcommand login (owner connection) (:username :password)
+;;   (let ((auth (auth connection)))
+;;     (when auth
+;;       (error 'already-logged-in :auth auth))))
