@@ -10,6 +10,7 @@ Protocol class PLAYER
 
 Must be NAMED and SEXPABLE.
 |#
+
 (defprotocol player
     (player () ())
   (defgeneric username (player))

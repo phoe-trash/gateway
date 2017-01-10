@@ -13,6 +13,7 @@ Must be SEXPABLE and IMMUTABLE.
 Constructor arguments:
 :PASSPHRASE - a passphrase.
 |#
+
 (defprotocol password
     (password () ()
       (:documentation ""))

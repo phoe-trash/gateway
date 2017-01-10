@@ -13,6 +13,7 @@ Must be KILLABLE and NAMED.
 Spawns a thread which accepts new connections on the
 provided host and port.
 |#
+
 (defprotocol acceptor
     (acceptor () ())
   (defmethod socket (object))

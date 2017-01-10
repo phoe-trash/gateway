@@ -10,6 +10,7 @@ Protocol class LIBRARY
 
 Must be SYNCHRONIZED.
 |#
+
 (defprotocol library
     (library () ())
   (defgeneric players (library))

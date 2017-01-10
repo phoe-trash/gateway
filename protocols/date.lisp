@@ -13,6 +13,7 @@ Must be SEXPABLE and IMMUTABLE.
 The :UNIT argument must accept arguments
 :YEAR, :MONTH, :DAY, :HOUR, :MINUTE, :SECOND, :NANOSECOND.
 |#
+
 (defprotocol date
     (date () ())
   (defgeneric parse-date (string))

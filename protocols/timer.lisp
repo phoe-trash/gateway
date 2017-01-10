@@ -15,6 +15,7 @@ a list of arguments. During every cycle of the timer, the handler
 function is called with each of the arguments by means of
 (MAPC HANDLER ARGUMENTS).
 |#
+
 (defprotocol timer
     (timer () ())
   (defgeneric name (object))

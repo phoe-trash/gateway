@@ -18,6 +18,7 @@ push-oh-error-p is nil, the error is signaled instead by means of #'ERROR.
 
 The getter function is expected to block until a message is available.
 |#
+
 (defprotocol gem
     (gem () ())
   (defgeneric thread (object))

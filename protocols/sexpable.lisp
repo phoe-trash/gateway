@@ -22,6 +22,7 @@ S-expression (such as the one output from the SEXP generic
 function) and returns an object of a given class equivalent to
 the original.
 |#
+
 (defprotocol sexpable ()
   (defgeneric sexp (object))
   (defun unsexp (sexp &optional parent)

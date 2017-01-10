@@ -16,6 +16,7 @@ or a programmer's request,
 * when an internal error occurs, causing the object to fail
 serving its purpose.
 |#
+
 (defprotocol killable ()
   (defgeneric kill (object))
   (defgeneric alivep (object))

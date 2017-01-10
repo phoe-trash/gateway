@@ -26,6 +26,7 @@ Constructor arguments:
   :HOST - hostname.
   :PORT - port.
 |#
+
 (defprotocol connection
     (connection () ())
   (defgeneric auth (connection))

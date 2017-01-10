@@ -8,8 +8,9 @@
 #|
 Protocol class CROWN
 
-TODO add timer and gems
+Must be KILLABLE.
 |#
+
 (defprotocol crown
     (crown () ())
   ;; DATA AND THREADS

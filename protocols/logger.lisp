@@ -10,6 +10,7 @@ Protocol class LOGGER
 
 Must be NAMED and KILLABLE.
 |#
+
 (defprotocol logger
     (logger () ())
   (defgeneric stream-of (object))
