@@ -73,8 +73,7 @@
    (lambda () (notify (i-listener crown)))
    (lambda () (pop-queue (queue crown)))
    (lambda (x) (push-queue x (queue crown)))
-   (lambda (x) (note "[G] ")
-     (apply #'execute-operation x))
+   (lambda (x) (apply #'execute-operation x))
    (lambda (connection command)
      (push-queue `(execute-command :crown ,crown :command ,command
                                    :connection ,connection)

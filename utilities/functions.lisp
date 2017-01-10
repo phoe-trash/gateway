@@ -77,8 +77,21 @@
 (defun verify-arguments (function &rest arguments)
   (funcall (generate-matcher (arglist function)) arguments))
 
-;;;; TESTING
+;;;; REPLACE-ALL
+(defun replace-all (string part replacement &key (test #'char=))
+  (with-output-to-string (out)
+    (loop with part-length = (length part)
+          for old-pos = 0 then (+ pos part-length)
+          for pos = (search part string
+                            :start2 old-pos
+                            :test test)
+          do (write-string string out
+                           :start old-pos
+                           :end (or pos (length string)))
+          when pos do (write-string replacement out)
+            while pos)))
 
+;;;; TESTING
 (defun run ()
   (note "~%[T] Beginning tests.~%")
   (1am:run)
