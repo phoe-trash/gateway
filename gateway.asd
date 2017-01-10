@@ -24,6 +24,7 @@
   :serial t
   :components (;; PACKAGE
                (:file "package")
+               ;; PROLOGUE
                ;; UTILITIES
                (:file "utilities/macros")
                (:file "utilities/functions")
@@ -77,4 +78,5 @@
                (:file "errors/not-authorized")
                (:file "errors/authentication-failure")
                (:file "errors/unknown-player")
+               ;; EPILOGUE
                ))
