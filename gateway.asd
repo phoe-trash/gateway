@@ -72,9 +72,9 @@
                (:file "commands/logout")
                ;; CONDITIONS
                ;; ERRORS
-               (:file "conditions/errors/already-logged-in")
-               (:file "conditions/errors/not-logged-in")
-               (:file "conditions/errors/not-authorized")
-               (:file "conditions/errors/authentication-failure")
-               (:file "conditions/errors/unknown-player")
+               (:file "errors/already-logged-in")
+               (:file "errors/not-logged-in")
+               (:file "errors/not-authorized")
+               (:file "errors/authentication-failure")
+               (:file "errors/unknown-player")
                ))
