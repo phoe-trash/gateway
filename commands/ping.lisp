@@ -24,8 +24,3 @@ Arguments:
       (data-send connection (cons :ping data))
       (is (wait () (data-equal (data-receive connection)
                                (cons :pong data)))))))
-
-;; (defcommand login (owner connection) (:username :password)
-;;   (let ((auth (auth connection)))
-;;     (when auth
-;;       (error 'already-logged-in :auth auth))))

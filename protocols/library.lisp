@@ -12,5 +12,6 @@ Must be SYNCHRONIZED.
 |#
 (defprotocol library
     (library () ())
-  (defgeneric lookup (library key))
-  (defgeneric (setf lookup) (library new-value key)))
+  (defgeneric players (library))
+  (defgeneric lookup (key library))
+  (defgeneric (setf lookup) (new-value key library)))

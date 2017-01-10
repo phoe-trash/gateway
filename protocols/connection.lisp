@@ -28,6 +28,7 @@ Constructor arguments:
 |#
 (defprotocol connection
     (connection () ())
+  (defgeneric auth (connection))
   (defgeneric stream-of (connection))
   (defgeneric data-send (connection object))
   (defgeneric data-receive (connection))

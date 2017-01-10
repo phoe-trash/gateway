@@ -28,5 +28,10 @@
     `(setf (gethash ',(string name) %command-data%)
            (lambda ,args
              (declare (ignorable ,@args))
-             (let ,let-list
-               ,@body)))))
+             (handler-bind ((gateway-condition (curry #'handle-gateway-condition
+                                                      ,owner-var ,connection-var)))
+               (handler-case
+                   (let ,let-list
+                     ,@body)
+                 (gateway-error (error)
+                   (handle-gateway-error owner connection error))))))))

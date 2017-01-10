@@ -6,7 +6,7 @@
 (in-package #:gateway)
 
 (defclass standard-crown (crown)
-  ((%library :accessor library)
+  ((%library :accessor %library)
    (%queue :accessor queue)
    (%timer :accessor timer)
    (%gems :accessor gems :initform ())
@@ -30,6 +30,10 @@
       (%crown-constructor-new standard-crown n-host n-port i-host i-port)
       (error "Constructing from existing data not implemented yet.")))
 
+(defmethod library ((crown standard-crown) (keyword symbol))
+  (check-type keyword keyword)
+  (gethash keyword (%library crown)))
+
 (defun %crown-constructor-new (crown n-host n-port i-host i-port)
   (destructuring-bind (n-getter e-getter i-getter
                        n-cleaner e-cleaner i-cleaner
@@ -38,7 +42,7 @@
                        data-getter data-pusher data-handler
                        sexp-pusher)
       (%crown-constructor-lambdas crown)
-    (setf  (library crown) (make-instance 'standard-library)
+    (setf  (library crown) (make-instance 'standard-library :type :crown)
            (queue crown) (make-queue)
            (n-acceptor crown) (%make-acceptor n-host n-port n-pusher n-notifier)
            (i-acceptor crown) (%make-acceptor i-host i-port i-pusher i-notifier)
@@ -48,6 +52,11 @@
            (operations crown) (%crown-standard-operations crown)
            (timer crown) (%make-timer (operations crown) 200.0 data-pusher)
            (gems crown) (list (%make-gem data-getter data-pusher data-handler nil)))))
+
+(defmacro %crown-cleaner (lock connections)
+  `(lambda () (with-lock-held ((,lock crown))
+                (setf (,connections crown)
+                      (delete-if #'deadp (,connections crown))))))
 
 (defun %crown-constructor-lambdas (crown)
   (list
@@ -69,11 +78,6 @@
      (push-queue `(execute-command :crown ,crown :command ,command
                                    :connection ,connection)
                  (queue crown)))))
-
-(defmacro %crown-cleaner (lock connections)
-  `(lambda () (with-lock-held ((,lock crown))
-                (setf (,connections crown)
-                      (delete-if #'deadp (,connections crown))))))
 
 (defun %crown-standard-operations (crown)
   (declare (ignore crown))

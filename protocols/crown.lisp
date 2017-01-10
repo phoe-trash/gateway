@@ -13,7 +13,7 @@ TODO add timer and gems
 (defprotocol crown
     (crown () ())
   ;; DATA AND THREADS
-  (defgeneric library (crown))
+  (defgeneric library (crown keyword))
   (defgeneric queue (object))
   (defgeneric timer (object))
   (defgeneric gems (object))
