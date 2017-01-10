@@ -68,9 +68,11 @@
                ;; COMMANDS
                (:file "commands/ping")
                (:file "commands/login")
+               (:file "commands/logout")
                ;; CONDITIONS
                ;; ERRORS
                (:file "conditions/errors/already-logged-in")
+               (:file "conditions/errors/not-logged-in")
                (:file "conditions/errors/not-authorized")
                (:file "conditions/errors/authentication-failure")
                ))

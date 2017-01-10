@@ -15,6 +15,7 @@ Arguments:
 * AUTH: the NAMED object representing whomever the user is already logged
 in as.
 |#
+
 (define-gateway-error already-logged-in
     ((auth :accessor already-logged-in-auth
            :initarg :auth

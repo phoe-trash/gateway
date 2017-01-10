@@ -14,6 +14,7 @@ authorized to perform.
 Arguments:
 * COMMAND: the command the user was not authorized to perform.
 |#
+
 (define-gateway-error not-authorized
     ((command :accessor not-authorized-command
               :initarg :command
