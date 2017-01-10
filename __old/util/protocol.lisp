@@ -5,41 +5,8 @@
 
 (in-package #:gateway)
 
-(defprotocol identifiable ()
-  (defun identify (type key)
-    (%identify type key)))
-
-(defprotocol cache ()
-  (defun cache (type key)
-    (%cache type key))
-  (defun (setf cache) (new-value type key)
-    (setf (%cache type key) new-value)))
-
 (defprotocol messagable ()
   (defgeneric send-message (message recipient)))
-
-(defprotocol crown
-    (crown () ())
-  ;; DATA AND THREADS
-  (defgeneric library (crown))
-  (defgeneric queue (object))
-  ;; N-CONNECTIONS
-  (defgeneric n-acceptor (object))
-  (defgeneric n-connections (object))
-  (defgeneric n-lock (object))
-  (defgeneric n-listener (object))
-  ;; E-CONNECTIONS
-  (defgeneric e-connections (object))
-  (defgeneric e-lock (object))
-  (defgeneric e-listener (object))
-  ;; I-CONNECTIONS
-  (defgeneric i-acceptor (object))
-  (defgeneric i-connections (object))
-  (defgeneric i-lock (object))
-  (defgeneric i-listener (object))
-  ;; METHODS
-  (defgeneric kill (object))
-  (defgeneric alivep (object)))
 
 (defprotocol player
     (player () ()
@@ -108,24 +75,6 @@ Constructor arguments:
   (defgeneric chats (object))
   (defgeneric add-persona (persona object))
   (defgeneric delete-persona (persona object)))
-
-(defprotocol gem
-    (gem () ()
-      (:documentation "Constructor arguments:
-:OWNER - a CROWN or a JEWEL.
-"))
-  (defgeneric owner (gem))
-  (defgeneric thread (gem)))
-
-(defprotocol timer
-    (timer () ()
-      (:documentation "Constructor arguments:
-:DELAY - delay between each timer ticks,
-:QUEUE - event queue to set updates to,
-:OWNER - a CROWN or a JEWEL.
-"))
-  (defgeneric delay (timer))
-  (defgeneric (setf delay) (timer)))
 
 (defprotocol connector
     (connector () ()
