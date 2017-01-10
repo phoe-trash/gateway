@@ -24,7 +24,7 @@
 
 (defun %logger-loop (logger)
   (with-thread-handlers (logger)
-    (let (*print-right-margin*)
+    (let ((*print-right-margin* most-positive-fixnum))
       (apply #'fformat (stream-of logger) (pop-queue (queue logger)))
       (fresh-line))))
 
