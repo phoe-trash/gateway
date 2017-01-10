@@ -32,7 +32,7 @@
 
 (defmethod library ((crown standard-crown) (keyword symbol))
   (check-type keyword keyword)
-  (gethash keyword (%library crown)))
+  (lookup keyword (%library crown)))
 
 (defun %crown-constructor-new (crown n-host n-port i-host i-port)
   (destructuring-bind (n-getter e-getter i-getter
@@ -42,7 +42,7 @@
                        data-getter data-pusher data-handler
                        sexp-pusher)
       (%crown-constructor-lambdas crown)
-    (setf  (library crown) (make-instance 'standard-library :type :crown)
+    (setf  (%library crown) (make-instance 'standard-library :type :crown)
            (queue crown) (make-queue)
            (n-acceptor crown) (%make-acceptor n-host n-port n-pusher n-notifier)
            (i-acceptor crown) (%make-acceptor i-host i-port i-pusher i-notifier)
@@ -73,7 +73,8 @@
    (lambda () (notify (i-listener crown)))
    (lambda () (pop-queue (queue crown)))
    (lambda (x) (push-queue x (queue crown)))
-   (lambda (x) (apply #'execute-operation x))
+   (lambda (x) (note "[G] ")
+     (apply #'execute-operation x))
    (lambda (connection command)
      (push-queue `(execute-command :crown ,crown :command ,command
                                    :connection ,connection)

@@ -24,14 +24,20 @@
                       keyword-list &body body)
   (let* ((gensym-sexp (gensym "COMMAND"))
          (args (list gensym-sexp owner-var connection-var))
-         (let-list (%data-getf-let-list keyword-list gensym-sexp)))
+         (let-list (%data-getf-let-list keyword-list gensym-sexp))
+         (handle-error (gensym "HANDLE-ERROR"))
+         (handle-condition (gensym "HANDLE-CONDITION"))
+         )
     `(setf (gethash ',(string name) %command-data%)
            (lambda ,args
              (declare (ignorable ,@args))
-             (handler-bind ((gateway-condition (curry #'handle-gateway-condition
-                                                      ,owner-var ,connection-var)))
-               (handler-case
-                   (let ,let-list
-                     ,@body)
-                 (gateway-error (error)
-                   (handle-gateway-error owner connection error))))))))
+             (let ,let-list
+               (flet ((,handle-error (x)
+                        (handle-gateway-error ,owner-var ,connection-var x))
+                      (,handle-condition (x)
+                        (handle-gateway-condition ,owner-var ,connection-var x)))
+                 (handler-case
+                     (handler-bind ((gateway-condition #',handle-condition))
+                       (progn ,@body))
+                   (gateway-error (error)
+                     (,handle-error error)))))))))

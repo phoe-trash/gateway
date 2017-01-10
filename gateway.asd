@@ -43,6 +43,7 @@
                (:file "protocols/timer")
                (:file "protocols/crown")
                (:file "protocols/gem")
+               (:file "protocols/player")
                ;; FRAMEWORK
                (:file "framework/sexp")
                (:file "framework/operations")
@@ -60,11 +61,13 @@
                (:file "classes/standard-timer")
                (:file "classes/standard-crown")
                (:file "classes/standard-gem")
+               (:file "classes/standard-player")
                ;; OPERATIONS
                (:file "operations/clean-connections")
                (:file "operations/execute-command")
                ;; COMMANDS
                (:file "commands/ping")
+               (:file "commands/login")
                ;; CONDITIONS
                ;; ERRORS
                (:file "conditions/errors/already-logged-in")

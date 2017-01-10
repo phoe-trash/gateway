@@ -76,7 +76,7 @@
   (with-gensyms (result)
     `(loop for ,result = ,form
            if ,result return ,result
-             else (sleep ,step))))
+             else do (sleep ,step))))
 
 ;;;; FINALIZED-LET
 (defmacro finalized-let* ((&rest bindings) &body body)
@@ -94,12 +94,14 @@
 (defmacro with-thread-handlers ((symbol) &body body)
   `(labels
        ((%loop-1 (,symbol)
+          (declare (optimize (debug 3) (safety 3) (speed 0)))
           (note "[~~] ~A: starting.~%" (name ,symbol))
           (unwind-protect
                (%loop-2 ,symbol)
             (kill ,symbol)
             (note "[!] ~A: killed.~%" (name ,symbol))))
         (%loop-2 (,symbol)
+          (declare (optimize (debug 3) (safety 3) (speed 0)))
           (restart-case
               (loop (%loop-3 ,symbol))
             (retry ()
@@ -107,6 +109,7 @@
               (note "[!] ~A: restarted.~%" (name ,symbol))
               (%loop-2 ,symbol))))
         (%loop-3 (,symbol)
+          (declare (optimize (debug 3) (safety 3) (speed 0)))
           ,@body)
         (%report (stream)
           (fformat stream
@@ -135,7 +138,10 @@
 (defun %reporting-debugger-hook (condition value)
   (declare (ignore value))
   (note "[!] DEBUGGER ENTERED:~%~A~%" condition)
-  (sb-debug:print-backtrace)
+  (note (with-output-to-string (s)
+          (terpri s)
+          (sb-debug:print-backtrace :count 10 :stream s)
+          (terpri s)))
   (let ((*debugger-hook* #'swank:swank-debugger-hook))
     (swank:swank-debugger-hook condition *debugger-hook*)))
 

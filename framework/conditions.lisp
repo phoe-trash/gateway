@@ -17,7 +17,9 @@
                   ,@body))))
 
 (defun handle-gateway-condition (owner connection condition)
-  (%handle-gateway-condition owner connection condition %condition-data%))
+  (unless (typep condition 'gateway-error)
+    (note "[!] Handling condition ~A.~%" (type-of condition))
+    (%handle-gateway-condition owner connection condition %condition-data%)))
 
 
 
@@ -27,16 +29,17 @@
 
 (defmacro define-gateway-error (name slot-specs (owner-var connection-var condition-var)
                                 &body body)
-  `(progn (define-condition ,name (gateway-condition error) ,slot-specs)
+  `(progn (define-condition ,name (gateway-error) ,slot-specs)
           (setf (gethash ',name %error-data%)
                 (lambda (,owner-var ,connection-var ,condition-var)
                   ,@body))))
 
 (defun handle-gateway-error (owner connection error)
+  (note "[!] Handling error ~A.~%" (type-of error))
   (%handle-gateway-condition owner connection error %error-data%))
 
-
-
-(defun %handle-gateway-condition (owner connection error hashtable)
-  (let ((fn (gethash (type-of error) hashtable)))
-    (funcall fn owner connection error)))
+(defun %handle-gateway-condition (owner connection condition hashtable)
+  (let ((fn (gethash (type-of condition) hashtable)))
+    (if fn
+        (funcall fn owner connection condition)
+        (error "Condition ~A not found in hashtable." (type-of condition)))))

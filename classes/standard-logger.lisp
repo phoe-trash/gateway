@@ -13,9 +13,10 @@
            :initform (make-queue))))
 
 (defconstructor (standard-logger)
-  (let ((name "Gateway - Logger"))
-    (join-thread (make-thread (lambda () (setf (stream-of standard-logger)
-                                               *standard-output*))))
+  (let ((name "Gateway - Logger")
+        (setter (lambda ()
+                  (setf (stream-of standard-logger) *standard-output*))))
+    (join-thread (make-thread setter))
     (setf (name standard-logger) name
           (thread standard-logger)
           (make-thread (curry #'%logger-loop standard-logger)
@@ -23,7 +24,9 @@
 
 (defun %logger-loop (logger)
   (with-thread-handlers (logger)
-    (apply #'fformat (stream-of logger) (pop-queue (queue logger)))))
+    (let (*print-right-margin*)
+      (apply #'fformat (stream-of logger) (pop-queue (queue logger)))
+      (fresh-line))))
 
 (defun %note (args)
   (when (and (boundp '*logger*) *logger* (alivep *logger*))

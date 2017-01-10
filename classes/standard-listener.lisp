@@ -39,7 +39,7 @@
   (with-thread-handlers (listener)
     (handler-case
         (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
-               (socket (first (wait-for-input sockets :timeout nil :ready-only t)))
+               (socket (first (wait-until (wait-for-input sockets :timeout nil :ready-only t))))
                (connection (owner socket))
                (command (data-receive connection)))
           (cond (command

@@ -8,9 +8,6 @@
 (defclass standard-gem (gem)
   ((%thread :accessor thread)
    (%name :accessor name)
-   (%push-on-error-p :accessor push-on-error-p
-                     :initarg :push-on-error-p
-                     :initform nil)
    (%getter :accessor getter
             :initarg :getter
             :initform (error "Must define a getter function."))
@@ -19,7 +16,10 @@
             :initform (error "Must define a pusher function."))
    (%handler :accessor handler
              :initarg :handler
-             :initform (error "Must define a handler function."))))
+             :initform (error "Must define a handler function."))
+   (%push-on-error-p :accessor push-on-error-p
+                     :initarg :push-on-error-p
+                     :initform nil)))
 
 (defconstructor (standard-gem)
   (let* ((name "Gateway - Gem")
