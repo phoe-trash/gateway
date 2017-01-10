@@ -47,6 +47,9 @@
                      #:iters ,(iteration-count password))))
 
 (defunsexp password ((key #:key) (salt #:salt) (iters #:iters)) ()
+  (assert key () "Key cannot be empty.")
+  (assert salt () "Salt cannot be empty.")
+  (assert iters () "Iterations cannot be empty.")
   (make-instance 'standard-password :%read-data (list key salt iters)))
 
 (defun derive-key (passphrase &key salt

@@ -8,7 +8,7 @@
 #|
 Protocol class PLAYER
 
-Must be NAMED.
+Must be NAMED and SEXPABLE.
 |#
 (defprotocol player
     (player () ())

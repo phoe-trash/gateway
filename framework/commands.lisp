@@ -26,12 +26,14 @@
          (args (list gensym-sexp owner-var connection-var))
          (let-list (%data-getf-let-list keyword-list gensym-sexp))
          (handle-error (gensym "HANDLE-ERROR"))
-         (handle-condition (gensym "HANDLE-CONDITION"))
-         )
+         (handle-condition (gensym "HANDLE-CONDITION")))
     `(setf (gethash ',(string name) %command-data%)
            (lambda ,args
-             (declare (ignorable ,@args))
-             (let ,let-list
+             (declare (ignorable ,gensym-sexp))
+             ;; (declare (ignorable ,@args))
+             (let ((,owner-var ,owner-var)
+                   (,connection-var ,connection-var)
+                   ,@let-list)
                (flet ((,handle-error (x)
                         (handle-gateway-error ,owner-var ,connection-var x))
                       (,handle-condition (x)

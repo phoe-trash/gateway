@@ -32,14 +32,16 @@
          (fn (gethash data-word %unsexp-data%)))
     (funcall fn (cdr sexp) parent)))
 
-(defmacro defunsexp (name keyword-list parent &body body)
+(defmacro defunsexp (name keyword-list owner &body body)
   (let* ((gensym-sexp (gensym "SEXP"))
-         (gensym-parent (gensym "PARENT"))
-         (parent-list (if (car parent) (list (car parent)) (list gensym-parent)))
-         (args (cons gensym-sexp parent-list))
+         (gensym-owner (gensym "OWNER"))
+         (owner-list (if (car owner) (list (car owner)) (list gensym-owner)))
+         (args (cons gensym-sexp owner-list))
          (let-list (%data-getf-let-list keyword-list gensym-sexp)))
     `(setf (gethash (string ',name) %unsexp-data%)
            (lambda ,args
              (declare (ignorable ,@args))
              (let ,let-list
+               ,(when (car owner)
+                  `(assert ,(car owner) () "Owner must be provided."))
                ,@body)))))

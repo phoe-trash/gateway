@@ -11,9 +11,10 @@
   (defvar *date-time-units* '(:year :month :day :hour :minute :second :nanosecond)))
 
 (defmethod sexp ((object standard-date))
-  (sexp `(#:date #:date ,(format nil "~A" object))))
+  (sexp `(:date :datestring ,(format nil "~A" object))))
 
-(defunsexp date ((datestring #:date)) ()
+(defunsexp date ((datestring :datestring)) ()
+  (assert datestring () "Datestring cannot be empty.")
   (parse-date datestring))
 
 (defmethod parse-date ((datestring string))

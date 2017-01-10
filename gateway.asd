@@ -49,6 +49,7 @@
                (:file "framework/operations")
                (:file "framework/commands")
                (:file "framework/conditions")
+               (:file "framework/errors")
                ;; CLASSES
                (:file "classes/standard-date")
                (:file "classes/standard-password")
@@ -75,4 +76,5 @@
                (:file "conditions/errors/not-logged-in")
                (:file "conditions/errors/not-authorized")
                (:file "conditions/errors/authentication-failure")
+               (:file "conditions/errors/unknown-player")
                ))

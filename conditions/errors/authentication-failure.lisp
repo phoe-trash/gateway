@@ -15,5 +15,4 @@ provided by him are not valid.
 (define-gateway-error authentication-failure ()
     (owner connection condition)
   (declare (ignore owner condition))
-  (data-send connection `(:error :type :authentication-failure))
-  (note "[!] Authentication failure completed.~%"))
+  (data-send connection `(:error :type :authentication-failure)))

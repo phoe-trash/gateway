@@ -121,6 +121,10 @@
 (defun %make-crown ()
   (make-instance 'standard-crown :new t))
 
+(defun %make-empty-crown ()
+  (make-instance 'standard-crown))
+;; TODO handle killing empty crowns
+
 
 
 (deftest test-standard-crown-death
