@@ -16,15 +16,12 @@ Arguments:
 |#
 
 (defoperation activate-player (:crown :username)
-  (%activate-player crown username))
-
-(defun %activate-player (owner username)
-  (with-lock-held ((inactive-players-lock owner))
-    (let ((player (find username (inactive-players owner) :key #'username)))
+  (with-lock-held ((inactive-players-lock crown))
+    (let ((player (find username (inactive-players crown) :key #'username)))
       (unless player (error 'unknown-player :username username))
-      (setf (lookup username (library owner :players)) player
-            (lookup (email player) (library owner :emails)) player
-            (inactive-players owner) (delete player (inactive-players owner) :count 1)))))
+      (setf (lookup username (library crown :players)) player
+            (lookup (email player) (library crown :emails)) player
+            (inactive-players crown) (delete player (inactive-players crown) :count 1)))))
 
 ;; TODO test for command ACTIVATE-PLAYER
 
@@ -38,4 +35,6 @@ Arguments:
         (push player (inactive-players crown)))
       (execute-operation 'activate-player :crown crown :username username)
       (let ((player-lookup (lookup username (library crown :players))))
-        (is (eq player player-lookup))))))
+        (is (eq player player-lookup))
+        (with-lock-held ((inactive-players-lock crown))
+          (is (null (inactive-players crown))))))))
