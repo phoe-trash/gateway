@@ -13,8 +13,12 @@ Must be KILLABLE.
 
 (defprotocol crown
     (crown () ())
-  ;; DATA AND THREADS
+  ;; DATA
   (defgeneric library (crown keyword))
+  (defgeneric inactive-players (crown))
+  (defgeneric (setf inactive-players) (new-value crown))
+  (defgeneric inactive-players-lock (crown))
+  ;; THREADS
   (defgeneric queue (object))
   (defgeneric timer (object))
   (defgeneric gems (object))

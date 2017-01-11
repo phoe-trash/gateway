@@ -34,9 +34,10 @@ Arguments:
 (deftest test-command-login
   (let* ((username "test-username")
          (password "test-password")
+         (email "test-email@email.com")
          (wrong-username "wrong-username")
          (wrong-password "wrong-password")
-         (player (%make-player username password))
+         (player (%make-player username password email))
          (login-ok '(:ok :login))
          (authentication-failure '(:error :type :authentication-failure))
          (already-logged-in '(:error :type :already-logged-in)))

@@ -12,6 +12,9 @@
    (%password :accessor password
               :initarg :password
               :initform (error "Must provide password."))
+   (%email :accessor email
+           :initarg :email
+           :initform (error "Must provide email."))
    (%lock :accessor lock)))
 
 (defconstructor (standard-player)
@@ -21,8 +24,8 @@
 (defmethod name ((player standard-player))
   (username player))
 
-(defun %make-player (username passphrase)
-  (make-instance 'standard-player :username username
+(defun %make-player (username passphrase email)
+  (make-instance 'standard-player :username username :email email
                                   :password (make-password passphrase)))
 
 (defmethod sexp ((player standard-player))
@@ -38,7 +41,8 @@
 (deftest test-standard-player
   (let* ((username "test-username")
          (password "test-password")
-         (player (%make-player username password)))
+         (email "test-email@email.com")
+         (player (%make-player username password email)))
     (with-crown-and-connections crown () ()
       (setf (lookup username (library crown :players)) player)
       (is (password-matches-p (password player) password))

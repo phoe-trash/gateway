@@ -22,7 +22,8 @@ This command allows the user to log out of the system.
 (deftest test-command-logout
   (let* ((username "test-username")
          (password "test-password")
-         (player (%make-player username password))
+         (email "test-email@email.com")
+         (player (%make-player username password email))
          (not-logged-in '(:error :type :not-logged-in))
          (login-ok '(:ok :login))
          (logout-ok '(:ok :logout)))

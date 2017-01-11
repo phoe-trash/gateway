@@ -33,8 +33,9 @@ Arguments:
 (deftest test-command-change-password
   (let* ((username "test-username")
          (password "test-password")
+         (email "test-email@email.com")
          (new-password "new-password")
-         (player (%make-player username password))
+         (player (%make-player username password email))
          (not-logged-in '(:error :type :not-logged-in))
          (login-ok '(:ok :login))
          (logout-ok '(:ok :logout))

@@ -19,7 +19,8 @@
                (setf (lookup keyword standard-library)
                      (make-instance 'standard-library :test hash-table-test))
                (unless (null rest) (apply #'library-hash-table rest))))
-      (library-hash-table :players #'equal)))
+      (library-hash-table :players #'equal)
+      (library-hash-table :emails #'equalp)))
   (setf (%type standard-library) type))
 
 (defmethod lookup (key (library standard-library))

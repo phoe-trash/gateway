@@ -19,6 +19,7 @@
                #:bordeaux-threads
                #:usocket
                #:lparallel
+               #:cl-ppcre
                #:trivial-arguments
                #:trivia)
   :serial t
@@ -67,10 +68,13 @@
                ;; OPERATIONS
                (:file "operations/clean-connections")
                (:file "operations/execute-command")
+               (:file "operations/activate-player")
                ;; COMMANDS
                (:file "commands/ping")
                (:file "commands/login")
                (:file "commands/logout")
+               (:file "commands/register")
+               (:file "commands/change-password")
                ;; CONDITIONS
                ;; ERRORS
                (:file "errors/already-logged-in")
@@ -78,5 +82,9 @@
                (:file "errors/not-authorized")
                (:file "errors/authentication-failure")
                (:file "errors/unknown-player")
+               (:file "errors/email-taken")
+               (:file "errors/invalid-email")
+               (:file "errors/username-taken")
+               (:file "errors/invalid-username")
                ;; EPILOGUE
                ))

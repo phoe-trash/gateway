@@ -32,6 +32,13 @@
         (t
          (equal object-1 object-2))))
 
+;;;; STRING FUNCTIONS
+(defun valid-email-p (string)
+  (scan "^[a-zA-Z0-9-._]+@.*\..*$" string))
+
+(defun valid-username-p (string)
+  (scan "(?=^.{3,64}$)^[a-zA-Z0-9]+[a-zA-Z0-9._-]*[a-zA-Z0-9]+$" string))
+
 ;;;; VARIA
 (defun fformat (stream format-string &rest format-args)
   (apply #'format stream format-string format-args)

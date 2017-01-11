@@ -15,24 +15,8 @@
         #:usocket
         #:trivial-arguments
         #:trivia
+        #:cl-ppcre
         #:lparallel
         #:lparallel.queue)
   (:shadowing-import-from #:1am
-                          #:is #:signals #:*tests*)
-  #|
-  (:use #:common-lisp
-  #:closer-mop
-  #:named-readtables
-  #:hu.dwim.defclass-star
-  #:cl-colors
-  #:jpl-queues
-  #:trivial-garbage
-  #:bordeaux-threads
-  #:alexandria
-  #:usocket
-  #:flexi-streams
-  #:iterate
-  #:local-time
-  #:1am)
-  |#
-  )
+                          #:is #:signals #:*tests*))

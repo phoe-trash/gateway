@@ -7,6 +7,9 @@
 
 (defclass standard-crown (crown)
   ((%library :accessor %library)
+   (%inactive-players :accessor inactive-players :initform ())
+   (%inactive-players-lock :accessor inactive-players-lock
+                           :initform (%crown-lock "inactive-players"))
    (%queue :accessor queue)
    (%timer :accessor timer)
    (%gems :accessor gems :initform ())
