@@ -11,7 +11,12 @@
               :initform (error "Must provide username."))
    (%password :accessor password
               :initarg :password
-              :initform (error "Must provide password."))))
+              :initform (error "Must provide password."))
+   (%lock :accessor lock)))
+
+(defconstructor (standard-player)
+  (setf (lock standard-player)
+        (make-lock (format nil "Lock for player ~S" (username standard-player)))))
 
 (defmethod name ((player standard-player))
   (username player))

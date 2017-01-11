@@ -12,7 +12,8 @@ Should be signaled when the user tries to perform an action he is not
 authorized to perform.
 
 Arguments:
-* COMMAND: the command the user was not authorized to perform.
+* COMMAND: the symbol describing the command the user was not authorized
+to perform.
 |#
 
 (define-gateway-error not-authorized

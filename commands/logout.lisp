@@ -15,7 +15,8 @@ This command allows the user to log out of the system.
   (check-type owner crown)
   (let ((auth (auth connection)))
     (unless auth (error 'not-logged-in)))
-  (setf (auth connection) nil)
+  (with-lock-held ((lock connection))
+    (setf (auth connection) nil))
   (data-send connection '(:ok :logout)))
 
 (deftest test-command-logout
@@ -27,11 +28,12 @@ This command allows the user to log out of the system.
          (logout-ok '(:ok :logout)))
     (with-crown-and-connections crown (connection) ()
       (setf (lookup username (library crown :players)) player)
-      (data-send connection `(logout))
-      (is (wait () (data-equal (data-receive connection) not-logged-in)))
-      (data-send connection `(login :username ,username :password ,password))
-      (is (wait () (data-equal (data-receive connection) login-ok)))
-      (data-send connection `(logout))
-      (is (wait () (data-equal (data-receive connection) logout-ok)))
-      (data-send connection `(logout))
-      (is (wait () (data-equal (data-receive connection) not-logged-in))))))
+      (%test connection
+             `(logout)
+             not-logged-in
+             `(login :username ,username :password ,password)
+             login-ok
+             `(logout)
+             logout-ok
+             `(logout)
+             not-logged-in))))

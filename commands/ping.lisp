@@ -19,8 +19,8 @@ Arguments:
   (data-send connection (list :pong :data data)))
 
 (deftest test-command-ping
-  (let ((data '(:data (1 2 3 4 5))))
+  (let ((data '(1 2 3 4 5)))
     (with-crown-and-connections crown (connection) ()
-      (data-send connection (cons :ping data))
-      (is (wait () (data-equal (data-receive connection)
-                               (cons :pong data)))))))
+      (%test connection
+             `(:ping :data ,data)
+             `(:pong :data ,data)))))

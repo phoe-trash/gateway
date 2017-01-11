@@ -96,3 +96,10 @@
   (note "~%[T] Beginning tests.~%")
   (1am:run)
   (note "[T] Finished tests.~%~%"))
+
+(defun %test (connection &rest clauses)
+  (flet ((%%test (query response)
+           (data-send connection query)
+           (is (wait () (data-equal (data-receive connection) response)))))
+    (loop for (query response) on clauses by #'cddr
+          do (%%test query response))))

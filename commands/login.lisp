@@ -27,7 +27,8 @@ Arguments:
                  (string= username (username player))
                  (password-matches-p (password player) password))
       (error 'authentication-failure))
-    (setf (auth connection) player)
+    (with-lock-held ((lock connection))
+      (setf (auth connection) player))
     (data-send connection '(:ok :login))))
 
 (deftest test-command-login
@@ -36,16 +37,19 @@ Arguments:
          (wrong-username "wrong-username")
          (wrong-password "wrong-password")
          (player (%make-player username password))
-         (ok '(:ok :login))
+         (login-ok '(:ok :login))
          (authentication-failure '(:error :type :authentication-failure))
          (already-logged-in '(:error :type :already-logged-in)))
     (with-crown-and-connections crown (connection) ()
       (setf (lookup username (library crown :players)) player)
-      (flet ((check (username password response)
-               (data-send connection `(login :username ,username :password ,password))
-               (is (wait () (data-equal (data-receive connection) response)))))
-        (check wrong-username password authentication-failure)
-        (check username wrong-password authentication-failure)
-        (check username password ok)
-        (is (find player (n-connections crown) :key #'auth))
-        (check username password already-logged-in)))))
+      (%test connection
+             `(login :username ,wrong-username :password ,password)
+             authentication-failure
+             `(login :username ,username :password ,wrong-password)
+             authentication-failure
+             `(login :username ,username :password ,password)
+             login-ok)
+      (is (find player (n-connections crown) :key #'auth))
+      (%test connection
+             `(login :username ,username :password ,password)
+             already-logged-in))))
