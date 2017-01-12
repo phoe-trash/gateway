@@ -66,7 +66,6 @@
                (:file "classes/standard-gem")
                (:file "classes/standard-player")
                ;; OPERATIONS
-               (:file "operations/clean-connections")
                (:file "operations/execute-command")
                (:file "operations/unknown-command")
                (:file "operations/activate-player")
