@@ -17,7 +17,7 @@ in as.
 |#
 
 (define-gateway-error already-logged-in
-    ((auth :accessor already-logged-in-auth
+    ((auth :reader already-logged-in-auth
            :initarg :auth
            :initform (error "Must provide previous auth.")))
     (owner connection condition)

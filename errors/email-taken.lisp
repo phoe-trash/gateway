@@ -16,7 +16,7 @@ Arguments:
 |#
 
 (define-gateway-error email-taken
-    ((email :accessor email-taken-email
+    ((email :reader email-taken-email
             :initarg :email
             :initform (error "Must provide email.")))
     (owner connection condition)

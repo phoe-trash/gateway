@@ -17,7 +17,7 @@ to perform.
 |#
 
 (define-gateway-error not-authorized
-    ((command :accessor not-authorized-command
+    ((command :reader not-authorized-command
               :initarg :command
               :initform (error "Must provide the command.")))
     (owner connection condition)

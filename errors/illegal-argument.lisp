@@ -18,13 +18,13 @@ Arguments:
 |#
 
 (define-gateway-error illegal-argument
-    ((var :accessor illegal-argument-var
+    ((var :reader illegal-argument-var
           :initarg :var
           :initform (error "Must provide var."))
-     (value :accessor illegal-argument-value
+     (value :reader illegal-argument-value
             :initarg :value
             :initform (error "Must provide value."))
-     (type :accessor illegal-argument-type
+     (type :reader illegal-argument-type
            :initarg :type
            :initform (error "Must provide type.")))
     (owner connection condition)

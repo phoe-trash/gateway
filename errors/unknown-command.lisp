@@ -20,7 +20,7 @@ Arguments:
 |#
 
 (define-gateway-error unknown-command
-    ((command :accessor unknown-command-command
+    ((command :reader unknown-command-command
               :initarg :command
               :initform (error "Must provide command.")))
     (owner connection condition)

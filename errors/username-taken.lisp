@@ -16,7 +16,7 @@ Arguments:
 |#
 
 (define-gateway-error username-taken
-    ((username :accessor username-taken-username
+    ((username :reader username-taken-username
                :initarg :username
                :initform (error "Must provide username.")))
     (owner connection condition)

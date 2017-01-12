@@ -16,7 +16,7 @@ Arguments:
 |#
 
 (define-gateway-error unknown-player
-    ((username :accessor unknown-player-username
+    ((username :reader unknown-player-username
                :initarg :username
                :initform (error "Must provide username.")))
     (owner connection condition)
