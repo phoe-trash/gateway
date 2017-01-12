@@ -16,8 +16,7 @@
   (let* ((data-word (string command))
          (fn (gethash data-word %command-data%)))
     (if fn
-        (progn (note "[G] Executing command ~S.~%" command)
-               (funcall fn plist owner connection))
+        (funcall fn plist owner connection)
         (execute-operation 'unknown-command :command command
                                             :connection connection))))
 
@@ -30,6 +29,7 @@
          (handle-condition (gensym "HANDLE-CONDITION")))
     `(setf (gethash ',(string name) %command-data%)
            (lambda ,args
+             (note "[G] Executing command ~S.~%" ,name)
              (declare (ignorable ,gensym-sexp))
              (let ((,owner-var ,owner-var)
                    (,connection-var ,connection-var)
