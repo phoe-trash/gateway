@@ -27,3 +27,13 @@ Arguments:
   (declare (ignore owner))
   (let ((command (unknown-command-command condition)))
     (data-send connection `(:error :type :unknown-command :command ,command))))
+
+(deftest test-error-unknown-command
+  (with-crown-and-connections crown (connection) ()
+    (data-send connection `(:foo :bar :baz))
+    (is (wait () (data-equal (data-receive connection)
+                             `(:error :type :unknown-command :command :foo))))
+    (data-send connection `(:unknown-command))
+    (is (wait () (data-equal (data-receive connection)
+                             `(:error :type :unknown-command :command :unknown-command))))))
+

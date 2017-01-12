@@ -19,12 +19,3 @@ Arguments:
   (note "[!] Command ~A not found.~%" command)
   (let ((error (make-condition 'unknown-command :command command)))
     (handle-gateway-error nil connection error)))
-
-(deftest test-operation-unknown-command
-  (with-crown-and-connections crown (connection) ()
-    (data-send connection `(:foo :bar :baz))
-    (is (wait () (data-equal (data-receive connection)
-                             `(:error :type :unknown-command :command :foo))))
-    (data-send connection `(:unknown-command))
-    (is (wait () (data-equal (data-receive connection)
-                             `(:error :type :unknown-command :command :unknown-command))))))
