@@ -89,4 +89,5 @@
                (:file "errors/unknown-command")
                (:file "errors/illegal-argument")
                ;; EPILOGUE
+               (:file "new")
                ))
