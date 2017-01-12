@@ -22,7 +22,7 @@ Arguments:
 
 (deftest test-operation-unknown-command
   (with-crown-and-connections crown (connection) ()
-    (data-send connection `(:foo))
+    (data-send connection `(:foo :bar :baz))
     (is (wait () (data-equal (data-receive connection)
                              `(:error :type :unknown-command :command :foo))))
     (data-send connection `(:unknown-command))

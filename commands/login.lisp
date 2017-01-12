@@ -16,9 +16,8 @@ Arguments:
 * PASSWORD: string containing the password.
 |#
 
-(defcommand login (owner connection) (:username :password)
-  (check-type username string)
-  (check-type password string)
+(defcommand login (owner connection) ((:username string)
+                                      (:password string))
   (check-type owner crown)
   (let ((auth (auth connection)))
     (when auth (error 'already-logged-in :auth auth)))

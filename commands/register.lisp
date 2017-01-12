@@ -17,10 +17,9 @@ Arguments:
 * EMAIL: the email of the created player.
 |#
 
-(defcommand register (owner connection) (:username :password :email)
-  (check-type username string)
-  (check-type password string)
-  (check-type email string)
+(defcommand register (owner connection) ((:username string)
+                                         (:password string)
+                                         (:email string))
   (check-type owner crown)
   (let ((auth (auth connection)))
     (when auth (error 'already-logged-in :auth auth)))
@@ -47,7 +46,6 @@ Arguments:
                     :key #'username :test #'string=)))
     (error 'username-taken :username username)))
 
-;; TODO test for command REGISTER
 (deftest test-command-register
   (let* ((username "test-username")
          (password "test-password")

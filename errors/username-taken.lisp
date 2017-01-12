@@ -10,6 +10,9 @@ Error USERNAME-TAKEN
 
 Should be signaled when the user provides an username which is already
 registered to a player on the system.
+
+Arguments:
+* USERNAME: the invalid username.
 |#
 
 (define-gateway-error username-taken

@@ -10,6 +10,9 @@ Error UNKNOWN-PLAYER
 
 Should be signaled when a gem attempts to access a user which is not
 present in the owner.
+
+Arguments:
+* USERNAME: the username referring to the unknown player.
 |#
 
 (define-gateway-error unknown-player

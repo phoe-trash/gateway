@@ -10,6 +10,9 @@ Error INVALID-USERNAME
 
 Should be signaled when the user provides an username which is not
 a valid username address.
+
+Arguments:
+* USERNAME: the invalid username.
 |#
 
 (define-gateway-error invalid-username

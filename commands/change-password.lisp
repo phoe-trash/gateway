@@ -16,9 +16,8 @@ Arguments:
 * NEW-PASSWORD: string containing the new password to be set.
 |#
 
-(defcommand change-password (owner connection) (:old-password :new-password)
-  (check-type old-password string)
-  (check-type new-password string)
+(defcommand change-password (owner connection) ((:old-password string)
+                                                (:new-password string))
   (check-type owner crown)
   (let ((player (auth connection)))
     (unless player (error 'not-logged-in))

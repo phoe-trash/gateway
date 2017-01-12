@@ -10,6 +10,9 @@ Error EMAIL-TAKEN
 
 Should be signaled when the user provides an email which is already
 registered to a player on the system.
+
+Arguments:
+* EMAIL: the taken email.
 |#
 
 (define-gateway-error email-taken

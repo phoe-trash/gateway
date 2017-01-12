@@ -88,5 +88,6 @@
                (:file "errors/username-taken")
                (:file "errors/invalid-username")
                (:file "errors/unknown-command")
+               (:file "errors/illegal-argument")
                ;; EPILOGUE
                ))
