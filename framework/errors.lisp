@@ -27,8 +27,6 @@
                       (declare (ignorable ,condition-var))
                       ,@body))))))
 
-;; TODO: fix ignorables
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun %error-report (condition-var let-list report-data)
     (when report-data
