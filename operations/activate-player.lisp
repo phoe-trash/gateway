@@ -23,8 +23,6 @@ Arguments:
             (lookup (email player) (library crown :emails)) player
             (inactive-players crown) (delete player (inactive-players crown) :count 1)))))
 
-;; TODO test for command ACTIVATE-PLAYER
-
 (deftest test-operation-activate-player
   (let* ((username "test-username")
          (password "test-password")

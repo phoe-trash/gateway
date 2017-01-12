@@ -15,10 +15,11 @@
   (assert (identity command))
   (let* ((data-word (string command))
          (fn (gethash data-word %command-data%)))
-    (if (null fn)
-        (error "Command ~S not found." command)
+    (if fn
         (progn (note "[G] Executing command ~S.~%" command)
-               (funcall fn plist owner connection)))))
+               (funcall fn plist owner connection))
+        (execute-operation 'unknown-command :command command
+                                            :connection connection))))
 
 (defmacro defcommand (name (owner-var connection-var)
                       keyword-list &body body)
@@ -43,3 +44,4 @@
                        (progn ,@body))
                    (gateway-error (error)
                      (,handle-error error)))))))))
+

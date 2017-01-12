@@ -68,6 +68,7 @@
                ;; OPERATIONS
                (:file "operations/clean-connections")
                (:file "operations/execute-command")
+               (:file "operations/unknown-command")
                (:file "operations/activate-player")
                ;; COMMANDS
                (:file "commands/ping")
@@ -86,5 +87,6 @@
                (:file "errors/invalid-email")
                (:file "errors/username-taken")
                (:file "errors/invalid-username")
+               (:file "errors/unknown-command")
                ;; EPILOGUE
                ))
