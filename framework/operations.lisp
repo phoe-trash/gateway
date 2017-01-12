@@ -12,8 +12,8 @@
 (defun %execute-operation (operation plist)
   (assert (proper-list-p plist))
   (assert (identity operation))
-  (let* ((fn (gethash operation %operation-data%)))
-    (if fn
+  (multiple-value-bind (fn foundp) (gethash operation %operation-data%)
+    (if foundp
         (funcall fn plist)
         (error "Operation ~S not found." operation))))
 

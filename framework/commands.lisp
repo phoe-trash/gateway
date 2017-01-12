@@ -13,12 +13,12 @@
   (check-type owner crown)
   (assert (proper-list-p plist))
   (assert (identity command))
-  (let* ((data-word (string command))
-         (fn (gethash data-word %command-data%)))
-    (if fn
-        (funcall fn plist owner connection)
-        (execute-operation 'unknown-command :command command
-                                            :connection connection))))
+  (let ((data-word (string command)))
+    (multiple-value-bind (fn foundp) (gethash data-word %command-data%)
+      (if foundp
+          (funcall fn plist owner connection)
+          (execute-operation 'unknown-command :command command
+                                              :connection connection)))))
 
 (defmacro defcommand (name (owner-var connection-var)
                       keyword-list &body body)
