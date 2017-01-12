@@ -14,7 +14,7 @@ This command allows the user to log out of the system.
 (defcommand logout (owner connection) ()
   (check-type owner crown)
   (let ((auth (auth connection)))
-    (unless auth (error 'not-logged-in)))
+    (unless auth (error 'not-logged-in :connection connection)))
   (with-lock-held ((lock connection))
     (setf (auth connection) nil))
   (data-send connection '(:ok :logout)))

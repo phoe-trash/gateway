@@ -20,6 +20,7 @@ Arguments:
                :initarg :username
                :initform (error "Must provide username.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((username (username (unknown-player-username condition))))
-    (data-send connection `(:error :type :unknown-user :username ,username))))
+    (((username (username (unknown-player-username condition))))
+     ("Player ~S is not known on the system." username)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :unknown-user :username ,username))))

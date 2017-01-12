@@ -28,13 +28,14 @@ Arguments:
            :initarg :type
            :initform (error "Must provide type.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((var (illegal-argument-var condition))
-        (value (illegal-argument-value condition))
-        (type (illegal-argument-type condition)))
-    (note "[!] Illegal argument for ~A: ~S, which is not ~S.~%" var value type)
-    (data-send connection `(:error :type :illegal-argument
-                                   :var ,var :value ,value :type ,type))))
+    (((var (illegal-argument-var condition))
+      (value (illegal-argument-value condition))
+      (type (illegal-argument-type condition)))
+     ("[!] Illegal argument for ~A: ~S, which is not of type ~S.~%"
+      var value type)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :illegal-argument
+                                     :var ,var :value ,value :type ,type))))
 
 (deftest test-error-illegal-argument
   (with-crown-and-connections crown (connection) ()

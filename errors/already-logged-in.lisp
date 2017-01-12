@@ -21,6 +21,7 @@ in as.
            :initarg :auth
            :initform (error "Must provide previous auth.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((name (name (already-logged-in-auth condition))))
-    (data-send connection `(:error :type :already-logged-in :name ,name))))
+    (((name (name (already-logged-in-auth condition))))
+     ("Player is already logged in as ~S." name)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :already-logged-in :name ,name))))

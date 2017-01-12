@@ -9,12 +9,18 @@
 
 (define-condition gateway-condition () ())
 
-(defmacro define-gateway-condition (name slot-specs (owner-var connection-var condition-var)
-                                    &body body)
-  `(progn (define-condition ,name () ,slot-specs)
-          (setf (gethash ',name %condition-data%)
-                (lambda (,owner-var ,connection-var ,condition-var)
-                  ,@body))))
+;; TODO pull changes from DEFINE-GATEWAY-ERROR to DEFINE-GATEWAY-CONDITION
+
+(defmacro define-gateway-condition
+    (name slot-specs (owner-var connection-var condition-var &optional stream-var)
+     report-data &body body)
+  (let ((report (when (and stream-var report-data)
+                  `((:report (lambda (,condition-var ,stream-var)
+                               (format nil ,@report-data)))))))
+    `(progn (define-condition ,name () ,slot-specs ,@report)
+            (setf (gethash ',name %condition-data%)
+                  (lambda (,owner-var ,connection-var ,condition-var)
+                    ,@body)))))
 
 (defun handle-gateway-condition (owner connection condition)
   (unless (typep condition 'gateway-error)

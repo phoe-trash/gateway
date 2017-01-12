@@ -20,7 +20,7 @@ Arguments:
             :initarg :email
             :initform (error "Must provide email.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((email (invalid-email-email condition)))
-    (data-send connection `(:error :type :invalid-email :email ,email))
-    (note "[!] Finished handling INVALID-EMAIL.~%")))
+    (((email (invalid-email-email condition)))
+     ("The provided email, ~S, was invalid." email)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :invalid-email :email ,email))))

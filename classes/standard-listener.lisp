@@ -129,9 +129,8 @@
         (data-send (second conns-1) sample-data-2)
         (data-send (second conns-2) sample-data-1))
       (flet ((output-present-p (connection output)
-               (wait () (with-lock-held (lock)
-                          (member (list connection output) data
-                                  :test #'data-equal)))))
+               (wait () (with-lock-held (lock) (member (list connection output) data
+                                                       :test #'data-equal)))))
         (is (output-present-p (first conns-1) sample-data-1))
         (is (output-present-p (first conns-1) sample-data-2))
         (is (output-present-p (first conns-2) sample-data-1))))))

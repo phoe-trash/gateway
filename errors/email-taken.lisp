@@ -20,6 +20,7 @@ Arguments:
             :initarg :email
             :initform (error "Must provide email.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((email (email-taken-email condition)))
-    (data-send connection `(:error :type :email-taken :email ,email))))
+    (((email (email-taken-email condition)))
+     ("The email ~A is already taken." email)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :email-taken :email ,email))))

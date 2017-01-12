@@ -25,7 +25,7 @@ Arguments:
     (unless (and foundp
                  (string= username (username player))
                  (password-matches-p (password player) password))
-      (error 'authentication-failure))
+      (error 'authentication-failure :connection connection))
     (with-lock-held ((lock connection))
       (setf (auth connection) player))
     (data-send connection '(:ok :login))))

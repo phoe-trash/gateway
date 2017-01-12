@@ -17,9 +17,10 @@ Arguments:
 
 (define-gateway-error username-taken
     ((username :reader username-taken-username
-               :initarg :username
-               :initform (error "Must provide username.")))
+            :initarg :username
+            :initform (error "Must provide username.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((username (username-taken-username condition)))
-    (data-send connection `(:error :type :username-taken :username ,username))))
+    (((username (username-taken-username condition)))
+     ("The username ~A is already taken." username)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :username-taken :username ,username))))

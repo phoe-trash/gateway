@@ -17,10 +17,16 @@ to perform.
 |#
 
 (define-gateway-error not-authorized
-    ((command :reader not-authorized-command
+    ((connection :reader not-authorized-connection
+                 :initarg :connection
+                 :initform (error "Must provide connection."))
+     (command :reader not-authorized-command
               :initarg :command
               :initform (error "Must provide the command.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((command (not-authorized-command condition)))
-    (data-send connection `(:error :type :not-authorize :command ,command))))
+    (((command (not-authorized-command condition))
+      (connection (not-authorized-connection condition)))
+     ("Attempted to perform an unauthorized command ~S from connection ~S."
+      command connection)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :not-authorize :command ,command))))

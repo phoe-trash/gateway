@@ -17,9 +17,10 @@ Arguments:
 
 (define-gateway-error invalid-username
     ((username :reader invalid-username-username
-               :initarg :username
-               :initform (error "Must provide username.")))
+            :initarg :username
+            :initform (error "Must provide username.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((username (invalid-username-username condition)))
-    (data-send connection `(:error :type :invalid-username :username ,username))))
+    (((username (invalid-username-username condition)))
+     ("The provided username, ~S, was invalid." username)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :invalid-username :username ,username))))

@@ -24,9 +24,10 @@ Arguments:
               :initarg :command
               :initform (error "Must provide command.")))
     (owner connection condition)
-  (declare (ignore owner))
-  (let ((command (unknown-command-command condition)))
-    (data-send connection `(:error :type :unknown-command :command ,command))))
+    (((command (unknown-command-command condition)))
+     ("Unknown command: ~S." command)
+      (declare (ignore owner))
+      (data-send connection `(:error :type :unknown-command :command ,command))))
 
 (deftest test-error-unknown-command
   (with-crown-and-connections crown (connection) ()
