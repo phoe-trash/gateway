@@ -20,7 +20,7 @@
                   (lambda ,vars
                     (declare (ignorable ,@vars))
                     (let ,main-lets
-                      (declare (ignorable ,@vars ,@(mapcar #'car let-list)))
+                      (declare (ignorable ,@vars))
                       (note (cat (format nil "[!] Condition ~A: " ',name)
                                  (format nil ,@report-data))))
                     (let* ,main-lets
