@@ -136,6 +136,11 @@
         (is (output-present-p (first conns-1) sample-data-2))
         (is (output-present-p (first conns-2) sample-data-1))))))
 
+(deftest test-standard-listener-clean-connections
+  (with-crown-and-connections crown (connection) ()
+    (kill connection)
+    (is (wait () (= 1 (length (n-connections crown)))))))
+
 ;; Oh goodness, I remember the days when I've had no idea what a closure was
 ;; and how a function can be an object.
 ;; ~phoe, 28 Dec 2016
