@@ -8,7 +8,8 @@
 #|
 Operation UNKNOWN-COMMAND
 
-This operation signals the UNKNOWN-COMMAND error.
+This operation constructs an instance of the UNKNOWN-COMMAND error
+from the provided data and calls HANDLER-GATEWAY-ERROR on it.
 
 Arguments:
 * COMMAND: the command not found on the system.
