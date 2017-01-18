@@ -22,5 +22,5 @@ Arguments:
   (let ((data '(1 2 3 4 5)))
     (with-crown-and-connections crown (connection) ()
       (%test connection
-             `(:ping :data ,data)
-             `(:pong :data ,data)))))
+             `(ping :data ,data)
+             `(pong :data ,data)))))

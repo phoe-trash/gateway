@@ -23,7 +23,7 @@
          (let-list (%data-getf-let-list keyword-list gensym-sexp)))
     `(setf (gethash ',name %operation-data%)
            (lambda ,args
-             (note "[G] Executing operation ~A.~%" ,name)
              (declare (ignorable ,@args))
+             (note "[G] Executing operation ~A.~%" ',name)
              (let ,let-list
                ,@body)))))

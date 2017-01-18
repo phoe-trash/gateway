@@ -35,19 +35,18 @@ Arguments:
       var value type)
       (declare (ignore owner))
       (data-send connection `(:error :type :illegal-argument
-                                     :var ,var :value ,value :type ,type))))
+                                     :var ,var :value ,value
+                                     :expected-type ,type))))
 
 (deftest test-error-illegal-argument
   (with-crown-and-connections crown (connection) ()
     (flet ((response (var value)
              `(:error :type :illegal-argument
-                      :var ,var :value ,value :type :string)))
-      (data-send connection '(:login :username 2 :password "foo"))
-      (is (wait () (data-equal (data-receive connection)
-                               (response :username 2))))
-      (data-send connection '(:login :username "foo" :password :password))
-      (is (wait () (data-equal (data-receive connection)
-                               (response :password :password))))
-      (data-send connection '(:login :username "foo" :password (1 2 3 4)))
-      (is (wait () (data-equal (data-receive connection)
-                               (response :password '(1 2 3 4))))))))
+                      :var ,var :value ,value :expected-type :string)))
+      (%test connection
+             '(:login :username 2 :password "foo")
+             (response :username 2)
+             '(:login :username "foo" :password :password)
+             (response :password :password)
+             '(:login :username "foo" :password (1 2 3 4))
+             (response :password '(1 2 3 4))))))

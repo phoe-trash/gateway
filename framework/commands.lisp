@@ -29,8 +29,8 @@
          (handle-condition (gensym "HANDLE-CONDITION")))
     `(setf (gethash ',(string name) %command-data%)
            (lambda ,args
-             (note "[G] Executing command ~S.~%" ,name)
              (declare (ignorable ,gensym-sexp))
+             (note "[G] Executing command ~S.~%" ',name)
              (let ((,owner-var ,owner-var)
                    (,connection-var ,connection-var)
                    ,@let-list)
@@ -62,4 +62,3 @@
                     (error 'illegal-argument :var ',(first x) :type ',(second x)
                                              :value ,symbol)))))
         (mapcar #'generate keyword-list)))))
-

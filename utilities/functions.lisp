@@ -105,8 +105,10 @@
   (note "[T] Finished tests.~%~%"))
 
 (defun %test (connection &rest clauses)
-  (flet ((%%test (query response)
+  (flet ((%%test (query expected)
            (data-send connection query)
-           (is (wait () (data-equal (data-receive connection) response)))))
+           (let ((received (wait () (data-receive connection))))
+             (assert (data-equal received expected))
+             (is t))))
     (loop for (query response) on clauses by #'cddr
           do (%%test query response))))

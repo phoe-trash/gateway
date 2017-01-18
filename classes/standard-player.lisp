@@ -15,6 +15,8 @@
    (%email :accessor email
            :initarg :email
            :initform (error "Must provide email."))
+   (%personas :accessor personas
+              :initform ())
    (%lock :accessor lock)))
 
 (defconstructor (standard-player)
@@ -47,5 +49,3 @@
       (setf (lookup username (library crown :players)) player)
       (is (password-matches-p (password player) password))
       (is (eq player (unsexp (sexp player) crown))))))
-
-

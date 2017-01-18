@@ -25,3 +25,7 @@
     (setf (owner standard-persona) (player standard-persona)))
   (setf (lock standard-persona)
         (make-lock (format nil "Lock for persona ~S" (name standard-persona)))))
+
+(defun %make-persona (name &optional owner)
+  (make-instance 'standard-persona
+                 :name name :player owner :owner owner))

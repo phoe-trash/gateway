@@ -18,4 +18,6 @@ Must be NAMED and SEXPABLE.
   (defgeneric (setf password) (new-value player))
   (defgeneric email (player))
   (defgeneric (setf email) (new-value player))
+  (defgeneric personas (player))
+  (defgeneric (setf personas) (new-value player))
   (defgeneric lock (player)))

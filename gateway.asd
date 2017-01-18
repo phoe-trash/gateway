@@ -75,6 +75,7 @@
                (:file "commands/logout")
                (:file "commands/register")
                (:file "commands/change-password")
+               (:file "commands/add-persona")
                ;; CONDITIONS
                ;; ERRORS
                (:file "errors/already-logged-in")
@@ -88,6 +89,7 @@
                (:file "errors/invalid-username")
                (:file "errors/unknown-command")
                (:file "errors/illegal-argument")
+               (:file "errors/name-taken")
                ;; EPILOGUE
                (:file "new")
                ))

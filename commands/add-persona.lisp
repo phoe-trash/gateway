@@ -1,9 +1,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; new.lisp
+;;;; add-persona.lisp
 
 (in-package #:gateway)
+
+#|
+Command ADD-PERSONA
+
+This command allows the user to add a persona to their account.
+
+Arguments:
+* NAME: the name for the newly created persona.
+|#
 
 (defcommand add-persona (owner connection) ((:name string))
   (check-type owner crown)
@@ -40,13 +49,3 @@
       (%test connection
              `(add-persona :name ,name)
              name-taken))))
-
-(define-gateway-error name-taken
-    ((name :reader name-taken-name
-           :initarg :name
-           :initform (error "Must provide name.")))
-    (owner connection condition)
-    (((name (name-taken-name condition)))
-     ("The name ~A is already taken." name)
-      (declare (ignore owner))
-      (data-send connection `(:error :type :name-taken :name ,name))))
