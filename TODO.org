@@ -1,0 +1,21 @@
+* TODO
+** Change library interface
+#+NAME: library code example
+#+BEGIN_SRC lisp
+  (let ((persona (%make-persona "test-persona")))
+    (with-lock-held ((library-lock owner))
+      (library-add owner :persona persona)))
+  ;; later
+  (with-lock-held ((library-lock owner))
+    (library-get owner :persona :name "test-persona"))
+  ;; later
+  (with-lock-held ((library-lock owner))
+    (let* ((elements ())
+           (fn (lambda (x) (push x elements))))
+      (library-mapc crown :persona #'fn)
+      (assert (find "test-persona" elements :key #'name :test #'string=))))
+
+#+END_SRC
+** Add persistence support for:
+*** players
+** ASSERT - CREATE - MODIFY - REPLY for all commands

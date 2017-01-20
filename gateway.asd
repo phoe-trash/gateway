@@ -46,6 +46,7 @@
                (:file "protocols/crown")
                (:file "protocols/gem")
                (:file "protocols/player")
+               (:file "protocols/persona")
                ;; FRAMEWORK
                (:file "framework/sexp")
                (:file "framework/operations")
@@ -65,6 +66,7 @@
                (:file "classes/standard-crown")
                (:file "classes/standard-gem")
                (:file "classes/standard-player")
+               (:file "classes/standard-persona")
                ;; OPERATIONS
                (:file "operations/execute-command")
                (:file "operations/unknown-command")
@@ -90,6 +92,7 @@
                (:file "errors/unknown-command")
                (:file "errors/illegal-argument")
                (:file "errors/name-taken")
+               (:file "errors/invalid-name")
                ;; EPILOGUE
                (:file "new")
                ))

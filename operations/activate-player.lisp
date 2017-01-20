@@ -20,8 +20,9 @@ Arguments:
     (let ((player (find username (inactive-players crown) :key #'username)))
       (unless player (error 'unknown-player :username username))
       (setf (lookup username (library crown :players)) player
-            (lookup (email player) (library crown :emails)) player
-            (inactive-players crown) (delete player (inactive-players crown) :count 1)))))
+            (lookup (email player) (library crown :emails)) player)
+      (with-lock-held ((inactive-players-lock crown))
+        (inactive-players crown) (delete player (inactive-players crown) :count 1)))))
 
 (deftest test-operation-activate-player
   (let* ((username "test-username")
