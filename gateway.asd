@@ -21,7 +21,8 @@
                #:lparallel
                #:cl-ppcre
                #:trivial-arguments
-               #:trivia)
+               #:trivia
+               #:bknr.datastore)
   :serial t
   :components (;; PACKAGE
                (:file "package")

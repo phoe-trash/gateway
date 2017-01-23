@@ -17,6 +17,7 @@
         #:trivia
         #:cl-ppcre
         #:lparallel
-        #:lparallel.queue)
+        #:lparallel.queue
+        #:bknr.datastore)
   (:shadowing-import-from #:1am
                           #:is #:signals #:*tests*))
