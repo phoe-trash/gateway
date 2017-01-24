@@ -25,6 +25,8 @@
                  :directory directory
                  :subsystems (list (make-instance 'store-object-subsystem))))
 
+(defgeneric store-location (object))
+
 (defclass world ()
   ((name :accessor name
          :initarg :name
@@ -34,8 +36,11 @@
    (chats :accessor chats
           :initform ())))
 
+(defmethod store-location ((object world))
+  (merge-pathnames (concatenate 'string (name object) "/") *store-root*))
+
 (defmethod initialize-instance :after ((world world) &key)
-  (let* ((directory (merge-pathnames (concatenate 'string (name world) "/") *store-root*))
+  (let* ((directory (store-location world))
          (maps-directory (merge-pathnames "maps/" directory))
          (players-directory (merge-pathnames "players/" directory)))
     (ensure-directories-exist directory)
@@ -53,12 +58,15 @@
 
 (defmethod initialize-instance :after ((chat chat) &key)
   (let* ((world (world chat))
-         (owner-directory (merge-pathnames (concatenate 'string (name world) "/") *store-root*))
-         (chats-directory (merge-pathnames "chats/" owner-directory))
-         (directory (merge-pathnames (concatenate 'string (name chat) "/") chats-directory)))
+         (directory (store-location chat)))
     (ensure-directories-exist directory)
     (setf (messages-store chat) (make-object-store directory))
     (push chat (chats world))))
+
+(defmethod store-location ((object chat))
+  (let* ((owner-directory (store-location (world object)))
+         (chats-directory (merge-pathnames "chats/" owner-directory)))
+    (merge-pathnames (concatenate 'string (name object) "/") chats-directory)))
 
 #|
 (defparameter *foo-world* (make-instance 'world :name "foo-world"))
