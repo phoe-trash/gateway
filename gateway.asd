@@ -22,7 +22,8 @@
                #:cl-ppcre
                #:trivial-arguments
                #:trivia
-               #:bknr.datastore)
+               #:bknr.datastore
+               #:split-sequence)
   :serial t
   :components (;; PACKAGE
                (:file "package")
