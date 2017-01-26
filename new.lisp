@@ -54,10 +54,11 @@
       `(setf ,@setf-list)))
 
   (defun %make-stores-list (object store-definitions)
-    (flet ((fn (definition)
-             (destructuring-bind (accessor folder) definition
-               `((,accessor ,object)
-                 (make-object-store (merge-pathnames ,folder (store-location ,object)))))))
+    (flet
+        ((fn (definition)
+           (destructuring-bind (accessor folder) definition
+             `((,accessor ,object)
+               (make-object-store (merge-pathnames ,folder (store-location ,object)))))))
       (mapcan #'fn store-definitions)))
 
   (defun make-object-store (directory)
@@ -79,10 +80,6 @@
 (defmethod validate-superclass ((class storage-class) (super standard-class))
   t)
 
-;; (defmethod ensure-class-using-class :around (class (name (eql 'bar))
-;;                                              &key direct-slots my-argument)
-;;   )
-
 (defun %storage-class-slot-definition (symbol)
   (let* ((slot-name symbol)
          (reader symbol)
@@ -103,6 +100,10 @@
   (if (eql #\/ (elt string (1- (length string))))
       string
       (concatenate 'string string "/")))
+
+;; (defmethod ensure-class-using-class :around (class (name (eql 'bar)) &rest
+;;                                              &key direct-slots my-argument)
+;;   )
 
 #|
 (defclass sample-storage ()
