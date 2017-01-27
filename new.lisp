@@ -29,44 +29,33 @@
 
 (defgeneric store-location (object))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defmacro with-store (store &body body)
-    `(let ((*store* ,store))
-       ,@body))
+(defmacro with-store (store &body body)
+  `(let ((*store* ,store))
+     ,@body))
 
-  (defmacro with-store-and-transaction ((store &optional label) &body body)
-    `(with-store ,store
-       (with-transaction (,label)
-         ,@body)))
+(defmacro with-store-and-transaction ((store &optional label) &body body)
+  `(with-store ,store
+     (with-transaction (,label)
+       ,@body)))
 
-  (defmacro make-stores (object &body stores)
-    (let ((definitions (mapcar #'%make-store-definition stores)))
-      `(%make-stores ,object ,@definitions)))
-
-  (defun %make-store-definition (symbol)
-    (let* ((name (string symbol))
-           (store-name (concatenate 'string name "-STORE"))
-           (store-path (concatenate 'string name "/")))
-      `(,(intern store-name) ,(string-downcase store-path))))
-
-  (defmacro %make-stores (object &body store-definitions)
-    (let ((setf-list (%make-stores-list object store-definitions)))
-      `(setf ,@setf-list)))
-
-  (defun %make-stores-list (object store-definitions)
-    (flet
-        ((fn (definition)
+(defmacro make-stores (object &body stores)
+  (flet ((make-store-definition (symbol)
+           (let* ((name (string symbol)))
+             `(,(intern (concatenate 'string name "-STORE"))
+               ,(string-downcase (concatenate 'string name "/")))))
+         (store-list (definition)
            (destructuring-bind (accessor folder) definition
              `((,accessor ,object)
                (make-object-store (merge-pathnames ,folder (store-location ,object)))))))
-      (mapcan #'fn store-definitions)))
+    (let ((definitions (mapcar #'make-store-definition stores)))
+      `(setf ,@(mapcan #'store-list definitions)))))
 
-  (defun make-object-store (directory)
-    (ensure-directories-exist directory)
-    (make-instance 'mp-store
-                   :make-default nil
-                   :directory directory
-                   :subsystems (list (make-instance 'store-object-subsystem)))))
+(defun make-object-store (directory)
+  (ensure-directories-exist directory)
+  (make-instance 'mp-store
+                 :make-default nil
+                 :directory directory
+                 :subsystems (list (make-instance 'store-object-subsystem))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; STORAGE-CLASS
