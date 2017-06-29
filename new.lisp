@@ -199,3 +199,9 @@
 /worlds/quux-world/*
 
 |#
+
+#|
+
+(defmacro シンボル・マクローレット (macrobindings &body body) `(symbol-macrolet ,macrobindings ,@body)) ;; WHEN YOUR LISP HAS NOT ENOUGH ANIME
+
+|#
