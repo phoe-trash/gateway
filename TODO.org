@@ -19,3 +19,7 @@
 ** Add persistence support for:
 *** players
 ** ASSERT - CREATE - MODIFY - REPLY for all commands
+
+** add trait IMMUTABLE with an empty protocol
+** clarify SYNCHRONIZED on library
+** add descriptions of events to timer
