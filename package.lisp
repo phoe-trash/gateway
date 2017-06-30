@@ -5,9 +5,13 @@
 
 (defpackage #:gateway
   (:use #:common-lisp
-        #:closer-mop
+        ;; #:closer-mop
         #:alexandria
-        #:cl-yesql)
-  (:shadowing-import-from #:closer-mop
-                          #:standard-generic-function #:defmethod #:defgeneric
-                          #:standard-method #:standard-class))
+        #:postmodern)
+  ;; (:shadowing-import-from #:closer-mop
+  ;;                         #:standard-generic-function
+  ;;                         #:defmethod
+  ;;                         #:defgeneric
+  ;;                         #:standard-method
+  ;;                         #:standard-class)
+  )

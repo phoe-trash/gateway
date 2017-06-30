@@ -4,9 +4,10 @@
   :author "Michał \"phoe\" Herda"
   :license "GPL3"
   :depends-on (#:alexandria
+               #:overlord
                #:cl-yesql
                #:postmodern
-               #:closer-mop
+               ;; #:closer-mop
                ;; #:ironclad
                ;; #:flexi-streams
                ;; #:local-time
