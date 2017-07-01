@@ -5,13 +5,18 @@
 
 (defpackage #:gateway
   (:use #:common-lisp
-        ;; #:closer-mop
+        #:alexandria))
+
+(defpackage #:gateway/utils
+  (:use #:common-lisp
+        #:alexandria)
+  (:export #:in-directory
+           #:*current-directory*
+           #:define-query))
+
+(defpackage #:gateway/sql
+  (:use #:common-lisp
         #:alexandria
-        #:postmodern)
-  ;; (:shadowing-import-from #:closer-mop
-  ;;                         #:standard-generic-function
-  ;;                         #:defmethod
-  ;;                         #:defgeneric
-  ;;                         #:standard-method
-  ;;                         #:standard-class)
-  )
+        #:postmodern
+
+        #:gateway/utils))

@@ -7,22 +7,10 @@
                #:overlord
                #:cl-yesql
                #:postmodern
-               ;; #:closer-mop
-               ;; #:ironclad
-               ;; #:flexi-streams
-               ;; #:local-time
-               ;; #:1am
-               ;; #:secure-read
-               ;; #:bordeaux-threads
-               ;; #:usocket
-               ;; #:lparallel
-               ;; #:cl-ppcre
-               ;; #:trivial-arguments
-               ;; #:trivia
-               ;; #:bknr.datastore
-               ;;#:split-sequence
-               )
+               #:asdf)
   :serial t
-  :components (;;PACKAGE
+  :components (;; PACKAGE
                (:file "package")
+               ;; INSTALL
+               (:file "install/install")
                ))
