@@ -11,6 +11,8 @@
   :serial t
   :components (;; PACKAGE
                (:file "package")
+               ;; MACROS
+               (:file "utils/in-directory")
                ;; INSTALL
                (:file "install/install")
                ))

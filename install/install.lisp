@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; install.lisp
 
-(in-package :gateway/sql)
+(in-package :gateway/install)
 
 (define-queries "install/"
   drop-tables
@@ -25,9 +25,7 @@
   (drop-types)
   t)
 
-(defun install (&optional uninstall-p)
-  (when uninstall-p
-    (uninstall))
+(defun install ()
   (mapc #'funcall
         (list #'create-ch-permission
               #'create-tl-permission

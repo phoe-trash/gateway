@@ -9,12 +9,12 @@
 
 (defpackage #:gateway/utils
   (:use #:common-lisp
-        #:alexandria)
-  (:export #:in-directory
-           #:*current-directory*
-           #:define-query))
+        #:alexandria
+        #:postmodern)
+  (:export #:define-query
+           #:define-queries))
 
-(defpackage #:gateway/sql
+(defpackage #:gateway/install
   (:use #:common-lisp
         #:alexandria
         #:postmodern
