@@ -5,20 +5,21 @@
 
 (in-package :gateway/install)
 
-(define-queries "install/"
-  drop-tables
-  drop-types
-  create-ch-permission
-  create-tl-permission
-  create-table-timeline
-  create-table-chapter
-  create-table-player
-  create-table-persona
-  create-table-post
-  create-table-chapter-link
-  create-table-chapter-permission
-  create-table-timeline-permission
-  create-table-global-chapter-permission)
+(defun reload ()
+  (define-queries "install/"
+    drop-tables
+    drop-types
+    create-ch-permission
+    create-tl-permission
+    create-table-timeline
+    create-table-chapter
+    create-table-player
+    create-table-persona
+    create-table-post
+    create-table-chapter-link
+    create-table-chapter-permission
+    create-table-timeline-permission
+    create-table-global-chapter-permission))
 
 (defun uninstall ()
   (drop-tables)

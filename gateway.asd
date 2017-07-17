@@ -6,6 +6,7 @@
   :depends-on (#:alexandria
                #:overlord
                #:cl-yesql
+               #:cl-protest
                #:postmodern
                #:asdf)
   :serial t

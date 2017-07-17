@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
-;;;; © Michał "phoe" Herda 2016
+;;;; © Michał "phoe" Herda 2017
 ;;;; package.lisp
 
 (defpackage #:gateway
@@ -16,7 +16,17 @@
 
 (defpackage #:gateway/install
   (:use #:common-lisp
-        #:alexandria
         #:postmodern
+        #:gateway/utils)
+  (:export #:install
+           #:uninstall
+           #:reload))
 
-        #:gateway/utils))
+(defpackage #:gateway/protocols
+  (:use #:common-lisp
+        #:closer-mop
+        #:cl-protest)
+  (:shadowing-import-from #:cl-protest
+                          #:standard-generic-function
+                          #:defmethod
+                          #:defgeneric))

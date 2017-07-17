@@ -8,8 +8,8 @@
 (defparameter *current-directory* (asdf:system-relative-pathname :gateway ""))
 
 (defmacro in-directory (directory-name)
-  (let* ((pathname (asdf:system-relative-pathname :gateway directory-name)))
-    `(setf *current-directory* ,pathname)))
+  `(setf *current-directory*
+         (asdf:system-relative-pathname :gateway ,directory-name)))
 
 (defmacro define-query (symbol)
   (let* ((name (string-downcase (string symbol)))
@@ -20,6 +20,7 @@
     `(defprepared ,symbol ,query)))
 
 (defmacro define-queries (directory-path &rest symbols)
+  (in-directory directory-path)
   `(let (*current-directory*)
      (in-directory ,directory-path)
      ,@(mapcar (lambda (x) `(define-query ,x)) symbols)
