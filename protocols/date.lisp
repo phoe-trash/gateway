@@ -5,6 +5,8 @@
 
 (in-package :gateway/protocols)
 
+;; TODO: check the "generic function clobbers an earlier FTYPE proclamation"
+;; style-warnings
 (define-protocol date
     (:description "The DATE protocol describes a timestamp object, ~
 representing a point in time. These objects are immutable, have nanosecond ~
@@ -22,12 +24,16 @@ will be equal under :UNIT :MONTH.
 * 31st July 2017 and 1st August 2017 will not be DATE= under :UNIT :DAY or
 :MONTH, but will be equal under :UNIT :YEAR."
      :tags (date) :export t)
-  (:class date () ()) ;; TODO add protoclasses SERIALIZABLE
+  (:class date (serializable) ())
   "A timestamp object, representing a point in time."
-  (:function date-timestamp ((date date)) (timestamp string))
+  (:function date-timestamp ((date date)) (timestamp integer))
   "Converts a date object to a Unix timestamp."
-  (:function timestamp-date ((timestamp string)) (date date))
+  (:function timestamp-date ((timestamp integerp)) (date date))
   "Converts a Unix timestamp to a date object."
+  (:function date-nstimestamp ((date date)) (nstimestamp integer))
+  "Converts a date object to a Unix timestamp with nanosecond precision."
+  (:function nstimestamp-date ((nstimestamp integer)) (date date))
+  "Converts a Unix timestamp with nanosecond precision to a date object."
   (:function date= ((date-1 date) (date-2 date) &key) :generalized-boolean)
   "Returns true iff the two dates are equal under the provided granularity ~
 unit."

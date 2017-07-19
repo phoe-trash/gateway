@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
 ;;;; install.lisp
@@ -6,7 +6,7 @@
 (in-package :gateway/install)
 
 (defun reload ()
-  (define-queries "install/"
+  (define-queries "install/sql/"
     drop-tables
     drop-types
     create-ch-permission
