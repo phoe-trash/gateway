@@ -14,7 +14,8 @@
   (:export #:define-query
            #:define-queries
            #:count-digits
-           #:data-getf))
+           #:data-getf
+           #:prinr-to-string))
 
 (defpackage #:gateway/install
   (:use #:common-lisp
@@ -27,8 +28,8 @@
 (defpackage #:gateway/protocols
   (:use #:common-lisp
         #:closer-mop
-        #:cl-protest)
-  (:shadowing-import-from #:cl-protest
+        #:protest)
+  (:shadowing-import-from #:protest
                           #:standard-generic-function
                           #:defmethod
                           #:defgeneric))
@@ -37,9 +38,16 @@
   (:use #:common-lisp
         #:alexandria
         #:closer-mop
+        #:1am
+        #:protest
         #:gateway/utils
         #:gateway/protocols)
-  (:shadowing-import-from #:cl-protest
+  (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
                           #:defmethod
                           #:defgeneric))
+
+(uiop:define-package #:gateway/tests
+    (:use))
+
+(protest:define-test-package #:gateway/impl #:gateway/tests)

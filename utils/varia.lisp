@@ -18,3 +18,18 @@ INDICATOR."
         for value in (rest plist) by #'cddr
         when (and (symbolp key) (string= key indicator))
           return value))
+
+(defvar *gateway-pprint-dispatch* (copy-pprint-dispatch nil))
+
+(defvar *original-pprint-dispatch* (copy-pprint-dispatch nil))
+
+(set-pprint-dispatch
+ 'string
+ (lambda (stream object)
+   (let ((*print-pprint-dispatch* *original-pprint-dispatch*))
+     (prin1 object stream)))
+ 9001 *gateway-pprint-dispatch*)
+
+(defun prinr-to-string (object)
+  (let ((*print-pprint-dispatch* *gateway-pprint-dispatch*))
+    (princ-to-string object)))

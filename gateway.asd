@@ -6,14 +6,22 @@
   :depends-on (#:alexandria
                #:overlord
                #:cl-yesql
-               #:cl-protest
+               #:protest
                #:postmodern
+               #:1am
                #:asdf)
   :serial t
   :components (;; PACKAGE
                (:file "package")
                ;; MACROS
-               (:file "utils/in-directory")
+               (:file "utils/define-query")
+               (:file "utils/varia")
                ;; INSTALL
                (:file "install/install")
+               ;; PROTOCOLS
+               (:file "protocols/serializable")
+               (:file "protocols/default-deserializable")
+               (:file "protocols/date")
+               ;; IMPLEMENTATIONS
+               (:file "classes/standard-date")
                ))

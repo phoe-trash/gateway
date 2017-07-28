@@ -9,14 +9,14 @@
 ;; style-warnings
 (define-protocol date
     (:description "The DATE protocol describes a timestamp object, ~
-representing a point in time. These objects are immutable, have nanosecond ~
+representing a point in time. These objects are immutable, have millisecond ~
 precision and can be compared to other timestamp objects, converted to string ~
 and from string representations, precisely Unix timestamps.
 
 The time units, available in comparison functions, are :YEAR :MONTH :DAY :HOUR ~
-:MINUTE :SECOND :NANOSECOND. If the key argument UNIT is supplied with one of ~
+:MINUTE :SECOND :MILLISECOND. If the key argument UNIT is supplied with one of ~
 these values, the comparison takes into account that unit's granularity. The ~
-default unit is :NANOSECOND.
+default unit is :MILLISECOND.
 
 Examples:
 * 29th July 2017 and 30th July 2017 will not be DATE= under :UNIT :DAY, but ~
@@ -30,10 +30,10 @@ will be equal under :UNIT :MONTH.
   "Converts a date object to a Unix timestamp."
   (:function timestamp-date ((timestamp integerp)) (date date))
   "Converts a Unix timestamp to a date object."
-  (:function date-nstimestamp ((date date)) (nstimestamp integer))
-  "Converts a date object to a Unix timestamp with nanosecond precision."
-  (:function nstimestamp-date ((nstimestamp integer)) (date date))
-  "Converts a Unix timestamp with nanosecond precision to a date object."
+  (:function date-ustimestamp ((date date)) (nstimestamp integer))
+  "Converts a date object to a Unix timestamp with microsecond precision."
+  (:function ustimestamp-date ((nstimestamp integer)) (date date))
+  "Converts a Unix timestamp with microsecond precision to a date object."
   (:function date= ((date-1 date) (date-2 date) &key) :generalized-boolean)
   "Returns true iff the two dates are equal under the provided granularity ~
 unit."

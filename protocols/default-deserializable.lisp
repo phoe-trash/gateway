@@ -57,6 +57,7 @@ DESERIALIZE-USING-CLASS on that class and the list data.")
 
 ;; TODO create a protocol implementation file that calls this on all protocols
 ;; and their implementations
+;; TODO create a test that tests all default deserializations
 (defmethod (setf default-deserialization-class)
     ((new-value class) (class class))
   (cond ((null new-value)
