@@ -10,12 +10,33 @@
 (defpackage #:gateway/utils
   (:use #:common-lisp
         #:alexandria
-        #:postmodern)
-  (:export #:define-query
-           #:define-queries
-           #:count-digits
-           #:data-getf
-           #:prinr-to-string))
+        #:postmodern
+        #:trivial-arguments
+        #:trivia
+        #:cl-ppcre)
+  (:export
+   ;; FUNCTIONS
+   #:count-digits
+   #:cat
+   #:peek-char-no-hang
+   #:data-getf
+   #:data-equal
+   #:valid-email-p
+   #:valid-username-p
+   #:valid-name-p
+   ;; MACROS
+   #:define-constructor
+   #:define-print
+   #:wait
+   #:wait-until
+   #:finalized-let*
+   ;; DEFINE-QUERY
+   #:define-query
+   #:define-queries
+   ;; PRINR-TO-STRING
+   #:prinr-to-string
+   ;; VERIFY-ARGUMENTS
+   #:verify-arguments))
 
 (defpackage #:gateway/install
   (:use #:common-lisp
@@ -25,10 +46,10 @@
            #:uninstall
            #:reload))
 
-(defpackage #:gateway/protocols
-  (:use #:common-lisp
-        #:closer-mop
-        #:protest)
+(uiop:define-package #:gateway/protocols
+    (:use #:common-lisp
+          #:closer-mop
+          #:protest)
   (:shadowing-import-from #:protest
                           #:standard-generic-function
                           #:defmethod

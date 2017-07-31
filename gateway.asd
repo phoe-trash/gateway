@@ -1,4 +1,8 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
+;;;; © Michał "phoe" Herda 2017
+;;;; gateway.asd
+
 (asdf:defsystem #:gateway
   :description "A graphical chat/RP client written in Common Lisp."
   :author "Michał \"phoe\" Herda"
@@ -9,19 +13,25 @@
                #:protest
                #:postmodern
                #:1am
+               #:trivial-arguments
+               #:trivia
+               #:cl-ppcre
                #:asdf)
   :serial t
   :components (;; PACKAGE
                (:file "package")
-               ;; MACROS
+               ;; UTILS
+               (:file "utils/functions")
+               (:file "utils/macros")
                (:file "utils/define-query")
-               (:file "utils/varia")
+               (:file "utils/prinr-to-string")
+               (:file "utils/verify-arguments")
                ;; INSTALL
                (:file "install/install")
                ;; PROTOCOLS
                (:file "protocols/serializable")
                (:file "protocols/default-deserializable")
                (:file "protocols/date")
-               ;; IMPLEMENTATIONS
+               ;; CLASSES
                (:file "classes/standard-date")
                ))
