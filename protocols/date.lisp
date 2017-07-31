@@ -5,8 +5,6 @@
 
 (in-package :gateway/protocols)
 
-;; TODO: check the "generic function clobbers an earlier FTYPE proclamation"
-;; style-warnings
 (define-protocol date
     (:description "The DATE protocol describes a timestamp object, ~
 representing a point in time. These objects are immutable, have millisecond ~
@@ -23,7 +21,7 @@ Examples:
 will be equal under :UNIT :MONTH.
 * 31st July 2017 and 1st August 2017 will not be DATE= under :UNIT :DAY or
 :MONTH, but will be equal under :UNIT :YEAR."
-     :tags (date) :export t)
+     :tags (:date) :export t)
   (:class date (serializable) ())
   "A timestamp object, representing a point in time."
   (:function date-timestamp ((date date)) (timestamp integer))
@@ -56,6 +54,7 @@ provided granularity unit."
   "Returns the oldest date from all provided dates."
   (:function date-max ((date date) &rest other-dates) (date-max date))
   "Returns the newest date from all provided dates."
+  ;; TODO NOW only accepts one implementation
   (:function now () (now date))
   "Returns the date object that corresponds to the current time, relative to ~
 the call of this function.")

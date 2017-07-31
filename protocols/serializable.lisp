@@ -12,7 +12,7 @@ representation in form of a readable S-expression. Such S-expressions:
 * must be proper lists and must not contain improper lists,
 * must not contain any reader macros other than for characters #\\( #\\) #\\\",
 * can only consist of proper lists, numbers, symbols and strings."
-     :tags (serializable) :export t)
+     :tags (:serializable) :export t)
   (:class serializable () ())
   "A serializable object, participating in the SERIALIZABLE protocol."
   (:function serialize ((object serializable) &key type) serialized-data)

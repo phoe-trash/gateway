@@ -17,7 +17,7 @@ to create a generalized DESERIALIZE function, which is also a part of this ~
 protocol.
 
 This protocol depends on protocol SERIALIZABLE for implementation."
-     :tags (default-deserialization) :export t)
+     :tags (:default-deserialization) :export t)
   (:function default-deserialization-class
              ((class class)) (implementation-class class))
   "Returns the default deserialization class for the provided class. If no ~

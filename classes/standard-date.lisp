@@ -98,7 +98,8 @@ class DATE.")))
 
 (define-test-case standard-date-unit
     (:description "Unit tests for STANDARD-DATE."
-     :type :unit))
+     :tags (:unit)
+     :type :unit-suite))
 
 (define-test standard-date-unit
   (flet ((mkdt (d s ns) (make-instance 'standard-date :day d :sec s :nsec ns)))
