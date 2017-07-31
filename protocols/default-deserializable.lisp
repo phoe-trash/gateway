@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
-;;;; default-deserializable.lisp
+;;;; protocols/default-deserializable.lisp
 
 (in-package :gateway/protocols)
 

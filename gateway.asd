@@ -28,9 +28,12 @@
                (:file "utils/verify-arguments")
                ;; INSTALL
                (:file "install/install")
-               ;; PROTOCOLS
+               ;; PROTOCOLS - MIXINS
                (:file "protocols/serializable")
                (:file "protocols/default-deserializable")
+               (:file "protocols/named")
+               (:file "protocols/killable")
+               ;; PROTOCOLS - CLASSES
                (:file "protocols/date")
                ;; CLASSES
                (:file "classes/standard-date")
