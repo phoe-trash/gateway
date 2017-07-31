@@ -13,10 +13,10 @@
    (%iteration-count :reader iteration-count
                      :type integer)))
 
-(defconstructor (standard-password passphrase %read-data
-                                   (iteration-count 1000)
-                                   (key-length 512)
-                                   (salt-length 64))
+(define-constructor (standard-password passphrase %read-data
+                                       (iteration-count 1000)
+                                       (key-length 512)
+                                       (salt-length 64))
   (if %read-data
       (progn (check-type %read-data cons)
              (assert (= (length %read-data) 3))
@@ -51,18 +51,6 @@
   (assert salt () "Salt cannot be empty.")
   (assert iters () "Iterations cannot be empty.")
   (make-instance 'standard-password :%read-data (list key salt iters)))
-
-(defun derive-key (passphrase &key salt
-                                (iteration-count 1000)
-                                (key-length 512)
-                                (salt-length 64))
-  (let* ((kdf (ironclad:make-kdf 'ironclad:scrypt-kdf :digest :sha1))
-         (passphrase (flex:string-to-octets passphrase :external-format :utf-8))
-         (salt (or salt (ironclad:make-random-salt salt-length)))
-         (key (ironclad:derive-key kdf passphrase salt iteration-count key-length))
-         (result-key (ironclad:byte-array-to-hex-string key))
-         (result-salt (ironclad:byte-array-to-hex-string salt)))
-    (values result-key result-salt iteration-count)))
 
 (defun key-length (password)
   (/ (length (key-of password)) 2))

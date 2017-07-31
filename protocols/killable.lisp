@@ -16,15 +16,15 @@ parent object,
      :tags (:killable) :export t)
   (:class killable () ())
   "A killable object."
-  (:function kill ((object killable)) boolean)
-  "If the object is alive, this function kills it and returns T. Otherwise,
-this function returns NIL."
-  (:function deadp ((object killable)))
+  (:function kill ((object killable)) :generalized-boolean)
+  "If the object is alive, this function kills it and returns true. Otherwise,
+this function returns false."
+  (:function deadp ((object killable)) :generalized-boolean)
   "Returns true if the object is dead, false otherwise"
-  (:function alivep ((object killable)))
+  (:function alivep ((object killable)) :generalized-boolean)
   "Returns true if the object is alive, false otherwise.
 This function is a convenience function equivalent to NOT DEADP. No class
-is required to implement its behaviour.")
+is required to define methods for it.")
 
 (defmethod alivep (object)
   (not (deadp object)))

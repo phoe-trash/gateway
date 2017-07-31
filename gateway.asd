@@ -8,6 +8,7 @@
   :author "Michał \"phoe\" Herda"
   :license "GPL3"
   :depends-on (#:alexandria
+               #:asdf
                #:overlord
                #:cl-yesql
                #:protest
@@ -16,7 +17,8 @@
                #:trivial-arguments
                #:trivia
                #:cl-ppcre
-               #:asdf)
+               #:ironclad
+               )
   :serial t
   :components (;; PACKAGE
                (:file "package")
