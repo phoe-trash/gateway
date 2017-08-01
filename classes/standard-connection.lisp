@@ -47,8 +47,9 @@
 
 ;;;; READYP
 (defmethod readyp ((connection standard-connection))
-  (with-connection (connection)
-    (%connection-readyp connection)))
+  (or (not (open-stream-p (%stream-of connection)))
+      (with-connection (connection)
+        (%connection-readyp connection))))
 
 (defun %connection-readyp (connection)
   (peek-char-no-hang (%stream-of connection)))
@@ -98,24 +99,29 @@
 (define-test-case standard-connection-unit
     (:description "Unit tests for STANDARD-CONNECTION."
      :tags (:connection :unit)
-     :type :protocol))
+     :type :unit))
 
 (define-test standard-connection-unit
   (finalized-let*
       ((conns (multiple-value-list (%make-connection-pair))
               (mapc #'kill conns)))
-    (is (eq t (connection-send (first conns) '(1 2 3 4))))
+    #1?(is (eq t (connection-send (first conns) '(1 2 3 4))))
+    #2?(is (readyp (second conns)))
     (multiple-value-bind (message alivep) (connection-receive (second conns))
-      (is (equal message '(1 2 3 4)))
-      (is (eq alivep t)))
+      #3?(is (not (readyp (second conns))))
+      #4?(is (equal message '(1 2 3 4)))
+      #5?(is (eq alivep t)))
     (fformat (%stream-of (first conns)) "(")
+    #6?(is (readyp (second conns)))
     (multiple-value-bind (message alivep) (connection-receive (second conns))
-      (is (null message))
-      (is (eq alivep t)))
+      #7?(is (not (readyp (second conns))))
+      #8?(is (null message))
+      #9?(is (eq alivep t)))
     (kill (first conns))
+    #10?(is (wait () (readyp (second conns))))
     (multiple-value-bind (message alivep) (connection-receive (second conns))
-      (is (null message))
-      (is (null alivep)))))
+      #11?(is (null message))
+      #12?(is (null alivep)))))
 
 (define-test-case standard-connection-send-receive
     (:description "Test of sending and receiving data for STANDARD-CONNECTIONs."

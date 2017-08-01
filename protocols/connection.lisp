@@ -40,7 +40,8 @@ If the provided connection is dead (as by DEADP), this function returns ~
 \(VALUES NIL NIL)."
   (:function readyp ((connection connection)) :generalized-boolean)
   "Returns true if there is any data waiting to be received on the provided ~
-connection; otherwise, returns false.
+connection, including a possible end-of-file condition; otherwise, returns ~
+false.
 
 This data does not necessarily need to constitute a full message; it is ~
 possible for a connection to be READYP but for CONNECTION-RECEIVE to return ~
