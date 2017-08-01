@@ -98,7 +98,7 @@ class DATE.")))
 
 (define-test-case standard-date-unit
     (:description "Unit tests for STANDARD-DATE."
-     :tags (:unit)
+     :tags (:unit :date)
      :type :unit-suite))
 
 (define-test standard-date-unit

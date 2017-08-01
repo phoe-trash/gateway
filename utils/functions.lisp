@@ -57,6 +57,8 @@ Full RFC validation is not implemented - this is only a basic, rough ."
         string))
 
 (defun fformat (stream format-string &rest format-args)
-  "Like FORMAT, except it calls FORCE-OUTPUT on the stream after formatting."
+  "Like FORMAT, except it adds a fresh line after the formatted string and calls
+FORCE-OUTPUT on the stream after formatting."
   (apply #'format stream format-string format-args)
+  (fresh-line stream)
   (force-output stream))

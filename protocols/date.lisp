@@ -21,7 +21,9 @@ Examples:
 will be equal under :UNIT :MONTH.
 * 31st July 2017 and 1st August 2017 will not be DATE= under :UNIT :DAY or
 :MONTH, but will be equal under :UNIT :YEAR."
-     :tags (:date) :export t)
+     :tags (:date)
+     :dependencies (serializable)
+     :export t)
   (:class date (serializable) ())
   "A timestamp object, representing a point in time."
   (:function date-timestamp ((date date)) (timestamp integer))

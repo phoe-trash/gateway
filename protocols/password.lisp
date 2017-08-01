@@ -9,7 +9,9 @@
     (:description "This protocol describes password objects, which are ~
 immutable and contain a hashed representation of a passphrase string. The only ~
 functionality requested from a password is the PASSWORD-MATCHES-P function."
-     :tags (:password) :export t)
+     :tags (:password)
+     :dependencies (serializable)
+     :export t)
   (:class password (serializable) ())
   "A password object."
   (:function password-matches-p ((password password) (pasphrase string))

@@ -88,7 +88,7 @@
 
 (define-test-case standard-password-unit
     (:description "Unit tests for STANDARD-PASSWORD."
-     :tags (:unit :long-test)
+     :tags (:unit :password :long-test)
      :type :unit-suite))
 
 (define-test standard-password-unit

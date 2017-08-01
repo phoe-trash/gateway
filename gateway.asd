@@ -12,12 +12,15 @@
                #:overlord
                #:cl-yesql
                #:protest
+               #:safe-read
                #:postmodern
                #:1am
                #:trivial-arguments
                #:trivia
                #:cl-ppcre
                #:ironclad
+               #:usocket
+               #:bordeaux-threads
                )
   :serial t
   :components (;; PACKAGE
@@ -37,6 +40,13 @@
                (:file "protocols/killable")
                ;; PROTOCOLS - CLASSES
                (:file "protocols/date")
+               (:file "protocols/password")
+               (:file "protocols/connection")
+               (:file "protocols/acceptor")
                ;; CLASSES
                (:file "classes/standard-date")
+               (:file "classes/standard-password")
+               (:file "classes/standard-socket")
+               (:file "classes/standard-connection")
+               ;; (:file "classes/standard-acceptor")
                ))

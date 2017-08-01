@@ -17,8 +17,8 @@ parent object,
   (:class killable () ())
   "A killable object."
   (:function kill ((object killable)) :generalized-boolean)
-  "If the object is alive, this function kills it and returns true. Otherwise,
-this function returns false."
+  "If the object is alive, this function kills it. In any case, this functions ~
+has no return values."
   (:function deadp ((object killable)) :generalized-boolean)
   "Returns true if the object is dead, false otherwise"
   (:function alivep ((object killable)) :generalized-boolean)

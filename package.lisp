@@ -24,6 +24,7 @@
    #:valid-email-p
    #:valid-username-p
    #:valid-name-p
+   #:fformat
    ;; MACROS
    #:define-constructor
    #:define-print
@@ -49,7 +50,8 @@
 (uiop:define-package #:gateway/protocols
     (:use #:common-lisp
           #:closer-mop
-          #:protest)
+          #:protest
+          #:gateway/utils)
   (:shadowing-import-from #:protest
                           #:standard-generic-function
                           #:defmethod
@@ -57,9 +59,13 @@
 
 (defpackage #:gateway/impl
   (:use #:common-lisp
+        #:named-readtables
         #:alexandria
         #:closer-mop
         #:1am
+        #:safe-read
+        #:usocket
+        #:bordeaux-threads
         #:protest
         #:gateway/utils
         #:gateway/protocols)

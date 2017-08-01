@@ -1,9 +1,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2016
-;;;; standard-socket.lisp
+;;;; classes/standard-socket.lisp
 
-(in-package #:gateway)
+(in-package #:gateway/impl)
 
 (defclass standard-socket (stream-usocket)
   ((owner :accessor owner
