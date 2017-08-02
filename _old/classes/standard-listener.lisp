@@ -5,91 +5,91 @@
 
 (in-package #:gateway)
 
-(defclass standard-listener (listener)
-  ((%connection :accessor connection)
-   (%thread :accessor thread)
-   (%name :accessor name)
-   (%conn-getter :accessor conn-getter
-                 :initarg :conn-getter
-                 :initform (error "Must define a connection getter function."))
-   (%conn-pusher :accessor conn-pusher
-                 :initarg :conn-pusher
-                 :initform (error "Must define a connection pusher function."))
-   (%conn-cleaner :accessor conn-cleaner
-                  :initarg :conn-cleaner
-                  :initform (lambda ()))
-   (%data-pusher :accessor data-pusher
-                 :initarg :data-pusher
-                 :initform (error "Must define a data pusher function."))))
+;; (defclass standard-listener (listener)
+;;   ((%connection :accessor connection)
+;;    (%thread :accessor thread)
+;;    (%name :accessor name)
+;;    (%conn-getter :accessor conn-getter
+;;                  :initarg :conn-getter
+;;                  :initform (error "Must define a connection getter function."))
+;;    (%conn-pusher :accessor conn-pusher
+;;                  :initarg :conn-pusher
+;;                  :initform (error "Must define a connection pusher function."))
+;;    (%conn-cleaner :accessor conn-cleaner
+;;                   :initarg :conn-cleaner
+;;                   :initform (lambda ()))
+;;    (%data-pusher :accessor data-pusher
+;;                  :initarg :data-pusher
+;;                  :initform (error "Must define a data pusher function."))))
 
-(defconstructor (standard-listener (name ""))
-  (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
-    (let ((fn (lambda () (loop until (funcall (conn-getter standard-listener)))
-                (%listener-loop standard-listener))))
-      (funcall (conn-pusher standard-listener) connection-1)
-      (setf (name standard-listener) (%listener-constructor-name name)
-            (connection standard-listener) connection-2
-            (thread standard-listener)
-            (make-thread fn :name (name standard-listener))))))
+;; (defconstructor (standard-listener (name ""))
+;;   (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
+;;     (let ((fn (lambda () (loop until (funcall (conn-getter standard-listener)))
+;;                 (%listener-loop standard-listener))))
+;;       (funcall (conn-pusher standard-listener) connection-1)
+;;       (setf (name standard-listener) (%listener-constructor-name name)
+;;             (connection standard-listener) connection-2
+;;             (thread standard-listener)
+;;             (make-thread fn :name (name standard-listener))))))
 
-(defun %listener-constructor-name (name)
-  (format nil "Gateway - ~AListener" name))
+;; (defun %listener-constructor-name (name)
+;;   (format nil "Gateway - ~AListener" name))
 
-(defun %listener-loop (listener)
-  (with-thread-handlers (listener)
-    (handler-case
-        (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
-               (socket (first (wait-until (wait-for-input sockets :timeout nil :ready-only t))))
-               (connection (owner socket))
-               (command (data-receive connection)))
-          (cond (command
-                 (note "[.] ~A: got a command, ~S.~%" (name listener) command)
-                 (funcall (data-pusher listener) connection command))
-                (t
-                 (note "[.] ~A: got a notification.~%" (name listener)))))
-      (stream-error (e)
-        (%listener-handle-stream-error listener e)))))
+;; (defun %listener-loop (listener)
+;;   (with-thread-handlers (listener)
+;;     (handler-case
+;;         (let* ((sockets (mapcar #'socket (funcall (conn-getter listener))))
+;;                (socket (first (wait-until (wait-for-input sockets :timeout nil :ready-only t))))
+;;                (connection (owner socket))
+;;                (command (data-receive connection)))
+;;           (cond (command
+;;                  (note "[.] ~A: got a command, ~S.~%" (name listener) command)
+;;                  (funcall (data-pusher listener) connection command))
+;;                 (t
+;;                  (note "[.] ~A: got a notification.~%" (name listener)))))
+;;       (stream-error (e)
+;;         (%listener-handle-stream-error listener e)))))
 
-(defun %listener-handle-stream-error (listener condition)
-  (note "[!] ~A: stream error: ~A~%" (name listener) condition)
-  (let* ((connections (funcall (conn-getter listener)))
-         (stream (stream-error-stream condition))
-         (predicate (lambda (x) (eq stream (socket-stream (socket x)))))
-         (connection (find-if predicate connections)))
-    (when connection
-      (kill connection)
-      (note "[!] ~A: killed the offending connection.~%" (name listener))
-      (funcall (conn-cleaner listener)))))
+;; (defun %listener-handle-stream-error (listener condition)
+;;   (note "[!] ~A: stream error: ~A~%" (name listener) condition)
+;;   (let* ((connections (funcall (conn-getter listener)))
+;;          (stream (stream-error-stream condition))
+;;          (predicate (lambda (x) (eq stream (socket-stream (socket x)))))
+;;          (connection (find-if predicate connections)))
+;;     (when connection
+;;       (kill connection)
+;;       (note "[!] ~A: killed the offending connection.~%" (name listener))
+;;       (funcall (conn-cleaner listener)))))
 
-(defun %make-listener (getter pusher data-pusher cleaner)
-  (make-instance 'standard-listener
-                 :conn-getter getter
-                 :conn-pusher pusher
-                 :data-pusher data-pusher
-                 :conn-cleaner cleaner))
+;; (defun %make-listener (getter pusher data-pusher cleaner)
+;;   (make-instance 'standard-listener
+;;                  :conn-getter getter
+;;                  :conn-pusher pusher
+;;                  :data-pusher data-pusher
+;;                  :conn-cleaner cleaner))
 
-(defmethod notify ((listener standard-listener))
-  (fformat (socket-stream (socket (connection listener))) "()~%"))
+;; (defmethod notify ((listener standard-listener))
+;;   (fformat (socket-stream (socket (connection listener))) "()~%"))
 
-(defmethod alivep ((listener standard-listener))
-  (thread-alive-p (thread listener)))
+;; (defmethod deadp ((listener standard-listener))
+;;   (not (thread-alive-p (thread listener))))
 
-(defmethod kill ((listener standard-listener))
-  (unless (eq (current-thread) (thread listener))
-    (destroy-thread (thread listener)))
-  (kill (connection listener))
-  (values))
+;; (defmethod kill ((listener standard-listener))
+;;   (unless (eq (current-thread) (thread listener))
+;;     (destroy-thread (thread listener)))
+;;   (kill (connection listener))
+;;   (values))
 
 
 
 (deftest test-standard-listener-death
-  (let* ((conn-getter (lambda ()))
-         (conn-pusher (lambda (x) (kill x)))
-         (data-pusher (lambda (x y) (declare (ignore x  y))))
-         (listener (%make-listener conn-getter conn-pusher data-pusher conn-getter)))
-    (is (alivep listener))
-    (kill listener)
-    (is (wait () (deadp listener)))))
+    (let* ((conn-getter (lambda ()))
+           (conn-pusher (lambda (x) (kill x)))
+           (data-pusher (lambda (x y) (declare (ignore x  y))))
+           (listener (%make-listener conn-getter conn-pusher data-pusher conn-getter)))
+      (is (alivep listener))
+      (kill listener)
+      (is (wait () (deadp listener)))))
 
 (deftest test-standard-listener-dead-connection
   (let* ((connections nil) (data nil) (lock (make-lock "STANDARD-LISTENER test"))

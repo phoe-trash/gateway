@@ -36,10 +36,9 @@
              (connection (make-instance 'standard-connection :socket accept)))
         ;; (note "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
         ;;       (name acceptor)
-        ;;       (coerce (get-peer-address accept) 'list) (get-peer-port accept))
-        (funcall (handler acceptor) connection)
-        ;; (funcall (notifier acceptor)
-        ))))
+        ;;       (coerce (get-peer-address accept) 'list)
+        ;;       (get-peer-port accept))
+        (funcall (handler acceptor) connection)))))
 
 (defmethod deadp ((acceptor standard-acceptor))
   (not (thread-alive-p (thread acceptor))))
@@ -47,7 +46,8 @@
 (defmethod kill ((acceptor standard-acceptor))
   (unless (eq (thread acceptor) (current-thread))
     (destroy-thread (thread acceptor)))
-  (socket-close (socket acceptor))
+  (unless (deadp acceptor)
+    (socket-close (socket acceptor)))
   (values))
 
 
