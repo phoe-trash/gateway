@@ -9,7 +9,7 @@
   `(lambda (stream)
      (format stream
              "Abort the current iteration and send the ~A back to its loop."
-             (string-downcase (string (or ,killable-name "thread"))))))
+             (string-downcase (string (or ',killable-name "thread"))))))
 
 (defmacro with-restartability ((&optional killable) &body body)
   "This macro serves two purposes. First, it provides a semiautomatic means

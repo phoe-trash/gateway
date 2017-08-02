@@ -67,9 +67,9 @@
 (define-test standard-acceptor-death
   (let ((acceptor #1?(make-instance 'standard-acceptor
                                     :handler (constantly nil))))
-    #2?(is (alivep acceptor))
-    #3?(kill acceptor)
-    #4?(is (wait () (deadp acceptor)))))
+    (unwind-protect #2?(is (alivep acceptor))
+      #3?(kill acceptor)
+      #4?(is (wait () (deadp acceptor))))))
 
 (define-test-case standard-acceptor-unit
     (:description "Unit tests for STANDARD-ACCEPTOR."
