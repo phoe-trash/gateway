@@ -6,7 +6,7 @@
 (asdf:defsystem #:gateway
   :description "A graphical chat/RP client written in Common Lisp."
   :author "Michał \"phoe\" Herda"
-  :license "GPL3"
+  :license "AGPL3"
   :depends-on (#:alexandria
                #:asdf
                #:overlord
@@ -43,6 +43,8 @@
                (:file "protocols/password")
                (:file "protocols/connection")
                (:file "protocols/acceptor")
+               ;; FRAMEWORK
+               (:file "framework/with-restartability")
                ;; CLASSES
                (:file "classes/standard-date")
                (:file "classes/standard-password")

@@ -37,7 +37,17 @@
    ;; PRINR-TO-STRING
    #:prinr-to-string
    ;; VERIFY-ARGUMENTS
-   #:verify-arguments))
+   #:verify-arguments
+   ))
+
+(defpackage #:gateway/framework
+  (:use #:common-lisp
+        #:gateway/utils
+        #:gateway/protocols)
+  (:export
+   ;; WITH-RESTARTABILITY
+   #:with-restartability
+   ))
 
 (defpackage #:gateway/install
   (:use #:common-lisp
@@ -51,7 +61,8 @@
     (:use #:common-lisp
           #:closer-mop
           #:protest
-          #:gateway/utils)
+          #:gateway/utils
+          #:gateway/framework)
   (:shadowing-import-from #:protest
                           #:standard-generic-function
                           #:defmethod

@@ -99,7 +99,7 @@
 (define-test-case standard-connection-unit
     (:description "Unit tests for STANDARD-CONNECTION."
      :tags (:connection :unit)
-     :type :unit))
+     :type :unit-suite))
 
 (define-test standard-connection-unit
   (finalized-let*
@@ -168,7 +168,7 @@
               test-cases)))))
 
 (define-test-case standard-connection-death
-    (:description "Test of KILLABLE protocol for STANDARD-CONNECTIONs"
+    (:description "Test of KILLABLE protocol for STANDARD-CONNECTIONs."
      :tags (:protocol :killable :connection)
      :type :protocol)
   :arrange
