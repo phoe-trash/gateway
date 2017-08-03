@@ -26,33 +26,33 @@
 ;;;; KILLABLE
 (defmethod deadp ((connection standard-connection))
   (with-lock-held ((lock connection))
-    (%alivep connection)
-    (not (open-stream-p (%stream-of connection)))))
+    (alivep-internal connection)
+    (not (open-stream-p (stream-of connection)))))
 
 (defmethod kill ((connection standard-connection))
   (with-lock-held ((lock connection))
-    (%connection-kill connection))
+    (connection-kill connection))
   (values))
 
-(defun %stream-of (connection)
+(defmethod stream-of ((connection connection))
   (socket-stream (socket-of connection)))
 
-(defun %alivep (connection)
+(defun alivep-internal (connection)
   (handler-case
-      (peek-char-no-hang (%stream-of connection))
-    (error () (%connection-kill connection))))
+      (peek-char-no-hang (stream-of connection))
+    (error () (connection-kill connection))))
 
-(defun %connection-kill (connection)
+(defun connection-kill (connection)
   (socket-close (socket-of connection)))
 
 ;;;; READYP
 (defmethod readyp ((connection standard-connection))
-  (or (not (open-stream-p (%stream-of connection)))
+  (or (not (open-stream-p (stream-of connection)))
       (with-connection (connection)
-        (%connection-readyp connection))))
+        (connection-readyp connection))))
 
-(defun %connection-readyp (connection)
-  (peek-char-no-hang (%stream-of connection)))
+(defun connection-readyp (connection)
+  (peek-char-no-hang (stream-of connection)))
 
 ;;;; CONNECTION-RECEIVE/CONNECTION-SEND
 (defmacro with-connection ((connection) &body body)
@@ -71,9 +71,9 @@
   (if (deadp connection)
       (values nil nil)
       (with-connection (connection)
-        (if (%connection-readyp connection)
+        (if (connection-readyp connection)
             (multiple-value-bind (message condition)
-                (safe-read (%stream-of connection))
+                (safe-read (stream-of connection))
               (if (and (null message) (eq condition :incomplete-input))
                   (values nil t)
                   (values message t)))
@@ -82,12 +82,12 @@
 (defmethod connection-send ((connection standard-connection) object)
   (with-connection (connection)
     (let ((sexp (serialize object :type :string)))
-      (fformat (%stream-of connection) sexp)
+      (fformat (stream-of connection) sexp)
       t)))
 
 
 
-(defun %make-connection-pair ()
+(defun make-connection-pair ()
   (let* ((socket-listen (socket-listen "127.0.0.1" 0))
          (port (get-local-port socket-listen))
          (socket-connect (socket-connect "127.0.0.1" port))
@@ -103,7 +103,7 @@
 
 (define-test standard-connection-unit
   (finalized-let*
-      ((conns (multiple-value-list (%make-connection-pair))
+      ((conns (multiple-value-list (make-connection-pair))
               (mapc #'kill conns)))
     #1?(is (eq t (connection-send (first conns) '(1 2 3 4))))
     #2?(is (readyp (second conns)))
@@ -111,7 +111,7 @@
       #3?(is (not (readyp (second conns))))
       #4?(is (equal message '(1 2 3 4)))
       #5?(is (eq alivep t)))
-    (fformat (%stream-of (first conns)) "(")
+    (fformat (stream-of (first conns)) "(")
     #6?(is (readyp (second conns)))
     (multiple-value-bind (message alivep) (connection-receive (second conns))
       #7?(is (not (readyp (second conns))))
@@ -183,7 +183,7 @@
 
 (define-test standard-connection-death
   (finalized-let*
-      ((conns (multiple-value-list #1?(%make-connection-pair))
+      ((conns (multiple-value-list #1?(make-connection-pair))
               (mapc #'kill conns)))
     #2?(is (alivep (first conns)))
     #3?(is (alivep (second conns)))

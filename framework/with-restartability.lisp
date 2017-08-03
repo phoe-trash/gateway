@@ -5,7 +5,7 @@
 
 (in-package :gateway/framework)
 
-(defun %w-r-report (killable-name)
+(defun with-restartability-report (killable-name)
   `(lambda (stream)
      (format stream
              "Abort the current iteration and send the ~A back to its loop."
@@ -21,5 +21,6 @@ This macro is meant for being used inside functions passed to BT:MAKE-THREAD."
   `(unwind-protect
         (tagbody :start
            (restart-case (progn ,@body)
-             (retry () :report ,(%w-r-report killable) (go :start))))
+             (retry () :report ,(with-restartability-report killable)
+               (go :start))))
      ,(when killable `(kill ,killable))))

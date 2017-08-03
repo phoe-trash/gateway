@@ -10,7 +10,7 @@
 (defclass standard-listener (listener)
   ((%lock :accessor lock
           :initform (make-lock "Gateway - Listener lock"))
-   (%connections :reader connections)
+   (%connections :accessor connections) ; TODO turn into an :accessor
    (%notifier-connection :accessor notifier-connection)
    (%thread :accessor thread)
    (%name :accessor name
@@ -19,39 +19,35 @@
              :initarg :handler
              :initform (error "Must define a handler function."))))
 
-(defmethod (setf connections) (new-value (listener standard-listener))
-  (prog1 (setf (slot-value listener '%connections) new-value)
-    (%notify listener)))
-
-(defun %notify (listener)
-  (connection-send (notifier-connection listener) ()))
+(defmethod (setf connections) :after (new-value (listener standard-listener))
+  (connection-send (notifier-connection listener) '()))
 
 (define-constructor (standard-listener)
-  (multiple-value-bind (connection-1 connection-2) (%make-connection-pair)
-    (let ((fn (curry #'%listener-loop standard-listener)))
+  (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
+    (let ((fn (curry #'listener-loop standard-listener)))
       (setf (notifier-connection standard-listener) connection-1
             (connections standard-listener) (list connection-2)
             (thread standard-listener)
             (make-thread fn :name (name standard-listener))))))
 
-(defun %listener-ready-socket (listener)
+(defun listener-ready-socket (listener)
   (let* ((connections (with-lock-held ((lock listener)) (connections listener)))
          (sockets (mapcar #'socket-of connections)))
     (first (wait-until (wait-for-input sockets :timeout nil :ready-only t)))))
 
-(defun %listener-loop (listener)
+(defun listener-loop (listener)
   (with-restartability (listener)
     (loop
       (handler-case
-          (let* ((socket (%listener-ready-socket listener))
+          (let* ((socket (listener-ready-socket listener))
                  (connection (owner socket))
                  (command (connection-receive connection)))
             (when command
               (funcall (handler listener) connection command)))
         (stream-error (e)
-          (%listener-error listener e))))))
+          (listener-error listener e))))))
 
-(defun %listener-error (listener condition)
+(defun listener-error (listener condition)
   (let* ((connections (with-lock-held ((lock listener)) (connections listener)))
          (stream (stream-error-stream condition))
          (predicate (lambda (x) (eq stream (socket-stream (socket-of x)))))
@@ -72,10 +68,10 @@
     (kill (notifier-connection listener))
     (with-lock-held ((lock listener))
       (mapc #'kill (connections listener))
-      (setf (connections listener) ())))
+      (setf (connections listener) '())))
   (values))
 
-
+;;; TODO comments instead of three empty lines in a row
 
 (define-test-case standard-listener-death
     (:description "Test of KILLABLE protocol for STANDARD-LISTENER."
@@ -103,7 +99,7 @@
                                      :handler (constantly nil)))
          (notifier-1 #2?(notifier-connection listener))
          (notifier-2 #3?(first (connections listener))))
-    (multiple-value-bind (connection-1 connection-2) #4?(%make-connection-pair)
+    (multiple-value-bind (connection-1 connection-2) #4?(make-connection-pair)
       (declare (ignore connection-2))
       #5?(with-lock-held ((lock listener))
            (push connection-1 (connections listener)))
@@ -140,7 +136,7 @@ of the connection."
   (finalized-let* ((listener #1?(make-instance 'standard-listener
                                                :handler (constantly nil))
                              (kill listener)))
-    (multiple-value-bind (connection-1 connection-2) #2?(%make-connection-pair)
+    (multiple-value-bind (connection-1 connection-2) #2?(make-connection-pair)
       #3?(with-lock-held ((lock listener))
            (push connection-1 (connections listener)))
       #4?(is (alivep listener))
@@ -170,15 +166,15 @@ list."
   8 "Pop the message from the list and go back to step 6 a few times.")
 
 (define-test standard-listener-message
-  (finalized-let* ((list ())
+  (finalized-let* ((list '()) ; TODO quote all empty "data" lists in code
                    (fn (lambda (conn data) (push (list conn data) list)))
                    (listener #1?(make-instance 'standard-listener :handler fn)
                              (kill listener))
-                   (c1 (multiple-value-list #2?(%make-connection-pair))
+                   (c1 (multiple-value-list #2?(make-connection-pair))
                        (mapc #'kill c1))
-                   (c2 (multiple-value-list #3?(%make-connection-pair))
+                   (c2 (multiple-value-list #3?(make-connection-pair))
                        (mapc #'kill c2))
-                   (c3 (multiple-value-list #4?(%make-connection-pair))
+                   (c3 (multiple-value-list #4?(make-connection-pair))
                        (mapc #'kill c3))
                    (c1a (first c1)) (c1b (second c1))
                    (c2a (first c2)) (c2b (second c2))
@@ -189,6 +185,7 @@ list."
          (push c3a (connections listener)))
     (loop for i below 30
           for data = (make-list 10 :initial-element i)
-          do #6?(connection-send (whichever c1b c2b c3b) data)
-          #7?(is (wait () (member data list :test #'equal :key #'second)))
-          #8?(pop list))))
+          do (progn
+               #6?(connection-send (whichever c1b c2b c3b) data)
+               #7?(is (wait () (member data list :test #'equal :key #'second)))
+               #8?(pop list)))))

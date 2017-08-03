@@ -13,7 +13,7 @@
    (%iteration-count :reader iteration-count
                      :type integer)))
 
-(define-constructor (standard-password passphrase %read-data
+(define-constructor (standard-password passphrase deserialized-data
                                        (iteration-count 1000)
                                        (key-length 512)
                                        (salt-length 64))
@@ -21,13 +21,13 @@
              (bind (place)
                `(setf (values (val %key) (val %salt) (val %iteration-count))
                       ,place)))
-    (if %read-data
-        (progn (check-type %read-data cons)
-               (assert (= (length %read-data) 3))
-               (check-type (first %read-data) string)
-               (check-type (second %read-data) string)
-               (check-type (third %read-data) integer)
-               (bind (values-list %read-data)))
+    (if deserialized-data
+        (progn (check-type deserialized-data cons)
+               (assert (= (length deserialized-data) 3))
+               (check-type (first deserialized-data) string)
+               (check-type (second deserialized-data) string)
+               (check-type (third deserialized-data) integer)
+               (bind (values-list deserialized-data)))
         (progn (check-type passphrase string)
                (bind (derive-key passphrase
                        :iteration-count iteration-count
@@ -56,7 +56,7 @@
       (check-type salt string)
       (check-type iteration-count unsigned-byte)
       (make-instance 'standard-password
-                     :%read-data (list key salt iteration-count)))))
+                     :deserialized-data (list key salt iteration-count)))))
 
 (defmethod password-matches-p ((password standard-password) (passphrase string))
   (let* ((salt (ironclad:hex-string-to-byte-array (salt password)))

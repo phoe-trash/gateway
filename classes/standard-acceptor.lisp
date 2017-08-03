@@ -17,18 +17,18 @@
   (check-type host string)
   (check-type port (unsigned-byte 16))
   (let* ((socket (socket-listen "127.0.0.1" port :reuseaddress t))
-         (name (%acceptor-constructor-name socket))
-         (fn (curry #'%acceptor-loop standard-acceptor)))
+         (name (acceptor-constructor-name socket))
+         (fn (curry #'acceptor-loop standard-acceptor)))
     (setf (socket standard-acceptor) socket
           (name standard-acceptor) name
           (thread standard-acceptor) (make-thread fn :name name))))
 
-(defun %acceptor-constructor-name (socket)
+(defun acceptor-constructor-name (socket)
   (format nil "Gateway - Acceptor for ~{~D.~D.~D.~D~}:~D"
           (coerce (get-local-name socket) 'list)
           (get-local-port socket)))
 
-(defun %acceptor-loop (acceptor)
+(defun acceptor-loop (acceptor)
   (with-restartability (acceptor)
     (loop
       (let* ((socket (socket acceptor))

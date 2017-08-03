@@ -55,13 +55,13 @@ class DATE.")))
   (assert (member unit *date-granularity-units*))
   (if (eq unit :nanosecond)
       (local-time:timestamp= date-1 date-2)
-      (every #'= (%date-elts date-1 unit) (%date-elts date-2 unit))))
+      (every #'= (date-elts date-1 unit) (date-elts date-2 unit))))
 
-(defun %date-elts (date unit)
-  (subseq (nreverse (%date=-decode date)) 4
+(defun date-elts (date unit)
+  (subseq (nreverse (date=-decode date)) 4
           (+ 5 (position unit *date-granularity-units*))))
 
-(defun %date=-decode (date)
+(defun date=-decode (date)
   (multiple-value-list
    (local-time:decode-timestamp date :timezone local-time:+utc-zone+)))
 
