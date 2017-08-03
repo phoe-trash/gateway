@@ -47,4 +47,9 @@ This data does not necessarily need to constitute a full message; it is ~
 possible for a connection to be READYP but for CONNECTION-RECEIVE to return ~
 \(VALUES NIL T), at which point the received partial data is buffered, the ~
 connection becomes not READYP again, and only a subsequent part of the message ~
-arriving on the connection causes CONNECTION-RECEIVE to return a full message.")
+arriving on the connection causes CONNECTION-RECEIVE to return a full message."
+  (:function ready-connection-using-class
+             ((concrete-class class) connections) (connection connection))
+  "Provided with a concrete connection class and a list of instances of that ~
+class, blocks until a connection has available data, at which point that ~
+connection is returned.")

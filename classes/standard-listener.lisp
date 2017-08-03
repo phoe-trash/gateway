@@ -17,7 +17,12 @@
           :initform "Gateway - Listener")
    (%handler :accessor handler
              :initarg :handler
-             :initform (error "Must define a handler function."))))
+             :initform (error "Must define a handler function.")))
+  (:documentation #.(format nil "A standard implementation of Gateway protocol ~
+class LISTENER.
+
+The STANDARD-LISTENER spawns a thread which monitors the CONNECTIONs on the ~
+connection list by means of READY-CONNECTIONS-USING-CLASS.")))
 
 (defmethod (setf connections) :after (new-value (listener standard-listener))
   (connection-send (notifier-connection listener) '()))
@@ -30,17 +35,15 @@
             (thread standard-listener)
             (make-thread fn :name (name standard-listener))))))
 
-(defun listener-ready-socket (listener)
-  (let* ((connections (with-lock-held ((lock listener)) (connections listener)))
-         (sockets (mapcar #'socket-of connections)))
-    (first (wait-until (wait-for-input sockets :timeout nil :ready-only t)))))
+(defun listener-ready-connection (listener)
+  (let* ((conns (with-lock-held ((lock listener)) (connections listener))))
+    (ready-connection-using-class (class-of (first conns)) conns)))
 
 (defun listener-loop (listener)
   (with-restartability (listener)
     (loop
       (handler-case
-          (let* ((socket (listener-ready-socket listener))
-                 (connection (owner socket))
+          (let* ((connection (listener-ready-connection listener))
                  (command (connection-receive connection)))
             (when command
               (funcall (handler listener) connection command)))
@@ -70,6 +73,14 @@
       (mapc #'kill (connections listener))
       (setf (connections listener) '())))
   (values))
+
+;; Oh goodness, I remember the days when I've had no idea what a closure was
+;; and how a function can be an object.
+;; ~phoe, 28 Dec 2016
+
+;; Oh goodness, I remember the days when I wrote the above comment. I've learned
+;; so much since then.
+;; ~phoe, 03 Aug 2017
 
 ;;; TESTS
 

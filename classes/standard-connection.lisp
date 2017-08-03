@@ -81,6 +81,13 @@
       (fformat (stream-of connection) sexp)
       t)))
 
+(defmethod ready-connection-using-class
+    ((class (eql (find-class 'standard-connection))) connections)
+  (let* ((sockets (mapcar #'socket-of connections))
+         (ready-sockets (wait-until (wait-for-input sockets :timeout nil
+                                                            :ready-only t))))
+    (owner (first ready-sockets))))
+
 ;;; TESTS
 
 (defun make-connection-pair ()
