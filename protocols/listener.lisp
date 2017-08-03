@@ -6,7 +6,10 @@
 (in-package #:gateway/protocols)
 
 (define-protocol listener
-    (:description "TODO
+    (:description "The LISTENER protocol describes objects which contain a ~
+list of connections and constantly scan them for incoming data, reading it ~
+and calling their handler function on them to pass it to other parts of the ~
+system.
 
 The connection list should be treated as immutable at all time and should ~
 never be destructively modified. Instead, all operations are expected to copy ~
