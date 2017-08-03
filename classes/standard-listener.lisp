@@ -152,6 +152,43 @@ of the connection."
       #10?(is (alivep listener)))))
 
 (define-test-case standard-listener-message
-    (:description ""
+    (:description "Tests the message-passing functionality of the ~
+STANDARD-LISTENER."
      :tags (:implementation :listener :connection)
-     :type :implementation))
+     :type :implementation)
+  :arrange
+  1 "Create a listener with a simple list-pushing handler."
+  2 "Create both sides of connection 1."
+  3 "Create both sides of connection 2."
+  4 "Create both sides of connection 3."
+  5 "Add first sides of the three connections to the listener's connection ~
+list."
+  :loop-act
+  6 "Send a message through the other side of connection 1, 2 or 3."
+  :loop-assert
+  7 "Assert the message was pushed onto the list."
+  8 "Pop the message from the list and go back to step 6 a few times.")
+
+(define-test standard-listener-message
+  (finalized-let* ((list ())
+                   (fn (lambda (conn data) (push (list conn data) list)))
+                   (listener #1?(make-instance 'standard-listener :handler fn)
+                             (kill listener))
+                   (c1 (multiple-value-list #2?(%make-connection-pair))
+                       (mapc #'kill c1))
+                   (c2 (multiple-value-list #3?(%make-connection-pair))
+                       (mapc #'kill c2))
+                   (c3 (multiple-value-list #4?(%make-connection-pair))
+                       (mapc #'kill c3))
+                   (c1a (first c1)) (c1b (second c1))
+                   (c2a (first c2)) (c2b (second c2))
+                   (c3a (first c3)) (c3b (second c3)))
+    #5?(with-lock-held ((lock listener))
+         (push c1a (connections listener))
+         (push c2a (connections listener))
+         (push c3a (connections listener)))
+    (loop for i below 30
+          for data = (make-list 10 :initial-element i)
+          do #6?(connection-send (whichever c1b c2b c3b) data)
+          #7?(is (wait () (member data list :test #'equal :key #'second)))
+          #8?(pop list))))
