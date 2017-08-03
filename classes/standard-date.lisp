@@ -1,16 +1,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
-;;;; standard-date.lisp
+;;;; classes/standard-date.lisp
 
 (in-package :gateway/impl)
 
-;; TODO move to constants file, turn into a constant
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defvar *date-granularity-units*
-    '(:year :month :day :hour :minute :second :nanosecond)))
-
 (defclass standard-date (date local-time:timestamp) ()
+  ;; TODO implement such documentation for other standard classes as well
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class DATE.")))
 
@@ -94,7 +90,7 @@ class DATE.")))
 (defmethod now ()
   (change-class (local-time:now) 'standard-date))
 
-
+;;; TESTS
 
 (define-test-case standard-date-unit
     (:description "Unit tests for STANDARD-DATE."

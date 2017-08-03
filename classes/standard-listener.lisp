@@ -10,7 +10,7 @@
 (defclass standard-listener (listener)
   ((%lock :accessor lock
           :initform (make-lock "Gateway - Listener lock"))
-   (%connections :accessor connections) ; TODO turn into an :accessor
+   (%connections :accessor connections)
    (%notifier-connection :accessor notifier-connection)
    (%thread :accessor thread)
    (%name :accessor name
@@ -71,7 +71,7 @@
       (setf (connections listener) '())))
   (values))
 
-;;; TODO comments instead of three empty lines in a row
+;;; TESTS
 
 (define-test-case standard-listener-death
     (:description "Test of KILLABLE protocol for STANDARD-LISTENER."
@@ -166,7 +166,7 @@ list."
   8 "Pop the message from the list and go back to step 6 a few times.")
 
 (define-test standard-listener-message
-  (finalized-let* ((list '()) ; TODO quote all empty "data" lists in code
+  (finalized-let* ((list '())
                    (fn (lambda (conn data) (push (list conn data) list)))
                    (listener #1?(make-instance 'standard-listener :handler fn)
                              (kill listener))

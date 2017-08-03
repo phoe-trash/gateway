@@ -84,7 +84,7 @@
 (defun salt-length (password)
   (/ (length (salt password)) 2))
 
-
+;;; TESTS
 
 (define-test-case standard-password-unit
     (:description "Unit tests for STANDARD-PASSWORD."

@@ -31,6 +31,8 @@
                (:file "utils/define-query")
                (:file "utils/prinr-to-string")
                (:file "utils/verify-arguments")
+               ;; VARIABLES
+               (:file "variables/constants")
                ;; INSTALL
                (:file "install/install")
                ;; PROTOCOLS - MIXINS

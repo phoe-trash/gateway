@@ -21,9 +21,9 @@
   (setf (socket-of standard-connection)
         (change-class socket 'standard-socket :owner standard-connection)
         (lock standard-connection)
-        (make-lock (format nil "STANDARD-CONNECTION ~A:~D" host port))))
+        (make-lock (format nil "Gateway - STANDARD-CONNECTION ~A:~D"
+                           host port))))
 
-;;;; KILLABLE
 (defmethod deadp ((connection standard-connection))
   (with-lock-held ((lock connection))
     (alivep-internal connection)
@@ -45,7 +45,6 @@
 (defun connection-kill (connection)
   (socket-close (socket-of connection)))
 
-;;;; READYP
 (defmethod readyp ((connection standard-connection))
   (or (not (open-stream-p (stream-of connection)))
       (with-connection (connection)
@@ -54,7 +53,6 @@
 (defun connection-readyp (connection)
   (peek-char-no-hang (stream-of connection)))
 
-;;;; CONNECTION-RECEIVE/CONNECTION-SEND
 (defmacro with-connection ((connection) &body body)
   `(when (alivep ,connection)
      (handler-case
@@ -62,8 +60,6 @@
            ,@body)
        (error (e)
          (declare (ignorable e))
-         ;; TODO add logging (again)
-         ;; (note "[!] Connection: ~A~%" e)
          (kill ,connection)
          (error e)))))
 
@@ -85,7 +81,7 @@
       (fformat (stream-of connection) sexp)
       t)))
 
-
+;;; TESTS
 
 (defun make-connection-pair ()
   (let* ((socket-listen (socket-listen "127.0.0.1" 0))

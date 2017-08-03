@@ -34,10 +34,6 @@
       (let* ((socket (socket acceptor))
              (accept (socket-accept (wait-for-input socket)))
              (connection (make-instance 'standard-connection :socket accept)))
-        ;; (note "[.] ~A: got a connection, ~{~A.~A.~A.~A~}:~S.~%"
-        ;;       (name acceptor)
-        ;;       (coerce (get-peer-address accept) 'list)
-        ;;       (get-peer-port accept))
         (funcall (handler acceptor) connection)))))
 
 (defmethod deadp ((acceptor standard-acceptor))
@@ -50,7 +46,7 @@
     (socket-close (socket acceptor)))
   (values))
 
-
+;;; TESTS
 
 (define-test-case standard-acceptor-death
     (:description "Test of KILLABLE protocol for STANDARD-ACCEPTOR."

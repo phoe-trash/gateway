@@ -40,6 +40,12 @@
    #:verify-arguments
    ))
 
+(defpackage #:gateway/variables
+  (:use #:common-lisp)
+  (:export
+   ;; CONSTANTS
+   #:*date-granularity-units*))
+
 (defpackage #:gateway/framework
   (:use #:common-lisp
         #:gateway/utils
@@ -79,6 +85,7 @@
         #:bordeaux-threads
         #:protest
         #:gateway/utils
+        #:gateway/variables
         #:gateway/protocols)
   (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
