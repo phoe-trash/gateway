@@ -11,7 +11,13 @@
    (%salt :reader salt
           :type string)
    (%iteration-count :reader iteration-count
-                     :type integer)))
+                     :type integer))
+  (:description #.(format nil "A standard implementation of a Gateway protocol ~
+class PASSWORD.
+
+STANDARD-PASSWORD instances are constructible by two means: by providing the ~
+passphrase (and optionally other password details) or by providing the ~
+deserialized password data.")))
 
 (define-constructor (standard-password passphrase deserialized-data
                                        (iteration-count 1000)

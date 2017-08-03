@@ -6,7 +6,6 @@
 (in-package :gateway/impl)
 
 (defclass standard-date (date local-time:timestamp) ()
-  ;; TODO implement such documentation for other standard classes as well
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class DATE.")))
 

@@ -22,7 +22,9 @@
 class LISTENER.
 
 The STANDARD-LISTENER spawns a thread which monitors the CONNECTIONs on the ~
-connection list by means of READY-CONNECTIONS-USING-CLASS.")))
+connection list by means of READY-CONNECTIONS-USING-CLASS. It then attempts ~
+to read a command by CONNECTION-RECEIVE and, if it is read, call its handler ~
+function with the connection and the command as arguments.")))
 
 (defmethod (setf connections) :after (new-value (listener standard-listener))
   (connection-send (notifier-connection listener) '()))

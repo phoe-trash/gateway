@@ -9,7 +9,14 @@
 (defclass standard-connection (connection)
   ((%socket :accessor socket-of)
    (%auth :accessor authentication :initform nil)
-   (%lock :accessor lock)))
+   (%lock :accessor lock))
+  (:description #.(format nil "A standard implementation of Gateway protocol ~
+class CONNECTION.
+
+This connection is a wrapper around a network socket (of class ~
+STANDARD-SOCKET, which is a trivial subclass of USOCKET:STREAM-SOCKET that ~
+also provides an owner slot, allowing to identify the connection the socket ~
+belongs to).")))
 
 (define-constructor (standard-connection (host "127.0.0.1") (port 65001) socket)
   (unless socket
