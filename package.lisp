@@ -79,10 +79,12 @@
         #:named-readtables
         #:alexandria
         #:closer-mop
+        #:cl-cpus
         #:1am
         #:safe-read
         #:usocket
         #:bordeaux-threads
+        #:lparallel.queue
         #:protest
         #:gateway/utils
         #:gateway/variables

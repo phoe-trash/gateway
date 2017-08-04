@@ -3,6 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; gateway.asd
 
+;;; TODO replace all 2016s in headers with 2017s
 (asdf:defsystem #:gateway
   :description "A graphical chat/RP client written in Common Lisp."
   :author "Michał \"phoe\" Herda"
@@ -12,6 +13,7 @@
                #:overlord
                #:cl-yesql
                #:protest
+               #:cl-cpus
                #:safe-read
                #:postmodern
                #:1am
@@ -21,6 +23,7 @@
                #:ironclad
                #:usocket
                #:bordeaux-threads
+               #:lparallel
                )
   :serial t
   :components (;; PACKAGE
