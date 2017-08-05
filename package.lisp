@@ -55,6 +55,11 @@
    #:with-restartability
    ))
 
+(defpackage #:gateway/db
+  (:use #:common-lisp
+        #:postmodern
+        #:gateway/utils))
+
 (defpackage #:gateway/install
   (:use #:common-lisp
         #:postmodern

@@ -58,9 +58,9 @@ and reserved for future use.")))
   t)
 
 (defun remove-results (kernel)
-  (loop for (result isp) = (multiple-value-list
-                            (lparallel:try-receive-result (channel kernel)))
-        while isp))
+  (loop for (result is) = (multiple-value-list
+                           (lparallel:try-receive-result (channel kernel)))
+        while is))
 
 ;;; TESTS
 

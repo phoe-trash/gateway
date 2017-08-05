@@ -19,7 +19,7 @@
     create-table-chapter-link
     create-table-chapter-permission
     create-table-timeline-permission
-    create-table-global-chapter-permission))
+    create-table-global-timeline-permission))
 
 (defun uninstall ()
   (drop-tables)
