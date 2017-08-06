@@ -26,6 +26,7 @@
    #:valid-username-p
    #:valid-name-p
    #:fformat
+   #:pprint-plist
    ;; MACROS
    #:define-constructor
    #:define-print
@@ -56,11 +57,6 @@
    #:with-restartability
    ))
 
-(defpackage #:gateway/db
-  (:use #:common-lisp
-        #:cl-yesql
-        #:gateway/utils))
-
 (defpackage #:gateway/install
   (:use #:common-lisp
         #:postmodern
@@ -85,7 +81,21 @@
         #:alexandria
         #:gateway/utils
         #:gateway/protocols)
-  (:export))
+  (:export #:config))
+
+(defpackage #:gateway/db
+  (:use #:common-lisp
+        #:cl-yesql
+        #:gateway/utils
+        #:gateway/config)
+  (:export #:connect-db
+           #:db-connected-p
+           #:disconnect-db
+           #:connect-test-db
+           #:test-db-connected-p
+           #:disconnect-test-db
+           #:with-db
+           #:with-test-db))
 
 (defpackage #:gateway/impl
   (:use #:common-lisp

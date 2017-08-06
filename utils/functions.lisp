@@ -69,3 +69,15 @@ FORCE-OUTPUT on the stream after formatting."
   (apply #'format stream format-string format-args)
   (fresh-line stream)
   (force-output stream))
+
+(defun pprint-plist (*standard-output* list)
+  "Pretty-prints a plist with newlines after each key-value pair."
+  (pprint-logical-block (*standard-output* list :prefix "(" :suffix ")")
+    (loop for cell on list by #'cddr
+          do (write (first cell))
+             (write-char #\Space)
+             (write (second cell))
+             (when (cddr cell)
+               (terpri *standard-output*)
+               (write-char #\Space)))
+    (terpri *standard-output*)))

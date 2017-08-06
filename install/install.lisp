@@ -5,6 +5,8 @@
 
 (in-package :gateway/install)
 
+
+;; TODO rewrite with CL-SQL
 (defun reload ()
   (define-queries "install/sql/"
     drop-tables
