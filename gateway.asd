@@ -30,7 +30,6 @@
                ;; UTILS
                (:file "utils/functions")
                (:file "utils/macros")
-               (:file "utils/define-query")
                (:file "utils/prinr-to-string")
                (:file "utils/verify-arguments")
                ;; VARIABLES
@@ -49,6 +48,8 @@
                (:file "protocols/password")
                (:file "protocols/connection")
                (:file "protocols/acceptor")
+               (:file "protocols/listener")
+               (:file "protocols/kernel")
                ;; FRAMEWORK
                (:file "framework/with-restartability")
                ;; CLASSES
@@ -56,5 +57,7 @@
                (:file "classes/standard-password")
                (:file "classes/standard-socket")
                (:file "classes/standard-connection")
-               ;; (:file "classes/standard-acceptor")
+               (:file "classes/standard-acceptor")
+               (:file "classes/standard-listener")
+               (:file "classes/standard-kernel")
                ))

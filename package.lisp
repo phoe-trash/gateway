@@ -57,14 +57,6 @@
    #:with-restartability
    ))
 
-(defpackage #:gateway/install
-  (:use #:common-lisp
-        #:postmodern
-        #:gateway/utils)
-  (:export #:install
-           #:uninstall
-           #:reload))
-
 (uiop:define-package #:gateway/protocols
     (:use #:common-lisp
           #:closer-mop
@@ -96,6 +88,14 @@
            #:disconnect-test-db
            #:with-db
            #:with-test-db))
+
+(defpackage #:gateway/install
+  (:use #:common-lisp
+        #:cl-yesql
+        #:gateway/db)
+  (:export #:install
+           #:uninstall
+           #:reload))
 
 (uiop:define-package #:gateway/impl
     (:use #:common-lisp

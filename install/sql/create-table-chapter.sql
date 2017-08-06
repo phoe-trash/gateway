@@ -1,7 +1,0 @@
--- name: install-create-table-chapter
-CREATE TABLE chapter (
-  chapter_id   serial      NOT NULL PRIMARY KEY,
-  chapter      text        NOT NULL,
-  chapter_time timestamp   NOT NULL,
-  timeline_id  integer     NOT NULL REFERENCES timeline(timeline_id)
-  ON UPDATE CASCADE);
