@@ -8,6 +8,7 @@
 (defclass standard-kernel (kernel)
   ((%kernel :accessor %kernel)
    (%channel :accessor channel)
+   (%cleaner :accessor cleaner)
    (%handler :accessor handler
              :initarg :handler
              :initform (error "Must provide a handler function."))
@@ -49,8 +50,12 @@ and reserved for future use.")))
           (lparallel:make-kernel threads
                                  :name (cat name " (lparallel kernel)")))
     (let ((lparallel:*kernel* (%kernel standard-kernel)))
-      (setf (channel standard-kernel)
-            (lparallel:make-channel)))))
+      (setf (channel standard-kernel) (lparallel:make-channel)
+            (cleaner standard-kernel)
+            (make-thread
+             (lambda ()
+               (loop (lparallel:receive-result (channel standard-kernel))))
+             :name "Gateway - Kernel cleaner thread")))))
 
 (defmethod deadp ((kernel standard-kernel))
   (not (lparallel.kernel::alivep (%kernel kernel))))
@@ -58,20 +63,12 @@ and reserved for future use.")))
 (defmethod kill ((kernel standard-kernel))
   (let ((lparallel:*kernel* (%kernel kernel)))
     (lparallel:end-kernel :wait t))
+  (destroy-thread (cleaner kernel))
   (values))
 
 (defmethod enqueue ((kernel standard-kernel) message)
-  ;; TODO cost of one thread waiting is less than cost of each worker polling.
-  ;;      consider creating a separate thread for that instead of polling on
-  ;;      each enqueue
-  (remove-results kernel)
   (lparallel:submit-task (channel kernel) (handler kernel) message)
   t)
-
-(defun remove-results (kernel)
-  (loop for (result is) = (multiple-value-list
-                           (lparallel:try-receive-result (channel kernel)))
-        while is))
 
 ;;; TESTS
 
@@ -98,14 +95,15 @@ and reserved for future use.")))
      :tags (:implementation :kernel)
      :type :implementation)
   :arrange
-  1. "Create a handler that atomically (with a lock) increases a variable that ~
+  1 "Create a handler that atomically (with a lock) increases a variable that ~
 is initially 0."
-  2. "Create a kernel."
-  3. "Prepare a shuffled list of integers from 1 to 100."
+  2 "Create a kernel."
+  3 "Prepare a shuffled list of integers from 1 to 100."
   :act
-  4. "Submit 100 tasks to the kernel which increase the variable by an integer."
+  4 "Submit 100 tasks to the kernel which increase the variable by an integer."
   :assert
-  5. "Assert the variable is = to 5050.")
+  5 "Assert the variable is = to 5050."
+  6 "Assert no more results are available in the channel.")
 
 (define-test standard-kernel
   (finalized-let*
@@ -117,4 +115,10 @@ is initially 0."
        (tasks #3?(shuffle (iota 100 :start 1))))
     #4?(dolist (i tasks)
          (is (enqueue kernel i)))
-    #5?(is (wait () (with-lock-held (lock) (= var 5050))))))
+    #5?(is (wait () (with-lock-held (lock) (= var 5050))))
+    (sleep 0.1)
+    #6?(is (wait () (equal '(nil nil)
+                           (multiple-value-list
+                            (lparallel.queue:peek-queue
+                             (lparallel.kernel::channel-queue
+                              (channel kernel)))))))))

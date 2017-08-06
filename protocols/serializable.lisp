@@ -23,14 +23,17 @@ SERIALIZE functions for the following standard classes:
 Since they are standard classes, they do not inherit from the protocol class ~
 SERIALIZABLE. They also do not participate in this protocol as they do not ~
 implement DESERIALIZE-USING-CLASS."
-     :tags (:serializable) :export t)
+     :tags (:serializable)
+     :export t)
   (:class serializable () ())
   "A serializable object. See protocol SERIALIZABLE for details."
   (:function serialize ((object serializable) &key type) serialized-data)
-  "Serializes the target object. If the :TYPE key parameter is :LIST, the ~
-object is serialized into its S-expression representation. If it is :STRING, ~
-that representation is additionally printed to a readable string, which is ~
-then returned. The default is :LIST."
+  "Serializes target object.
+
+If the :TYPE key parameter is :LIST, the object is serialized into its ~
+S-expression representation. If it is :STRING, that representation is ~
+additionally printed to a readable string, which is then returned. The default ~
+is :LIST."
   (:function deserialize-using-class
              ((class (or class symbol)) data) (object serializable))
   "Deserializes the provided data, which is a proper list, as an object of the ~
