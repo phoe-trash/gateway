@@ -19,6 +19,12 @@ STANDARD-PASSWORD instances are constructible by two means: by providing the ~
 passphrase (and optionally other password details) or by providing the ~
 deserialized password data.")))
 
+(define-print (standard-password stream)
+  (format stream "(~D-byte key, ~D-byte salt, ~D iterations)"
+          (key-length standard-password)
+          (salt-length standard-password)
+          (iteration-count standard-password)))
+
 (define-constructor (standard-password passphrase deserialized-data
                                        (iteration-count 1000)
                                        (key-length 512)

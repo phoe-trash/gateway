@@ -97,25 +97,33 @@
            #:with-db
            #:with-test-db))
 
-(defpackage #:gateway/impl
-  (:use #:common-lisp
-        #:named-readtables
-        #:alexandria
-        #:closer-mop
-        #:cl-cpus
-        #:1am
-        #:safe-read
-        #:usocket
-        #:bordeaux-threads
-        #:lparallel.queue
-        #:protest
-        #:gateway/utils
-        #:gateway/variables
-        #:gateway/protocols)
+(uiop:define-package #:gateway/impl
+    (:use #:common-lisp
+          #:named-readtables
+          #:alexandria
+          #:closer-mop
+          #:cl-cpus
+          #:1am
+          #:safe-read
+          #:usocket
+          #:bordeaux-threads
+          #:lparallel.queue
+          #:protest
+          #:gateway/utils
+          #:gateway/variables
+          #:gateway/protocols
+          #:gateway/framework)
   (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
                           #:defmethod
-                          #:defgeneric))
+                          #:defgeneric)
+  (:export #:standard-acceptor
+           #:standard-connection
+           #:standard-date
+           #:standard-kernel
+           #:standard-listener
+           #:standard-password
+           #:standard-socket))
 
 (uiop:define-package #:gateway/tests
     (:use))

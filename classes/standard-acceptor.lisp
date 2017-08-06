@@ -6,12 +6,20 @@
 (in-package :gateway/impl)
 
 (defclass standard-acceptor (acceptor)
-  ((%socket :accessor socket)
+  ((%socket :accessor socket-of)
    (%thread :accessor thread)
    (%name :accessor name)
    (%handler :accessor handler
              :initarg :handler
              :initform (error "Must define a handler function."))))
+
+(define-print (standard-acceptor stream)
+  (if (alivep standard-acceptor)
+      (let ((socket (socket-of standard-acceptor)))
+        (format stream "(~{~D.~D.~D.~D~}:~D, ALIVE)"
+                (coerce (get-local-name socket) 'list)
+                (get-local-port socket)))
+      (format stream "(DEAD)")))
 
 (define-constructor (standard-acceptor (host "127.0.0.1") (port 0))
   (check-type host string)
@@ -19,7 +27,7 @@
   (let* ((socket (socket-listen "127.0.0.1" port :reuseaddress t))
          (name (acceptor-constructor-name socket))
          (fn (curry #'acceptor-loop standard-acceptor)))
-    (setf (socket standard-acceptor) socket
+    (setf (socket-of standard-acceptor) socket
           (name standard-acceptor) name
           (thread standard-acceptor) (make-thread fn :name name))))
 
@@ -31,7 +39,7 @@
 (defun acceptor-loop (acceptor)
   (with-restartability (acceptor)
     (loop
-      (let* ((socket (socket acceptor))
+      (let* ((socket (socket-of acceptor))
              (accept (socket-accept (wait-for-input socket)))
              (connection (make-instance 'standard-connection :socket accept)))
         (funcall (handler acceptor) connection)))))
@@ -43,7 +51,7 @@
   (unless (eq (thread acceptor) (current-thread))
     (destroy-thread (thread acceptor)))
   (unless (deadp acceptor)
-    (socket-close (socket acceptor)))
+    (socket-close (socket-of acceptor)))
   (values))
 
 ;;; TESTS
@@ -80,8 +88,8 @@
                                                         :port 0
                                                         :handler handler)
                    (kill acceptor))
-         (host (get-local-address (socket acceptor)))
-         (port (get-local-port (socket acceptor)))
+         (host (get-local-address (socket-of acceptor)))
+         (port (get-local-port (socket-of acceptor)))
          (socket-1 #2?(socket-connect host port)
                    (socket-close socket-1)
                    (is (not (open-stream-p (socket-stream socket-1)))))

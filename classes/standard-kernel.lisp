@@ -28,6 +28,16 @@ The messages are expected to be in form (CONNECTION COMMAND . REST), where ~
 CONNECTION is a connection object from which MESSAGE came; REST is ignored ~
 and reserved for future use.")))
 
+(define-print (standard-kernel stream)
+  (format stream "(~D kernels, ~A)"
+          (worker-count standard-kernel)
+          (if (alivep standard-kernel) :alive :dead)))
+
+(defun worker-count (kernel)
+  (check-type kernel standard-kernel)
+  (let ((lparallel:*kernel* (%kernel kernel)))
+    (lparallel:kernel-worker-count)))
+
 ;;; TODO define-print for all classes
 
 (define-constructor (standard-kernel threads)

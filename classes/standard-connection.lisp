@@ -18,6 +18,15 @@ STANDARD-SOCKET, which is a trivial subclass of USOCKET:STREAM-SOCKET that ~
 also provides an owner slot, allowing to identify the connection the socket ~
 belongs to).")))
 
+(define-print (standard-connection stream)
+  (let ((socket (socket-of standard-connection)))
+    (if (alivep standard-connection)
+        (format stream "(~D:~{~D.~D.~D.~D~}:~D, ALIVE)"
+                (get-local-port socket)
+                (coerce (get-peer-name socket) 'list)
+                (get-peer-port socket))
+        (format stream "(DEAD)"))))
+
 (define-constructor (standard-connection (host "127.0.0.1") (port 65001) socket)
   (unless socket
     (check-type host string)

@@ -11,10 +11,12 @@
                                           &key ,@keys &allow-other-keys)
      ,@body))
 
-(defmacro define-print (object &body body)
-  "Defines a PRINT-OBJECT method on the given object."
-  `(defmethod print-object ((,object ,object) stream)
-     ,@body))
+(defmacro define-print ((object stream) &body body)
+  "Defines a PRINT-OBJECT method on the given object with
+PRINT-UNREADABLE-OBJECT."
+  `(defmethod print-object ((,object ,object) ,stream)
+     (print-unreadable-object (,object ,stream :type t :identity t)
+       ,@body)))
 
 ;;;; WAIT
 (defmacro wait ((&optional (timeout 2) (step 0.01)) &body body)

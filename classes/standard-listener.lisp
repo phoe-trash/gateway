@@ -27,7 +27,14 @@ to read a command by CONNECTION-RECEIVE and, if it is read, call its handler ~
 function with the connection and the command as arguments.
 
 The handler is expected to push a message in form (CONNECTION COMMAND) into ~
-a designated place..")))
+a designated place.")))
+
+(define-print (standard-listener stream)
+  (if (alivep standard-listener)
+      (let ((connections (with-lock-held ((lock standard-listener))
+                           (connections standard-listener))))
+        (format stream "(~D connections, ALIVE)" (length connections)))
+      (format stream "(DEAD)")))
 
 (defmethod (setf connections) :after (new-value (listener standard-listener))
   (connection-send (notifier-connection listener) '()))
