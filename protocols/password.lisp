@@ -13,7 +13,7 @@ functionality requested from a password is the PASSWORD-MATCHES-P function."
      :dependencies (serializable)
      :export t)
   (:class password (serializable) ())
-  "A password object."
+  "A password object. See protocol PASSWORD for details."
   (:function password-matches-p ((password password) (pasphrase string))
              :generalized-boolean)
   "Returns true iff a passphrase matches a given password object and false

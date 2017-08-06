@@ -15,7 +15,7 @@ parent object,
 * when an internal error occurs from which the object cannot recover."
      :tags (:killable) :export t)
   (:class killable () ())
-  "A killable object."
+  "A killable object. See protocol KILLABLE for details."
   (:function kill ((object killable)) :generalized-boolean)
   "If the object is alive, this function kills it. In any case, this functions ~
 has no return values."

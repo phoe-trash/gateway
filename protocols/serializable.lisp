@@ -25,7 +25,7 @@ SERIALIZABLE. They also do not participate in this protocol as they do not ~
 implement DESERIALIZE-USING-CLASS."
      :tags (:serializable) :export t)
   (:class serializable () ())
-  "A serializable object, participating in the SERIALIZABLE protocol."
+  "A serializable object. See protocol SERIALIZABLE for details."
   (:function serialize ((object serializable) &key type) serialized-data)
   "Serializes the target object. If the :TYPE key parameter is :LIST, the ~
 object is serialized into its S-expression representation. If it is :STRING, ~

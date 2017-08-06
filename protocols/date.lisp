@@ -25,7 +25,7 @@ will be equal under :UNIT :MONTH.
      :dependencies (serializable)
      :export t)
   (:class date (serializable) ())
-  "A timestamp object, representing a point in time."
+  "A date object. See protocol DATE for details."
   (:function date-timestamp ((date date)) (timestamp integer))
   "Converts a date object to a Unix timestamp."
   (:function timestamp-date-using-class

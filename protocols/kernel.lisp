@@ -19,8 +19,7 @@ implementation-dependent message as its argument."
      :dependencies (killable named)
      :export t)
   (:class kernel (killable named) ())
-  ;; TODO change this everywhere to "see protocol X for details"
-  "A kernel object."
+  "A kernel object. See protocol KERNEL for details."
   (:function enqueue ((kernel kernel) message) (values))
   "Enqueues a message in the kernel for processing. Returns T if the push was ~
 successful, NIL otherwise."

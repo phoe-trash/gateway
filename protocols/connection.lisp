@@ -17,7 +17,7 @@ Each such object has an authentication slot."
      :dependencies (killable serializable)
      :export t)
   (:class connection (killable) ())
-  "A connection object."
+  "A connection object. See protocol CONNECTION for details."
   (:function authentication ((connection connection)) t)
   "Returns the implementation-dependent object representing the user that ~
 authenticated themselves using this connection."

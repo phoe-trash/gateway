@@ -25,7 +25,7 @@ connections in a way defined by the implementing class."
      :dependencies (acceptor connection killable named)
      :export t)
   (:class listener (killable named) ())
-  "A listener object."
+  "A listener object. See protocol LISTENER for details."
   (:function lock ((listener listener)) lock)
   "Retrieves the lock of the listener.
 

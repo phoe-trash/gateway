@@ -20,7 +20,7 @@ connections in a way defined by the implementing class."
      :dependencies (killable named connection)
      :export t)
   (:class acceptor (killable named) ())
-  "An acceptor object."
+  "An acceptor object. See protocol ACCEPTOR for details."
   (:function handler ((acceptor acceptor)) function)
   "Returns the handler function of the acceptor."
   (:function (setf handler) (new-value (acceptor acceptor)) new-value)
