@@ -28,12 +28,15 @@ will be equal under :UNIT :MONTH.
   "A timestamp object, representing a point in time."
   (:function date-timestamp ((date date)) (timestamp integer))
   "Converts a date object to a Unix timestamp."
-  (:function timestamp-date ((timestamp integerp)) (date date))
-  "Converts a Unix timestamp to a date object."
+  (:function timestamp-date-using-class
+             ((class class) (timestamp integerp)) (date date))
+  "Converts a Unix timestamp to a date object of provided class."
   (:function date-ustimestamp ((date date)) (nstimestamp integer))
   "Converts a date object to a Unix timestamp with microsecond precision."
-  (:function ustimestamp-date ((nstimestamp integer)) (date date))
-  "Converts a Unix timestamp with microsecond precision to a date object."
+  (:function ustimestamp-date-using-class
+             ((class class) (nstimestamp integer)) (date date))
+  "Converts a Unix timestamp with microsecond precision to a date object of ~
+provided class."
   (:function date= ((date-1 date) (date-2 date) &key) :generalized-boolean)
   "Returns true iff the two dates are equal under the provided granularity ~
 unit."

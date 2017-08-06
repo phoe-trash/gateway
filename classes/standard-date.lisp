@@ -30,8 +30,9 @@ class DATE.")))
 (defmethod date-timestamp ((date standard-date))
   (local-time:timestamp-to-unix date))
 
-(defmethod timestamp-date ((timestamp integer))
-  ;; TODO add multiple implementation support
+(defmethod timestamp-date-using-class
+    ((class (eql (find-class 'standard-date)))
+     (timestamp integer))
   (change-class (local-time:unix-to-timestamp timestamp) 'standard-date))
 
 (defmethod date-ustimestamp ((date standard-date))
@@ -39,9 +40,11 @@ class DATE.")))
         (nsec (truncate (local-time:nsec-of date) 1000)))
     (+ (* 1000000 timestamp) nsec)))
 
-(defmethod ustimestamp-date ((nstimestamp integer))
+(defmethod ustimestamp-date-using-class
+    ((class (eql (find-class 'standard-date)))
+     (nstimestamp integer))
   (multiple-value-bind (timestamp msec) (truncate nstimestamp 1000000)
-    (let ((date (timestamp-date timestamp)))
+    (let ((date (timestamp-date-using-class class timestamp)))
       (setf (local-time:nsec-of date) (* 1000 msec))
       date)))
 
@@ -111,9 +114,12 @@ class DATE.")))
                          (find-class 'standard-date)
                          (read-from-string (serialize d-orig :type :string)))))
       (is (integerp (date-timestamp d-orig)))
-      (is (date= d-orig (timestamp-date (date-timestamp d-orig))))
+      (is (date= d-orig (timestamp-date-using-class (find-class 'standard-date)
+                                                    (date-timestamp d-orig))))
       (is (integerp (date-ustimestamp d-orig)))
-      (is (date= d-orig (ustimestamp-date (date-ustimestamp d-orig))))
+      (is (date= d-orig
+                 (ustimestamp-date-using-class (find-class 'standard-date)
+                                               (date-ustimestamp d-orig))))
       (is (date= d-orig d-same))
       (is (date= d-orig d-same :unit :nanosecond))
       (is (date= d-orig d-nsec :unit :second))
