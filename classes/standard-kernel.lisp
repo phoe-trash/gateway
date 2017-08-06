@@ -29,19 +29,20 @@ CONNECTION is a connection object from which MESSAGE came; REST is ignored ~
 and reserved for future use.")))
 
 (define-print (standard-kernel stream)
-  (format stream "(~D kernels, ~A)"
-          (worker-count standard-kernel)
-          (if (alivep standard-kernel) :alive :dead)))
+  (if (alivep standard-kernel)
+      (format stream "(~D workers, ALIVE)"
+              (worker-count standard-kernel))
+      (format stream "(DEAD)")))
 
 (defun worker-count (kernel)
   (check-type kernel standard-kernel)
   (let ((lparallel:*kernel* (%kernel kernel)))
     (lparallel:kernel-worker-count)))
 
-;;; TODO define-print for all classes
-
 (define-constructor (standard-kernel threads)
-  (let* ((threads (or threads (cl-cpus:get-number-of-processors)))
+  (let* ((threads (or threads
+                      (config :kernel-threads)
+                      (cl-cpus:get-number-of-processors)))
          (name "Gateway - Kernel, ~D threads" cpus))
     (setf (name standard-kernel) name
           (%kernel standard-kernel)

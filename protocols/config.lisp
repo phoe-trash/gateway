@@ -7,7 +7,6 @@
 
 (export 'config)
 
-;; TODO integrate config with everything
 (define-protocol config
     (:description "The CONFIG protocol describes the contents of a Gateway ~
 configuration file.

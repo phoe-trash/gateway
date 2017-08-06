@@ -3,7 +3,6 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; gateway.asd
 
-;;; TODO replace all 2017s in headers with 2017s
 (asdf:defsystem #:gateway
   :description "A graphical chat/RP client written in Common Lisp."
   :author "Michał \"phoe\" Herda"
