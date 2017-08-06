@@ -11,6 +11,7 @@
                #:asdf
                #:overlord
                #:cl-yesql
+               #:cl-yesql/postmodern
                #:protest
                #:cl-cpus
                #:safe-read
@@ -52,6 +53,8 @@
                (:file "protocols/kernel")
                ;; FRAMEWORK
                (:file "framework/with-restartability")
+               ;; CONFIG
+               (:file "config/config")
                ;; CLASSES
                (:file "classes/standard-date")
                (:file "classes/standard-password")

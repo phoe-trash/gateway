@@ -5,13 +5,18 @@
 
 (in-package :gateway/impl)
 
+(in-readtable protest)
+
 (defclass standard-acceptor (acceptor)
   ((%socket :accessor socket-of)
    (%thread :accessor thread)
    (%name :accessor name)
    (%handler :accessor handler
              :initarg :handler
-             :initform (error "Must define a handler function."))))
+             :initform (error "Must define a handler function.")))
+  (:documentation #.(format nil "A standard acceptor implementation, with a ~
+single server socket. Whenever a socket connection is initiated from outside, ~
+a connection is created and the handler function is called on it.")))
 
 (define-print (standard-acceptor stream)
   (if (alivep standard-acceptor)

@@ -5,6 +5,8 @@
 
 (in-package :gateway/impl)
 
+(in-readtable protest)
+
 (defclass standard-kernel (kernel)
   ((%kernel :accessor %kernel)
    (%channel :accessor channel)

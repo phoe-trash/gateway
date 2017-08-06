@@ -12,8 +12,8 @@
           :type string)
    (%iteration-count :reader iteration-count
                      :type integer))
-  (:description #.(format nil "A standard implementation of a Gateway protocol ~
-class PASSWORD.
+  (:documentation #.(format nil "A standard implementation of a Gateway ~
+protocol class PASSWORD.
 
 STANDARD-PASSWORD instances are constructible by two means: by providing the ~
 passphrase (and optionally other password details) or by providing the ~

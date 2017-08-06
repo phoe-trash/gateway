@@ -48,6 +48,16 @@
    ;; CONSTANTS
    #:*date-granularity-units*))
 
+(uiop:define-package #:gateway/protocols
+    (:use #:common-lisp
+          #:closer-mop
+          #:protest
+          #:gateway/utils)
+  (:shadowing-import-from #:protest
+                          #:standard-generic-function
+                          #:defmethod
+                          #:defgeneric))
+
 (defpackage #:gateway/framework
   (:use #:common-lisp
         #:gateway/utils
@@ -57,23 +67,11 @@
    #:with-restartability
    ))
 
-(uiop:define-package #:gateway/protocols
-    (:use #:common-lisp
-          #:closer-mop
-          #:protest
-          #:gateway/utils
-          #:gateway/framework)
-  (:shadowing-import-from #:protest
-                          #:standard-generic-function
-                          #:defmethod
-                          #:defgeneric))
-
 (defpackage #:gateway/config
   (:use #:common-lisp
         #:alexandria
         #:gateway/utils
-        #:gateway/protocols)
-  (:export #:config))
+        #:gateway/protocols))
 
 (defpackage #:gateway/db
   (:use #:common-lisp

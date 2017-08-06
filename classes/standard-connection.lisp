@@ -10,7 +10,7 @@
   ((%socket :accessor socket-of)
    (%auth :accessor authentication :initform nil)
    (%lock :accessor lock))
-  (:description #.(format nil "A standard implementation of Gateway protocol ~
+  (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class CONNECTION.
 
 This connection is a wrapper around a network socket (of class ~
@@ -61,14 +61,6 @@ belongs to).")))
 (defun connection-kill (connection)
   (socket-close (socket-of connection)))
 
-(defmethod readyp ((connection standard-connection))
-  (or (not (open-stream-p (stream-of connection)))
-      (with-connection (connection)
-        (connection-readyp connection))))
-
-(defun connection-readyp (connection)
-  (peek-char-no-hang (stream-of connection)))
-
 (defmacro with-connection ((connection) &body body)
   `(when (alivep ,connection)
      (handler-case
@@ -78,6 +70,14 @@ belongs to).")))
          (declare (ignorable e))
          (kill ,connection)
          (error e)))))
+
+(defmethod readyp ((connection standard-connection))
+  (or (not (open-stream-p (stream-of connection)))
+      (with-connection (connection)
+        (connection-readyp connection))))
+
+(defun connection-readyp (connection)
+  (peek-char-no-hang (stream-of connection)))
 
 (defmethod connection-receive ((connection standard-connection))
   (if (deadp connection)
