@@ -56,7 +56,6 @@ provided granularity unit."
   "Returns the oldest date from all provided dates."
   (:function date-max ((date date) &rest other-dates) (date-max date))
   "Returns the newest date from all provided dates."
-  ;; TODO NOW only accepts one implementation
-  (:function now () (now date))
-  "Returns the date object that corresponds to the current time, relative to ~
-the call of this function.")
+  (:function now-using-class ((class class)) (now date))
+  "Returns the date object of class CLASS that corresponds to the current ~
+time, relative to the call of this function.")

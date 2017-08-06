@@ -86,7 +86,7 @@ class DATE.")))
 (defmethod date-max (date &rest other-dates)
   (apply #'local-time:timestamp-maximum date other-dates))
 
-(defmethod now ()
+(defmethod now-using-class ((class (eql (find-class 'standard-date))))
   (change-class (local-time:now) 'standard-date))
 
 ;;; TESTS
@@ -151,5 +151,5 @@ class DATE.")))
       (is (date> d-year d-month))
       (is (eq d-orig (apply #'date-min vars)))
       (is (eq d-year (apply #'date-max vars)))
-      (is (typep (now) 'standard-date))
+      (is (typep (now-using-class (find-class 'standard-date)) 'standard-date))
       )))
