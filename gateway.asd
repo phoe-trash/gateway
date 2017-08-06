@@ -38,6 +38,8 @@
                (:file "variables/constants")
                ;; INSTALL
                (:file "install/install")
+               ;; PROTOCOLS - VARIA
+               (:file "protocols/config")
                ;; PROTOCOLS - MIXINS
                (:file "protocols/serializable")
                (:file "protocols/default-deserializable")

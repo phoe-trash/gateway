@@ -15,6 +15,13 @@
   "Concatenates targets into a string."
   (apply #'concatenate 'string strings))
 
+(defun catn (&rest strings)
+  "Concatenates targets into a string, inserting a newline between each of
+them."
+  (let ((strings (loop for cons on strings collect (car cons)
+                       when (cdr cons) collect #.(format nil "~%"))))
+    (apply #'concatenate 'string strings)))
+
 (defun peek-char-no-hang (&optional (input-stream *standard-input*)
                             (eof-error-p t) eof-value recursive-p)
   "Like PEEK-CHAR, except it returns NIL if there is no character waiting on the

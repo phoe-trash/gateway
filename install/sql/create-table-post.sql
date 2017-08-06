@@ -6,5 +6,4 @@ CREATE TABLE post (
   post_time     timestamp NOT NULL,
   contents      text      NOT NULL,
   chapter_id    integer   NOT NULL REFERENCES chapter(chapter_id) ON UPDATE CASCADE,
-  chapter_order integer   NOT NULL,
-  CONSTRAINT    id_order  UNIQUE(chapter_id, chapter_order));
+  chapter_order serial    NOT NULL);

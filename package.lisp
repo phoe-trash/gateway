@@ -7,17 +7,18 @@
   (:use #:common-lisp
         #:alexandria))
 
-(defpackage #:gateway/utils
-  (:use #:common-lisp
-        #:alexandria
-        #:postmodern
-        #:trivial-arguments
-        #:trivia
-        #:cl-ppcre)
+(uiop:define-package #:gateway/utils
+    (:use #:common-lisp
+          #:alexandria
+          #:postmodern
+          #:trivial-arguments
+          #:trivia
+          #:cl-ppcre)
   (:export
    ;; FUNCTIONS
    #:count-digits
    #:cat
+   #:catn
    #:peek-char-no-hang
    #:data-getf
    #:data-equal
@@ -57,7 +58,7 @@
 
 (defpackage #:gateway/db
   (:use #:common-lisp
-        #:postmodern
+        #:cl-yesql
         #:gateway/utils))
 
 (defpackage #:gateway/install
@@ -78,6 +79,13 @@
                           #:standard-generic-function
                           #:defmethod
                           #:defgeneric))
+
+(defpackage #:gateway/config
+  (:use #:common-lisp
+        #:alexandria
+        #:gateway/utils
+        #:gateway/protocols)
+  (:export))
 
 (defpackage #:gateway/impl
   (:use #:common-lisp
