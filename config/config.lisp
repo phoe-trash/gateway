@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
-;;;; © Michał "phoe" Herda 2016
+;;;; © Michał "phoe" Herda 2017
 ;;;; config/config.lisp
 
 (in-package #:gateway/config)

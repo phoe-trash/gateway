@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
-;;;; © Michał "phoe" Herda 2016
+;;;; © Michał "phoe" Herda 2017
 ;;;; classes/standard-listener.lisp
 
 (in-package #:gateway/impl)
@@ -81,7 +81,7 @@ a designated place..")))
 
 ;; Oh goodness, I remember the days when I've had no idea what a closure was
 ;; and how a function can be an object.
-;; ~phoe, 28 Dec 2016
+;; ~phoe, 28 Dec 2017
 
 ;; Oh goodness, I remember the days when I wrote the above comment. I've learned
 ;; so much since then.

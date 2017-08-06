@@ -1,6 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
-;;;; © Michał "phoe" Herda 2016
+;;;; © Michał "phoe" Herda 2017
 ;;;; db/connections.lisp
 
 (in-package #:gateway/db)
