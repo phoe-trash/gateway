@@ -5,6 +5,8 @@
 
 (in-package #:gateway/utils)
 
+;;; TODO Migrate to PHOE-TOOLBOX
+
 (defun count-digits (integer)
   "Returns the number of digits in an integer, sans any sign."
   (if (= 0 integer)
