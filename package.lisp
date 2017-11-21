@@ -53,7 +53,7 @@
           #:closer-mop
           #:protest
           #:gateway/utils)
-  (:shadowing-import-from #:protest
+  (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
                           #:defmethod
                           #:defgeneric))
