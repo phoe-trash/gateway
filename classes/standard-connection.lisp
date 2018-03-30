@@ -99,10 +99,16 @@ belongs to).")))
 
 (defmethod ready-connection-using-class
     ((class (eql (find-class 'standard-connection))) connections)
-  (let* ((sockets (mapcar #'socket-of connections))
-         (ready-sockets (wait-until (wait-for-input sockets :timeout nil
-                                                            :ready-only t))))
-    (owner (first ready-sockets))))
+  (let ((connections connections))
+    (tagbody :start
+       (handler-case
+           (let* ((sockets (mapcar #'socket-of connections))
+                  (ready (wait-until (wait-for-input sockets :timeout nil
+                                                             :ready-only t))))
+             (owner (first ready)))
+         (socket-error ()
+           (setf connections (remove-if #'deadp connections))
+           (go :start))))))
 
 ;;; TESTS
 

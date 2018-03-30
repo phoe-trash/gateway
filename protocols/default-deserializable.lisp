@@ -15,7 +15,7 @@ concrete implementing classes. This protocol describes a mechanism for making ~
 it possible to set and retrieve such classes, which in turn makes it possible ~
 to create a generalized DESERIALIZE function, which is also a part of this ~
 protocol.
-
+\
 This protocol depends on protocol SERIALIZABLE for implementation."
      :tags (:default-deserialization)
      :dependencies (serializable)

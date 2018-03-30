@@ -34,7 +34,7 @@ to reconnect to the database."
          (host (config :test-db-host))
          (port (config :test-db-port))
          (use-ssl (multiple-value-bind (value foundp) (config :test-db-use-ssl)
-                    (if foundp value :no)))
+                    (if foundp value :yes))) ;; TODO use default from protocol
          (connection (postmodern:connect database user pass host
                                          :port port :use-ssl use-ssl)))
     (setf *test-db-connection* connection)

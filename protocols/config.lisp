@@ -10,7 +10,7 @@
 (define-protocol config
     (:description "The CONFIG protocol describes the contents of a Gateway ~
 configuration file.
-
+\
 The contents of a configuration file is a single plist in form of (:FOO :BAR ~
 :BAZ \"quux\" :FRED 123 ...) with some options mandatory and some being ~
 optional. These settings describe various aspects of Gateway's functioning, ~
@@ -38,13 +38,13 @@ is mandatory for Gateway to function."
   "The hostname for the database connection."
   (:option :db-port :db (unsigned-byte 16) :mandatory)
   "The port for the database connection."
-  (:option :db-use-ssl :db boolean :optional t)
+  (:option :db-use-ssl :db boolean :optional :yes)
   "Should the DB connection use SSL?"
   (:category :test-db)
   "This config category describes configuration settings that regard ~
 connecting to a PostgreSQL test database. It is a scrap database for running ~
 the database tests from the Gateway test suite.
-
+\
 This category is optional, but if you do not provide it, you will not be able ~
 to run the full suite of Gateway tests."
   (:option :test-db-name :test-db string :optional)

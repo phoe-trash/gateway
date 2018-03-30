@@ -48,8 +48,13 @@ a designated place.")))
             (make-thread fn :name (name standard-listener))))))
 
 (defun listener-ready-connection (listener)
-  (let* ((conns (with-lock-held ((lock listener)) (connections listener))))
-    (ready-connection-using-class (class-of (first conns)) conns)))
+  (tagbody :start
+     (let* ((conns (with-lock-held ((lock listener)) (connections listener))))
+       (when (null conns) (sleep 0.1) (go :start))
+       (let ((conn (ready-connection conns)))
+         (if conn
+             conn
+             (go :start))))))
 
 (defun listener-loop (listener)
   (with-restartability (listener)
@@ -93,6 +98,11 @@ a designated place.")))
 ;; Oh goodness, I remember the days when I wrote the above comment. I've learned
 ;; so much since then.
 ;; ~phoe, 03 Aug 2017
+
+;; Oh goodness, I remember the days when I walked into a project that I have not
+;; been in for some time and immediately going "wtf, who wrote this." These days
+;; are over now.
+;; ~phoe, 30 Mar 2018
 
 ;;; TESTS
 
@@ -166,7 +176,7 @@ of the connection."
       #5?(kill connection-2)
       #6?(is (wait () (deadp connection-1)))
       #7?(is (deadp connection-2))
-      #8?(is (wait (20) (not (member connection-1 (connections listener)))))
+      #8?(is (wait () (not (member connection-1 (connections listener)))))
       #9?(is (= 1 (length (connections listener))))
       #10?(is (alivep listener)))))
 

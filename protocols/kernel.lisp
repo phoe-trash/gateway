@@ -9,9 +9,9 @@
     (:description "The KERNEL protocol describes objects which are capable of ~
 processing messages, either sequentially or concurrently. In the second case, ~
 the kernel contains implementation-dependent objects called workers.
-
+\
 The message's format is implementation-dependent.
-
+\
 On each enqueued message, the kernel's handler function is eventually called ~
 on that message. That function is an one-argument function that expects the ~
 implementation-dependent message as its argument."

@@ -10,12 +10,12 @@
 representing a point in time. These objects are immutable, have millisecond ~
 precision and can be compared to other timestamp objects, converted to string ~
 and from string representations, precisely Unix timestamps.
-
+\
 The time units, available in comparison functions, are :YEAR :MONTH :DAY :HOUR ~
 :MINUTE :SECOND :MILLISECOND. If the key argument UNIT is supplied with one of ~
 these values, the comparison takes into account that unit's granularity. The ~
 default unit is :MILLISECOND.
-
+\
 Examples:
 * 29th July 2017 and 30th July 2017 will not be DATE= under :UNIT :DAY, but ~
 will be equal under :UNIT :MONTH.
