@@ -19,41 +19,56 @@
 (defparameter *malformed-config*
   "The configuration is malformed.~%~A")
 
-(defvar *config* nil)
+(defvar *config*)
 
 (defmethod config ((option symbol))
-  (multiple-value-bind (key value foundp)
-      (get-properties *config* (list option))
-    (declare (ignore key))
-    (if foundp
-        (values value t)
-        (values nil nil))))
+  (let ((config (handler-case *config* (unbound-variable () (load-config)))))
+    (multiple-value-bind (key value foundp)
+        (get-properties config (list option))
+      (declare (ignore key))
+      (if foundp
+          (values value t)
+          (values nil nil)))))
 
 (defmethod (setf config) (new-value (option symbol))
-  (let ((new-config (list* option new-value
-                           (remove-from-plist *config* option))))
-    (validate-config new-config)
+  (let* ((config (handler-case *config* (unbound-variable () (load-config))))
+         (new-config (list* option new-value (remove-from-plist config))))
     (setf *config* new-config)
     new-value))
 
 (defun default-config-path ()
   "Returns the default pathname to the Gateway configuration file, based
 on the value of USER-HOMEDIR-PATHNAME."
-  (merge-pathnames (make-pathname :directory '(:relative ".gateway")
-                                  :name "config"
-                                  :type "sexp")
-                   (user-homedir-pathname)))
+  #.(merge-pathnames (make-pathname :directory '(:relative ".gateway")
+                                    :name "config"
+                                    :type "sexp")
+                     (user-homedir-pathname)))
+
+(defvar *sample-config*
+  '(:db-port 5432
+    :db-host "localhost"
+    :db-pass "postgres"
+    :db-user "postgres"
+    :db-name "gateway"))
+
+(defun create-config ()
+  "Creates a new sample configuration."
+  (copy-list *sample-config*))
 
 (defun load-config (&optional config-path)
   "Loads the Gateway configuration file from the provided path, validates it
 and sets it as the current Gateway configuration. If no path is provided, the
 default path is used.
 Returns the new value of *config*."
-  (let* ((path (or config-path (default-config-path))))
-    (with-input-from-file (stream path :if-does-not-exist :error)
-      (let ((config (read stream)))
-        (validate-config config)
-        (setf *config* config)))))
+  (let* ((path (or config-path (default-config-path)))
+         (config (ensure-config path)))
+    (validate-config config)
+    (setf *config* config)))
+
+(defun ensure-config (path)
+  (handler-case (with-input-from-file (stream path :if-does-not-exist :error)
+                  (read stream))
+    (file-error () (create-config))))
 
 (defun save-config (&optional config-path)
   "Validates and saves the current Gateway config to the provided path,

@@ -53,6 +53,8 @@
                (:file "protocols/kernel")
                ;; FRAMEWORK
                (:file "framework/with-restartability")
+               ;; DB
+               (:file "db/connections")
                ;; CONFIG
                (:file "config/config")
                ;; CLASSES

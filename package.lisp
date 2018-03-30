@@ -77,8 +77,11 @@
   (:use #:common-lisp
         #:cl-yesql
         #:gateway/utils
+        #:gateway/protocols
         #:gateway/config)
-  (:export #:connect-db
+  (:export #:*db-connection*
+           #:*test-db-connection*
+           #:connect-db
            #:db-connected-p
            #:disconnect-db
            #:connect-test-db

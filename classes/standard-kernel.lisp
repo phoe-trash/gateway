@@ -74,6 +74,8 @@ and reserved for future use.")))
 
 ;;; TESTS
 
+;; TODO separate tests from code
+
 (define-test-case standard-kernel-death
     (:description "Test of KILLABLE protocol for STANDARD-LISTENER."
      :tags (:protocol :killable :kernel)

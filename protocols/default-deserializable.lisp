@@ -48,7 +48,7 @@ DESERIALIZE-USING-CLASS on that class and the list data.")
   (multiple-value-bind (value foundp) (gethash class *serialization-classes*)
     (if foundp
         value
-        (let* ((classes (class-direct-subclasses class)))
+        (let* ((classes (class-direct-subclasses class))) ;; TODO indirect too
           (warn "Default deserialization for class ~A.~%Consider calling ~
 \(SETF DEFAULT-DESERIALIZATION-CLASS) for this class." (class-name class))
           (case (length classes)

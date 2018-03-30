@@ -33,7 +33,8 @@ to reconnect to the database."
          (pass (config :test-db-pass))
          (host (config :test-db-host))
          (port (config :test-db-port))
-         (use-ssl (config :test-db-use-ssl))
+         (use-ssl (multiple-value-bind (value foundp) (config :test-db-use-ssl)
+                    (if foundp value :no)))
          (connection (postmodern:connect database user pass host
                                          :port port :use-ssl use-ssl)))
     (setf *test-db-connection* connection)
@@ -70,7 +71,8 @@ to reconnect to the database."
          (pass (config :db-pass))
          (host (config :db-host))
          (port (config :db-port))
-         (use-ssl (config :db-use-ssl))
+         (use-ssl (multiple-value-bind (value foundp) (config :test-db-use-ssl)
+                    (if foundp value :no)))
          (connection (postmodern:connect database user pass host
                                          :port port :use-ssl use-ssl)))
     (setf *db-connection* connection)
