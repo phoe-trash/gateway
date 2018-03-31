@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; prinr-to-string.lisp
 
-(in-package :gateway/impl)
+(in-package :gateway/utils)
 
 (defvar *gateway-pprint-dispatch* (copy-pprint-dispatch nil))
 

@@ -9,3 +9,6 @@
   ((owner :accessor owner
           :initarg :owner
           :initform (error "Must provide an owner."))))
+
+(define-print (standard-socket stream)
+  (format stream "owner: ~S" (owner standard-socket)))

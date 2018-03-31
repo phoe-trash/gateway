@@ -5,8 +5,9 @@
 
 (in-package #:gateway/db)
 
-(defvar *db-connection* nil
-  "The connection to the database used for production.")
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defvar *db-connection* nil
+    "The connection to the database used for production."))
 
 (defvar *test-db-connection* nil
   "The connection to the database used for tests.

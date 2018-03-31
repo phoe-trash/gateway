@@ -61,4 +61,7 @@ provided granularity unit."
   "Returns the newest date from all provided dates."
   (:function now-using-class ((class class)) (now date))
   "Returns the date object of class CLASS that corresponds to the current ~
-time, relative to the call of this function.")
+time, relative to the call of this function."
+  (:variable *date-granularity-units* t
+             '(:year :month :day :hour :minute :second :nanosecond))
+  "List of all available granularity units.")

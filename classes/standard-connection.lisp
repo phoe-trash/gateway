@@ -105,7 +105,7 @@ belongs to).")))
            (let* ((sockets (mapcar #'socket-of connections))
                   (ready (wait-until (wait-for-input sockets :timeout nil
                                                              :ready-only t))))
-             (owner (first ready)))
+             (return-from ready-connection-using-class (owner (first ready))))
          (socket-error ()
            (setf connections (remove-if #'deadp connections))
            (go :start))))))

@@ -50,11 +50,10 @@ a designated place.")))
 (defun listener-ready-connection (listener)
   (tagbody :start
      (let* ((conns (with-lock-held ((lock listener)) (connections listener))))
-       (when (null conns) (sleep 0.1) (go :start))
+       (assert (not (null conns)) () "Listener: connection list is empty.")
        (let ((conn (ready-connection conns)))
-         (if conn
-             conn
-             (go :start))))))
+         (unless conn (go :start))
+         (return-from listener-ready-connection conn)))))
 
 (defun listener-loop (listener)
   (with-restartability (listener)
@@ -199,8 +198,10 @@ list."
   8 "Pop the message from the list and go back to step 6 a few times.")
 
 (define-test standard-listener-message
-  (finalized-let* ((list '())
-                   (fn (lambda (conn data) (push (list conn data) list)))
+  (finalized-let* ((lock (make-lock))
+                   (list '())
+                   (fn (lambda (conn data) (with-lock-held (lock)
+                                             (push (list conn data) list))))
                    (listener #1?(make-instance 'standard-listener :handler fn)
                              (kill listener))
                    (c1 (multiple-value-list #2?(make-connection-pair))
@@ -220,5 +221,6 @@ list."
           for data = (make-list 10 :initial-element i)
           do (progn
                #6?(connection-send (whichever c1b c2b c3b) data)
-               #7?(is (wait () (member data list :test #'equal :key #'second)))
-               #8?(pop list)))))
+               #7?(is (wait () (member data (with-lock-held (lock) list)
+                                       :test #'equal :key #'second)))
+               #8?(with-lock-held (lock) (pop list))))))

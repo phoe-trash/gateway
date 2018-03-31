@@ -24,19 +24,16 @@
                #:usocket
                #:bordeaux-threads
                #:lparallel
+               #:phoe-toolbox
+               #:verbose
                )
   :serial t
   :components (;; PACKAGE
                (:file "package")
                ;; UTILS
                (:file "utils/functions")
-               (:file "utils/macros")
                (:file "utils/prinr-to-string")
                (:file "utils/verify-arguments")
-               ;; VARIABLES
-               (:file "variables/constants")
-               ;; INSTALL
-               (:file "install/install")
                ;; PROTOCOLS - VARIA
                (:file "protocols/config")
                ;; PROTOCOLS - MIXINS
@@ -55,6 +52,8 @@
                (:file "framework/with-restartability")
                ;; DB
                (:file "db/connections")
+               ;; INSTALL
+               (:file "install/install")
                ;; CONFIG
                (:file "config/config")
                ;; CLASSES
