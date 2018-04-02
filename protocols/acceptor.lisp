@@ -24,4 +24,6 @@ connections in a way defined by the implementing class."
   (:function handler ((acceptor acceptor)) function)
   "Returns the handler function of the acceptor."
   (:function (setf handler) (new-value (acceptor acceptor)) new-value)
-  "Sets the handler function of the acceptor.")
+  "Sets the handler function of the acceptor."
+  (:function address ((acceptor acceptor)) string)
+  "Returns the address of the acceptor's listener socket in a string form.")

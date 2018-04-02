@@ -47,6 +47,7 @@ and reserved for future use.")))
                       (config :kernel-threads)
                       (cl-cpus:get-number-of-processors)))
          (name "Gateway - Kernel, ~D threads" cpus))
+    (v:trace :gateway "Standard kernel starting with ~D threads." threads)
     (setf (name standard-kernel) name
           (%kernel standard-kernel)
           (lparallel:make-kernel threads
@@ -63,6 +64,7 @@ and reserved for future use.")))
   (not (lparallel.kernel::alivep (%kernel kernel))))
 
 (defmethod kill ((kernel standard-kernel))
+  (v:trace :gateway "Standard kernel was killed.")
   (let ((lparallel:*kernel* (%kernel kernel)))
     (lparallel:end-kernel :wait t))
   (destroy-thread (cleaner kernel))

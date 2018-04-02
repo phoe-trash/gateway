@@ -8,6 +8,7 @@
 
 (defclass standard-connection (connection)
   ((%socket :accessor socket-of)
+   (%address :accessor address)
    (%auth :accessor authentication :initform nil)
    (%lock :accessor lock))
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
@@ -19,13 +20,8 @@ also provides an owner slot, allowing to identify the connection the socket ~
 belongs to).")))
 
 (define-print (standard-connection stream)
-  (let ((socket (socket-of standard-connection)))
-    (if (alivep standard-connection)
-        (format stream "(~D:~{~D.~D.~D.~D~}:~D, ALIVE)"
-                (get-local-port socket)
-                (coerce (get-peer-name socket) 'list)
-                (get-peer-port socket))
-        (format stream "(DEAD)"))))
+  (format stream "~A (~A)" (address standard-connection)
+          (if (alivep standard-connection) "ALIVE" "DEAD")))
 
 (define-constructor (standard-connection (host "127.0.0.1") (port 65001) socket)
   (unless socket
@@ -34,11 +30,14 @@ belongs to).")))
     (setf socket (change-class (socket-connect host port) 'standard-socket
                                :owner standard-connection)))
   (check-type socket stream-usocket)
-  (setf (socket-of standard-connection)
-        (change-class socket 'standard-socket :owner standard-connection)
-        (lock standard-connection)
-        (make-lock (format nil "Gateway - STANDARD-CONNECTION ~A:~D"
-                           host port))))
+  (let ((address (socket-peer-address socket)))
+    (v:trace :gateway "Standard connection created for ~A." address)
+    (setf (socket-of standard-connection)
+          (change-class socket 'standard-socket :owner standard-connection)
+          (address standard-connection) address
+          (lock standard-connection)
+          (make-lock (format nil "Gateway - STANDARD-CONNECTION ~A:~D"
+                             host port)))))
 
 (defmethod deadp ((connection standard-connection))
   (with-lock-held ((lock connection))
@@ -48,6 +47,7 @@ belongs to).")))
 (defmethod kill ((connection standard-connection))
   (with-lock-held ((lock connection))
     (connection-kill connection))
+  (v:trace :gateway "Standard connection killed for ~A." (address connection))
   (values))
 
 (defmethod stream-of ((connection connection))
@@ -101,14 +101,14 @@ belongs to).")))
     ((class (eql (find-class 'standard-connection))) connections)
   (let ((connections connections))
     (tagbody :start
-       (handler-case
-           (let* ((sockets (mapcar #'socket-of connections))
-                  (ready (wait-until (wait-for-input sockets :timeout nil
-                                                             :ready-only t))))
-             (return-from ready-connection-using-class (owner (first ready))))
-         (socket-error ()
-           (setf connections (remove-if #'deadp connections))
-           (go :start))))))
+       (let ((sockets (mapcar #'socket-of connections)))
+         (handler-case
+             (let* ((ready (wait-for-input sockets :timeout 0.1 :ready-only t)))
+               (return-from ready-connection-using-class
+                 (if ready (owner (first ready)) nil)))
+           (socket-error ()
+             (setf connections (remove-if #'deadp connections))
+             (go :start)))))))
 
 ;;; TESTS
 

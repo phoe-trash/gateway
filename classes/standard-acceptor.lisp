@@ -20,18 +20,15 @@ single server socket. Whenever a socket connection is initiated from outside, ~
 a connection is created and the handler function is called on it.")))
 
 (define-print (standard-acceptor stream)
-  (if (alivep standard-acceptor)
-      (format stream "(~A, ALIVE)" (address standard-acceptor))
-      (format stream "(DEAD)")))
+  (format stream "~A (~A)" (address standard-acceptor)
+          (if (alivep standard-acceptor) "ALIVE" "DEAD")))
 
 (define-constructor (standard-acceptor (host "127.0.0.1") (port 0))
   (check-type host string)
   (check-type port (unsigned-byte 16))
   (v:trace :gateway "Standard acceptor starting at ~A:~D." host port)
   (let* ((socket (socket-listen "127.0.0.1" port :reuseaddress t))
-         (address (format nil "~{~D.~D.~D.~D~}:~D"
-                          (coerce (get-local-name socket) 'list)
-                          (get-local-port socket)))
+         (address (socket-local-address socket))
          (name (format nil "Gateway - Acceptor for ~A" address))
          (fn (curry #'acceptor-loop standard-acceptor)))
     (setf (socket-of standard-acceptor) socket
@@ -44,7 +41,9 @@ a connection is created and the handler function is called on it.")))
     (loop for socket = (socket-of acceptor)
           for accept = (socket-accept (wait-for-input socket))
           for connection = (make-instance 'standard-connection :socket accept)
-          do (funcall (handler acceptor) connection))))
+          for address = (socket-peer-address accept)
+          do (v:debug :gateway "Standard acceptor: accepting from ~A." address)
+             (funcall (handler acceptor) connection))))
 
 (defmethod deadp ((acceptor standard-acceptor))
   (not (thread-alive-p (thread acceptor))))

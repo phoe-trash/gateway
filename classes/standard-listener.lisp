@@ -22,7 +22,7 @@
 class LISTENER.
 
 The STANDARD-LISTENER spawns a thread which monitors the CONNECTIONs on the ~
-connection list by means of READY-CONNECTIONS-USING-CLASS. It then attempts ~
+connection list by means of READY-CONNECTION. It then attempts ~
 to read a command by CONNECTION-RECEIVE and, if it is read, call its handler ~
 function with the connection and the command as arguments.
 
@@ -40,6 +40,7 @@ a designated place.")))
   (connection-send (notifier-connection listener) '()))
 
 (define-constructor (standard-listener)
+  (v:trace :gateway "Standard listener starting.")
   (multiple-value-bind (connection-1 connection-2) (make-connection-pair)
     (let ((fn (curry #'listener-loop standard-listener)))
       (setf (notifier-connection standard-listener) connection-1
@@ -51,8 +52,10 @@ a designated place.")))
   (tagbody :start
      (let* ((conns (with-lock-held ((lock listener)) (connections listener))))
        (assert (not (null conns)) () "Listener: connection list is empty.")
-       (let ((conn (ready-connection conns)))
+       (let* ((conn (ready-connection conns)))
          (unless conn (go :start))
+         (v:trace :gateway "Standard listener: receiving from ~A."
+                  (socket-peer-address (socket-of conn)))
          (return-from listener-ready-connection conn)))))
 
 (defun listener-loop (listener)
@@ -69,9 +72,11 @@ a designated place.")))
 (defun listener-error (listener condition)
   (let* ((connections (with-lock-held ((lock listener)) (connections listener)))
          (stream (stream-error-stream condition))
-         (predicate (lambda (x) (eq stream (socket-stream (socket-of x)))))
-         (connection (find-if predicate connections)))
+         (predicate (lambda (x) (eq stream (socket-stream x))))
+         (connection (find-if predicate connections :key #'socket-of)))
     (when connection
+      (v:debug :gateway "Standard listener: removing dead connection ~A."
+               (address connection))
       (kill connection)
       (with-lock-held ((lock listener))
         (setf (connections listener)
@@ -81,6 +86,7 @@ a designated place.")))
   (not (thread-alive-p (thread listener))))
 
 (defmethod kill ((listener standard-listener))
+  (v:trace :gateway "Standard listener was killed.")
   (unless (eq (current-thread) (thread listener))
     (destroy-thread (thread listener)))
   (unless (deadp listener)

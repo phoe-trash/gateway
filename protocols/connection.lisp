@@ -48,6 +48,8 @@ possible for a connection to be READYP but for CONNECTION-RECEIVE to return ~
 \(VALUES NIL T), at which point the received partial data is buffered, the ~
 connection becomes not READYP again, and only a subsequent part of the message ~
 arriving on the connection causes CONNECTION-RECEIVE to return a full message."
+  (:function address ((connection connection)) string)
+  "Returns the address of the connection's listener socket in a string form."
   (:function ready-connection-using-class ((concrete-class class) connections)
              (connection (or null connection)))
   "Provided with a concrete connection class and a list of instances of that ~
@@ -56,7 +58,8 @@ connection is returned.
 \
 Dead connections are automatically removed from CONNECTIONS during the ~
 blocking period of this function. If the list of connections becomes empty as ~
-an effect of this, this function returns NIL instead."
+an effect of this, or an implementation's timeout expires, this function ~
+returns NIL instead."
   (:function ready-connection (connections) (connection (or null connection)))
   "Calls READY-CONNECTION-USING-CLASS using the class of the first element of ~
 CONNECTIONS.")

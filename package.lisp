@@ -13,6 +13,7 @@
         #:postmodern
         #:trivial-arguments
         #:trivia
+        #:usocket
         #:cl-ppcre)
   (:export
    #:data-getf
@@ -20,7 +21,8 @@
    #:pprint-plist
    #:prinr-to-string
    #:verify-arguments
-   ))
+   #:socket-local-address
+   #:socket-peer-address))
 
 (uiop:define-package #:gateway/protocols
   (:use #:common-lisp

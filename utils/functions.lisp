@@ -83,3 +83,19 @@ INDICATOR."
                (terpri *standard-output*)
                (write-char #\Space)))
     (terpri *standard-output*)))
+
+(defun socket-local-address (socket)
+  "Returns a the socket's local address, in format A.B.C.D:E."
+  (handler-case
+      (format nil "~{~D.~D.~D.~D~}:~D"
+              (coerce (get-local-name socket) 'list)
+              (get-local-port socket))
+    (error () "<error>")))
+
+(defun socket-peer-address (socket)
+  "Returns a the socket's peer address, in format A.B.C.D:E."
+  (handler-case
+      (format nil "~{~D.~D.~D.~D~}:~D"
+              (coerce (get-peer-address socket) 'list)
+              (get-peer-port socket))
+    (error () "<error>")))
