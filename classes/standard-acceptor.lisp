@@ -11,6 +11,7 @@
   ((%socket :accessor socket-of)
    (%thread :accessor thread)
    (%name :accessor name)
+   (%address :accessor address)
    (%handler :accessor handler
              :initarg :handler
              :initform (error "Must define a handler function.")))
@@ -20,10 +21,7 @@ a connection is created and the handler function is called on it.")))
 
 (define-print (standard-acceptor stream)
   (if (alivep standard-acceptor)
-      (let ((socket (socket-of standard-acceptor)))
-        (format stream "(~{~D.~D.~D.~D~}:~D, ALIVE)"
-                (coerce (get-local-name socket) 'list)
-                (get-local-port socket)))
+      (format stream "(~A, ALIVE)" (address standard-acceptor))
       (format stream "(DEAD)")))
 
 (define-constructor (standard-acceptor (host "127.0.0.1") (port 0))
@@ -31,29 +29,28 @@ a connection is created and the handler function is called on it.")))
   (check-type port (unsigned-byte 16))
   (v:trace :gateway "Standard acceptor starting at ~A:~D." host port)
   (let* ((socket (socket-listen "127.0.0.1" port :reuseaddress t))
-         (name (acceptor-constructor-name socket))
+         (address (format nil "~{~D.~D.~D.~D~}:~D"
+                          (coerce (get-local-name socket) 'list)
+                          (get-local-port socket)))
+         (name (format nil "Gateway - Acceptor for ~A" address))
          (fn (curry #'acceptor-loop standard-acceptor)))
     (setf (socket-of standard-acceptor) socket
+          (address standard-acceptor) address
           (name standard-acceptor) name
           (thread standard-acceptor) (make-thread fn :name name))))
 
-(defun acceptor-constructor-name (socket)
-  (format nil "Gateway - Acceptor for ~{~D.~D.~D.~D~}:~D"
-          (coerce (get-local-name socket) 'list)
-          (get-local-port socket)))
-
 (defun acceptor-loop (acceptor)
   (with-restartability (acceptor)
-    (loop
-      (let* ((socket (socket-of acceptor))
-             (accept (socket-accept (wait-for-input socket)))
-             (connection (make-instance 'standard-connection :socket accept)))
-        (funcall (handler acceptor) connection)))))
+    (loop for socket = (socket-of acceptor)
+          for accept = (socket-accept (wait-for-input socket))
+          for connection = (make-instance 'standard-connection :socket accept)
+          do (funcall (handler acceptor) connection))))
 
 (defmethod deadp ((acceptor standard-acceptor))
   (not (thread-alive-p (thread acceptor))))
 
 (defmethod kill ((acceptor standard-acceptor))
+  (v:trace :gateway "Standard acceptor from ~A was killed." (address acceptor))
   (unless (eq (thread acceptor) (current-thread))
     (destroy-thread (thread acceptor)))
   (unless (deadp acceptor)
@@ -87,8 +84,9 @@ a connection is created and the handler function is called on it.")))
      :type :unit-suite))
 
 (define-test standard-acceptor-unit
-  (let* ((connections nil)
-         (handler (lambda (x) (push x connections))))
+  (let* ((connections '())
+         (lock (make-lock))
+         (handler (lambda (x) (with-lock-held (lock) (push x connections)))))
     (finalized-let*
         ((acceptor #1?(make-instance 'standard-acceptor :host "127.0.0.1"
                                                         :port 0
@@ -105,4 +103,4 @@ a connection is created and the handler function is called on it.")))
          (socket-3 #4?(socket-connect host port)
                    (socket-close socket-3)
                    (is (not (open-stream-p (socket-stream socket-3))))))
-      #5?(is (wait (20) (= 3 (length connections)))))))
+      #5?(is (wait () (= 3 (length (with-lock-held (lock) connections))))))))
