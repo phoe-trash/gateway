@@ -5,8 +5,6 @@
 
 (in-package :gateway/protocols)
 
-(export 'config)
-
 (define-protocol config
     (:description "The CONFIG protocol describes the contents of a Gateway ~
 configuration file.
@@ -18,12 +16,14 @@ from the database connection details to the number of kernel threads that ~
 Gateway should occupy for its functioning."
      :tags (:config)
      :export (config))
-  (:function config (option) t)
+  (:function config (option &optional default) t)
   "Retrieves the value of the provided configuration option and returns ~
-\(VALUES VALUE T). If the option is not found, returns (VALUES NIL NIL)."
-  (:function (setf config) (new-value option) new-value)
+\(VALUES VALUE T). If the option is not found, returns (VALUES DEFAULT NIL)."
+  (:function (setf config) (new-value option &optional default) t)
   "Checks if the new value is of proper type for the provided configuration ~
-option. If not, an error is signaled; if yes, that value is set to the config."
+option. If not, an error is signaled; if yes, that value is set to the config.
+\
+DEFAULT will be evaluated once but its value is ignored."
   (:category :db)
   "This config category describes configuration settings that regard ~
 connecting to a PostgreSQL database. Providing the connections details ~

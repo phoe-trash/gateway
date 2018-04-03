@@ -7,13 +7,13 @@
 
 (overlord:set-package-base "" :gateway)
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun reload ()
-    (overlord:import my-queries
-      :from #.(asdf:system-relative-pathname :gateway "install/install.sql")
-      :as :cl-yesql/postmodern
-      :binding :all-as-functions))
-  (reload))
+(overlord:import my-queries
+  :from #.(asdf:system-relative-pathname :gateway "install/install.sql")
+  :as :cl-yesql/postmodern
+  :binding :all-as-functions)
+
+(defun reload ()
+  (overlord:build 'my-queries))
 
 (defparameter *install-functions*
   (list #'create-ch-permission
@@ -33,17 +33,9 @@
         #'drop-types))
 
 (defun uninstall ()
-  (let* ((postmodern:*database* *db-connection*)
-         (db postmodern:*database*))
-    (assert (and db (postmodern:connected-p db)) ()
-            "The database is not connected.")
-    (mapc #'funcall *uninstall-functions*)
-    t))
+  (mapc #'funcall *uninstall-functions*)
+  t)
 
 (defun install ()
-  (let* ((postmodern:*database* *db-connection*)
-         (db postmodern:*database*))
-    (assert (and db (postmodern:connected-p db)) ()
-            "The database is not connected.")
-    (mapc #'funcall *install-functions*)
-    t))
+  (mapc #'funcall *install-functions*)
+  t)

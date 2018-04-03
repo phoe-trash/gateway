@@ -53,19 +53,12 @@
 
 (defpackage #:gateway/db
   (:use #:common-lisp
+        #:alexandria
         #:cl-yesql
         #:phoe-toolbox
         #:gateway/protocols
         #:gateway/config)
-  (:export #:*db-connection*
-           #:*test-db-connection*
-           #:connect-db
-           #:db-connected-p
-           #:disconnect-db
-           #:connect-test-db
-           #:test-db-connected-p
-           #:disconnect-test-db
-           #:with-db
+  (:export #:with-db
            #:with-test-db))
 
 (defpackage #:gateway/install

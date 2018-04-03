@@ -16,6 +16,7 @@
                #:cl-cpus
                #:safe-read
                #:postmodern
+               #:cl+ssl
                #:1am
                #:trivial-arguments
                #:trivia
@@ -25,8 +26,7 @@
                #:bordeaux-threads
                #:lparallel
                #:phoe-toolbox
-               #:verbose
-               )
+               #:verbose)
   :serial t
   :components (;; PACKAGE
                (:file "package")

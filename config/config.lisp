@@ -21,16 +21,17 @@
 
 (defvar *config*)
 
-(defmethod config ((option symbol))
+(defmethod config ((option symbol) &optional default)
   (let ((config (handler-case *config* (unbound-variable () (load-config)))))
     (multiple-value-bind (key value foundp)
         (get-properties config (list option))
       (declare (ignore key))
       (if foundp
           (values value t)
-          (values nil nil)))))
+          (values default nil)))))
 
-(defmethod (setf config) (new-value (option symbol))
+(defmethod (setf config) (new-value (option symbol) &optional default)
+  (declare (ignore default))
   (let* ((config (handler-case *config* (unbound-variable () (load-config))))
          (new-config (list* option new-value (remove-from-plist config))))
     (setf *config* new-config)
@@ -44,12 +45,19 @@ on the value of USER-HOMEDIR-PATHNAME."
                                     :type "sexp")
                      (user-homedir-pathname)))
 
-(defvar *sample-config*
+(defparameter *sample-config*
   '(:db-port 5432
     :db-host "localhost"
     :db-pass "postgres"
     :db-user "postgres"
-    :db-name "gateway"))
+    :db-name "gateway"
+    :db-use-ssl :yes
+    :test-db-port 5432
+    :test-db-host "localhost"
+    :test-db-pass "postgres"
+    :test-db-user "postgres"
+    :test-db-name "gateway-test"
+    :test-db-use-ssl :yes))
 
 (defun create-config ()
   "Creates a new sample configuration."
