@@ -28,8 +28,10 @@ database."
                                      :port ,port :use-ssl ,ssl :pooled-p t)
          ,@body))))
 
-(defun test-db-connection ()
-  (with-db () (postmodern:query "SELECT 'seems to be working, bro';")))
+(defun test-db-connections ()
+  (with-db () (postmodern:query "SELECT 1;"))
+  (with-test-db () (postmodern:query "SELECT 1;"))
+  t)
 
 ;; TODO remove this after https://bugs.launchpad.net/sbcl/+bug/1750466 is fixed
 (in-package :postmodern)

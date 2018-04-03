@@ -57,16 +57,11 @@
         #:cl-yesql
         #:phoe-toolbox
         #:gateway/protocols
+        #:gateway/utils
         #:gateway/config)
   (:export #:with-db
-           #:with-test-db))
-
-(defpackage #:gateway/install
-  (:use #:common-lisp
-        #:cl-yesql
-        #:gateway/utils
-        #:gateway/db)
-  (:export #:install
+           #:with-test-db
+           #:install
            #:uninstall
            #:reload))
 

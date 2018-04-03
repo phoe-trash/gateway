@@ -50,10 +50,6 @@
                (:file "protocols/kernel")
                ;; FRAMEWORK
                (:file "framework/with-restartability")
-               ;; DB
-               (:file "db/connections")
-               ;; INSTALL
-               (:file "install/install")
                ;; CONFIG
                (:file "config/config")
                ;; CLASSES
@@ -64,4 +60,7 @@
                (:file "classes/standard-acceptor")
                (:file "classes/standard-listener")
                (:file "classes/standard-kernel")
+               ;; DB
+               (:file "db/connections")
+               (:file "db/install")
                ))

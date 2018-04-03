@@ -3,12 +3,12 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; install.lisp
 
-(in-package :gateway/install)
+(in-package :gateway/db)
 
 (overlord:set-package-base "" :gateway)
 
 (overlord:import my-queries
-  :from #.(asdf:system-relative-pathname :gateway "install/install.sql")
+  :from #.(asdf:system-relative-pathname :gateway "db/install.sql")
   :as :cl-yesql/postmodern
   :binding :all-as-functions)
 
@@ -16,8 +16,8 @@
   (overlord:build 'my-queries))
 
 (defparameter *install-functions*
-  (list #'create-ch-permission
-        #'create-tl-permission
+  (list #'create-chapter-permission
+        #'create-timeline-permission
         #'create-table-timeline
         #'create-table-chapter
         #'create-table-player

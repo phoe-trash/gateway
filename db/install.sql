@@ -8,11 +8,11 @@ DROP TABLE IF EXISTS
 -- name: drop-types
 -- Drops all Gateway enum types from the database.
 DROP TYPE IF EXISTS
-    ch_permission, tl_permission;
+    chapter_permission_type, timeline_permission_type;
 
--- name: create-ch-permission
--- Creates the ch_permission enum type.
-CREATE TYPE ch_permission AS ENUM (
+-- name: create-chapter-permission
+-- Creates the chapter_permission enum type.
+CREATE TYPE chapter_permission_type AS ENUM (
     'administer'
     'view_chapter',
     'edit_own_posts',
@@ -24,9 +24,9 @@ CREATE TYPE ch_permission AS ENUM (
     'change_chapter_permissions',
     'change_chapter_name');
 
--- name: create-tl-permission
--- Creates the tl_permission enum type.
-CREATE TYPE tl_permission AS ENUM (
+-- name: create-timeline-permission
+-- Creates the timeline_permission enum type.
+CREATE TYPE timeline_permission_type AS ENUM (
     'administer',
     'view_timeline',
     'link_within_timeline',
@@ -101,7 +101,7 @@ CREATE TABLE chapter_permission (
                              ON UPDATE CASCADE,
     chapter_id integer       NOT NULL REFERENCES chapter(chapter_id)
                              ON UPDATE CASCADE,
-    permission ch_permission NOT NULL,
+    permission chapter_permission_type NOT NULL,
     CONSTRAINT chapter_permission_primary_key
     PRIMARY KEY (player_id, chapter_id, permission));
 
@@ -112,7 +112,7 @@ CREATE TABLE timeline_permission (
                               ON UPDATE CASCADE,
     timeline_id integer       NOT NULL REFERENCES timeline(timeline_id)
                               ON UPDATE CASCADE,
-    permission  tl_permission NOT NULL,
+    permission  timeline_permission_type NOT NULL,
     CONSTRAINT timeline_permission_primary_key
     PRIMARY KEY (player_id, timeline_id, permission));
 
@@ -121,6 +121,6 @@ CREATE TABLE timeline_permission (
 CREATE TABLE global_timeline_permission (
     timeline_id integer       NOT NULL REFERENCES timeline(timeline_id)
                               ON UPDATE CASCADE,
-    permission  ch_permission NOT NULL,
+    permission  chapter_permission_type NOT NULL,
     CONSTRAINT global_timeline_permission_primary_key
     PRIMARY KEY (timeline_id, permission));
