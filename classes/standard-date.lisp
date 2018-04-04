@@ -5,6 +5,7 @@
 
 (in-package :gateway/impl)
 
+;; TODO unbreak tests
 (defclass standard-date (date local-time:timestamp) ()
   (:documentation #.(format nil "A standard implementation of Gateway protocol ~
 class DATE.")))

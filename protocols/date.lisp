@@ -7,14 +7,14 @@
 
 (define-protocol date
     (:description "The DATE protocol describes a timestamp object, ~
-representing a point in time. These objects are immutable, have millisecond ~
+representing a point in time. These objects are immutable, have microsecond ~
 precision and can be compared to other timestamp objects, converted to string ~
 and from string representations, precisely Unix timestamps.
 \
 The time units, available in comparison functions, are :YEAR :MONTH :DAY :HOUR ~
-:MINUTE :SECOND :MILLISECOND. If the key argument UNIT is supplied with one of ~
+:MINUTE :SECOND :MICROSECOND. If the key argument UNIT is supplied with one of ~
 these values, the comparison takes into account that unit's granularity. The ~
-default unit is :MILLISECOND.
+default unit is :MICROSECOND.
 \
 Examples:
 * 29th July 2017 and 30th July 2017 will not be DATE= under :UNIT :DAY, but ~
@@ -63,5 +63,5 @@ provided granularity unit."
   "Returns the date object of class CLASS that corresponds to the current ~
 time, relative to the call of this function."
   (:variable *date-granularity-units* t
-             '(:year :month :day :hour :minute :second :nanosecond))
+             '(:year :month :day :hour :minute :second :microsecond))
   "List of all available granularity units.")

@@ -1,19 +1,16 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; GATEWAY
 ;;;; © Michał "phoe" Herda 2017
-;;;; install.lisp
+;;;; db/install.lisp
 
 (in-package :gateway/db)
 
 (overlord:set-package-base "" :gateway)
 
-(overlord:import my-queries
+(overlord:import queries-install
   :from #.(asdf:system-relative-pathname :gateway "db/install.sql")
   :as :cl-yesql/postmodern
   :binding :all-as-functions)
-
-(defun reload ()
-  (overlord:build 'my-queries))
 
 (defparameter *install-functions*
   (list #'create-chapter-permission
@@ -39,3 +36,5 @@
 (defun install ()
   (mapc #'funcall *install-functions*)
   t)
+
+(defun reinstall () (reload) (uninstall) (install))
