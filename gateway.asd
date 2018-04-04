@@ -63,4 +63,5 @@
                ;; DB
                (:file "db/connections")
                (:file "db/install")
+               (:file "db/player")
                ))
