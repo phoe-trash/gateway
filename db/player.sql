@@ -12,9 +12,9 @@ SELECT * from player
 -- name: player-row-by-email @row
 -- Retrieves a player whose data matches the arguments.
 SELECT * from player
-WHERE email = lower(?)
+    WHERE email = lower(?)
 
 -- name: player-row-by-display-name @row
 -- Retrieves a player whose data matches the arguments.
 SELECT * from player
-WHERE display_name = ?
+    WHERE display_name = ?
