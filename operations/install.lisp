@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; db/install.lisp
 
-(in-package :gateway/sql)
+(in-package :gateway/operations)
 
 (defparameter *install-functions*
   (list #'create-chapter-permission
@@ -27,7 +27,7 @@
 (defun uninstall () (mapc #'funcall *uninstall-functions*) t)
 
 (defun reinstall ()
-  (import-all)
+  (gateway/sql::import-all)
   (overlord:build)
   (uninstall)
   (install))
