@@ -51,7 +51,7 @@
         #:gateway/utils
         #:gateway/protocols))
 
-(defpackage #:gateway/sql
+(uiop:define-package #:gateway/sql
   (:use #:common-lisp
         #:alexandria
         #:cl-yesql
@@ -64,6 +64,13 @@
            #:install
            #:uninstall
            #:reload))
+
+(defpackage #:gateway/operations
+  (:use #:common-lisp
+        #:alexandria
+        #:phoe-toolbox
+        #:gateway/protocols
+        #:gateway/sql))
 
 (uiop:define-package #:gateway/impl
   (:use #:common-lisp
