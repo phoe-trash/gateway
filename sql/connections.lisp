@@ -18,7 +18,7 @@
        (unwind-protect (progn ,@body)
          (disconnect *database*)))))
 
-(in-package #:gateway/db)
+(in-package #:gateway/sql)
 
 (defmacro with-db (() &body body)
   "Evaluates forms with the database connection bound to the Gateway database."

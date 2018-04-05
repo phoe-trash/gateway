@@ -51,7 +51,7 @@
         #:gateway/utils
         #:gateway/protocols))
 
-(defpackage #:gateway/db
+(defpackage #:gateway/sql
   (:use #:common-lisp
         #:alexandria
         #:cl-yesql

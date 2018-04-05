@@ -60,8 +60,9 @@
                (:file "classes/standard-acceptor")
                (:file "classes/standard-listener")
                (:file "classes/standard-kernel")
-               ;; DB
-               (:file "db/connections")
-               (:file "db/install")
-               (:file "db/player")
+               ;; SQL
+               (:file "sql/connections")
+               (:file "sql/overlord")
+               ;; OPERATIONS
+               (:file "sql/install")
                ))
