@@ -97,3 +97,18 @@ INDICATOR."
               (coerce (get-peer-address socket) 'list)
               (get-peer-port socket))
     (error () "<error>")))
+
+(defun derive-key (passphrase &key salt
+                                (iteration-count 1000)
+                                (key-length 512)
+                                (salt-length 64))
+  "Provided a string passphrase, returns its hashed form along with the salt
+used for generating it."
+  (let* ((kdf (ironclad:make-kdf 'ironclad:pbkdf2 :digest :sha1))
+         (passphrase (flex:string-to-octets passphrase :external-format :utf-8))
+         (salt (or salt (ironclad:make-random-salt salt-length)))
+         (key (ironclad:derive-key kdf passphrase salt
+                                   iteration-count key-length))
+         (result-key (ironclad:byte-array-to-hex-string key))
+         (result-salt (ironclad:byte-array-to-hex-string salt)))
+    (values result-key result-salt iteration-count)))

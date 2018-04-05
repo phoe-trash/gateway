@@ -1,13 +1,14 @@
--- name: insert-player @execute
+-- name: insert-player @single
 -- Inserts a new player into the database.
-INSERT INTO player (player_name, email, display_name, pass_hash, pass_salt)
-    VALUES(:player_name, lower(:email), :display_name,
-           decode(:pass_hash, 'hex'), decode(:pass_salt, 'hex'));
+INSERT INTO player (login, email, display_name, pass_hash, pass_salt)
+    VALUES(:login, lower(:email), :display_name,
+           decode(:hash, 'hex'), decode(:salt, 'hex'))
+    RETURNING player_id;
 
--- name: select-player-by-name @row
--- Retrieves a player whose name matches the argument.
+-- name: select-player-by-login @row
+-- Retrieves a player whose login matches the argument.
 SELECT * from player
-    WHERE player_name = ?;
+    WHERE login = ?;
 
 -- name: select-player-by-email @row
 -- Retrieves a player whose email matches the argument.
@@ -19,17 +20,17 @@ SELECT * from player
 SELECT * from player
     WHERE display_name ~ ?;
 
--- name: activate-player @execute
+-- name: activate-player-by-id @execute
 -- Activates the player with the provided ID.
 UPDATE player SET activatedp = TRUE
     WHERE player_id = ?;
 
--- name: deactivate-player @execute
+-- name: deactivate-player-by-id @execute
 -- Deactivates the player with the provided ID.
 UPDATE player SET activatedp = FALSE
     WHERE player_id = ?;
 
--- name: activated-player-p @single
+-- name: activated-player-p-by-id @single
 -- Returns true if the player with the given ID is activated.
 SELECT activatedp FROM player
     WHERE player_id = ?;

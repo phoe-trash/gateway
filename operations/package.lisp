@@ -7,8 +7,12 @@
   (:use #:common-lisp
         #:alexandria
         #:phoe-toolbox
+        #:gateway/utils
         #:gateway/protocols
+        #:gateway/impl
         #:gateway/sql)
   (:export #:install
            #:uninstall
-           #:reinstall))
+           #:reinstall
+           #:add-player
+           #:activate-player))

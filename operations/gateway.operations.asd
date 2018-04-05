@@ -10,6 +10,7 @@
   :depends-on (#:alexandria
                #:phoe-toolbox
                #:gateway.protocols
+               #:gateway.impl
                #:gateway.sql)
   :serial t
   :components ((:file "package")

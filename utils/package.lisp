@@ -15,6 +15,7 @@
    #:data-equal
    #:pprint-plist
    #:prinr-to-string
+   #:derive-key
    #:verify-arguments
    #:socket-local-address
    #:socket-peer-address))

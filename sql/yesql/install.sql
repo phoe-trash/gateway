@@ -40,7 +40,7 @@ CREATE TYPE timeline_permission_type AS ENUM (
 -- name: create-table-player @execute
 -- Creates the player table.
 CREATE TABLE player (
-    player_name  text      NOT NULL UNIQUE,
+    login        text      NOT NULL UNIQUE,
     email        text      NOT NULL UNIQUE,
     display_name text      NOT NULL,
     pass_hash    bytea     NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE player (
     player_time  timestamp NOT NULL DEFAULT now(),
     player_id    serial    NOT NULL PRIMARY KEY,
     CONSTRAINT player_name_valid
-    CHECK (player_name ~ '^[a-zA-Z0-9]{3,}$'),
+    CHECK (login ~ '^[a-zA-Z0-9]{3,}$'),
     CONSTRAINT email_valid
     CHECK (email ~ '^[a-z0-9\\-._]+@[a-z0-9]+[a-z0-9\\-._]*\\.[a-z0-9\\-_]+$'));
 

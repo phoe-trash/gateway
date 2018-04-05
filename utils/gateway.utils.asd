@@ -9,6 +9,7 @@
   :license "AGPL3"
   :depends-on (#:alexandria
                #:postmodern
+               #:ironclad
                #:trivial-arguments
                #:trivia
                #:usocket
