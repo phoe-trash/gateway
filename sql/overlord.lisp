@@ -14,12 +14,13 @@
 
 (defun import-all ()
   (let ((*package* (find-package :gateway/sql)))
-    (eval `(prog1 t ,@(loop for (name . sql) in *sql-imports*
-                            with *package* = (find-package :gateway/sql)
-                            collect `(overlord:import ,name
-                                       :from ,sql
-                                       :as :cl-yesql/postmodern
-                                       :binding :all-as-functions
-                                       :export-bindings-p t))))))
+    (eval (loop for (name . sql) in *sql-imports*
+                with *package* = (find-package :gateway/sql)
+                collect `(overlord:import ,name
+                           :from ,sql
+                           :as :cl-yesql/postmodern
+                           :binding :all-as-functions
+                           :export-bindings-p t)))
+    t))
 
 (import-all)
