@@ -28,6 +28,5 @@
 
 (defun reinstall ()
   (gateway/sql::import-all)
-  (overlord:build)
   (uninstall)
   (install))

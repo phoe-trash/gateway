@@ -14,13 +14,14 @@
 
 (defun import-all ()
   (let ((*package* (find-package :gateway/sql)))
-    (eval (loop for (name . sql) in *sql-imports*
-                with *package* = (find-package :gateway/sql)
-                collect `(overlord:import ,name
-                           :from ,sql
-                           :as :cl-yesql/postmodern
-                           :binding :all-as-functions
-                           :export-bindings-p t)))
+    (loop for (name . sql) in *sql-imports*
+          with *package* = (find-package :gateway/sql)
+          do (eval `(overlord:import ,name
+                      :from ,sql
+                      :as :cl-yesql/postmodern
+                      :binding :all-as-functions
+                      :export-bindings-p t)))
+    (apply #'overlord:build (mapcar #'car *sql-imports*))
     t))
 
 (import-all)

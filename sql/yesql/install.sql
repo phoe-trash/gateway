@@ -43,8 +43,10 @@ CREATE TABLE player (
     player_name  text      NOT NULL UNIQUE,
     email        text      NOT NULL UNIQUE,
     display_name text      NOT NULL,
-    passhash     bytea     NOT NULL,
+    pass_hash    bytea     NOT NULL,
+    pass_salt    bytea     NOT NULL,
     -------------
+    activatedp   boolean   NOT NULL DEFAULT FALSE,
     player_time  timestamp NOT NULL DEFAULT now(),
     player_id    serial    NOT NULL PRIMARY KEY,
     CONSTRAINT player_name_valid

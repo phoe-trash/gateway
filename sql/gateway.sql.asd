@@ -10,6 +10,7 @@
   :depends-on (#:alexandria
                #:cl-yesql
                #:phoe-toolbox
+               #:cl+ssl
                #:cl-yesql/postmodern
                #:gateway.utils
                #:gateway.protocols
