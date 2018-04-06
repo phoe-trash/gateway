@@ -42,8 +42,3 @@ database."
        (postmodern:with-connection '(,name ,user ,pass ,host
                                      :port ,port :use-ssl ,ssl :pooled-p t)
          ,@body))))
-
-(defun test-db-connections ()
-  (with-db () (postmodern:query "SELECT 1;"))
-  (with-test-db () (postmodern:query "SELECT 1;"))
-  t)

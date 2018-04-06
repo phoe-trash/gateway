@@ -14,4 +14,5 @@
                #:gateway.sql)
   :serial t
   :components ((:file "package")
-               (:file "install")))
+               (:file "install")
+               (:file "player")))
