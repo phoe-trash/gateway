@@ -12,6 +12,7 @@
                #:ironclad
                #:trivial-arguments
                #:trivia
+               #:flexi-streams
                #:usocket
                #:cl-ppcre)
   :serial t
