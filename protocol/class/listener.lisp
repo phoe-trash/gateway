@@ -3,10 +3,10 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; protocols/listener.lisp
 
-(in-package #:gateway/protocols)
+(in-package #:gateway/protocol)
 
 (define-protocol listener
-    (:description "The LISTENER protocol describes objects which contain a ~
+    (:documentation "The LISTENER protocol describes objects which contain a ~
 list of connections and constantly scan them for incoming data, reading it ~
 and calling their handler function on them to pass it to other parts of the ~
 system.
@@ -22,22 +22,20 @@ and pass it to other parts of the program.
 The listener, when instantiated, automatically begins handling client ~
 connections in a way defined by the implementing class."
      :tags (:listener)
-     :dependencies (acceptor connection killable named)
+     :dependencies (acceptor connection killable named addressable with-handler)
      :export t)
-  (:class listener (killable named) ())
+  (:class listener (killable named with-handler) ())
   "A listener object. See protocol LISTENER for details."
-  (:function lock ((listener listener)) lock)
+  (:function lock ((listener listener)) t) ;; TODO update to BT:LOCK
   "Retrieves the lock of the listener.
 \
 It is an error to call CONNECTIONS or (SETF CONNECTIONS) without this lock ~
 being held."
   (:function connections ((listener listener)) list)
   "Retrieves the connections list of the listener."
-  (:function (setf connections) (new-value (listener listener)) new-value)
+  (:function (setf connections) (new-value (listener listener)) t)
   "Sets the connections list of the listener and notifies it about the change, ~
 so, if the listener is waiting, the next iteration of its functionality begins ~
-automatically with the newly provided connection list."
-  (:function handler ((listener listener)) function)
-  "Returns the handler function of the listener."
-  (:function (setf handler) (new-value (listener listener)) new-value)
-  "Sets the handler function of the listener.")
+automatically with the newly provided connection list.")
+
+(execute-protocol listener)

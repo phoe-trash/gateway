@@ -3,10 +3,10 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; protocols/date.lisp
 
-(in-package :gateway/protocols)
+(in-package #:gateway/protocol)
 
 (define-protocol date
-    (:description "The DATE protocol describes a timestamp object, ~
+    (:documentation "The DATE protocol describes a timestamp object, ~
 representing a point in time. These objects are immutable, have microsecond ~
 precision and can be compared to other timestamp objects, converted to string ~
 and from string representations, precisely Unix timestamps.
@@ -26,42 +26,44 @@ will be equal under :UNIT :MONTH.
      :export t)
   (:class date (serializable) ())
   "A date object. See protocol DATE for details."
-  (:function date-timestamp ((date date)) (timestamp integer))
+  (:function date-timestamp ((date date)) integer)
   "Converts a date object to a Unix timestamp."
   (:function timestamp-date-using-class
-             ((class class) (timestamp integerp)) (date date))
+             ((class class) (timestamp integer)) date)
   "Converts a Unix timestamp to a date object of provided class."
-  (:function date-ustimestamp ((date date)) (nstimestamp integer))
+  (:function date-ustimestamp ((date date)) integer)
   "Converts a date object to a Unix timestamp with microsecond precision."
   (:function ustimestamp-date-using-class
-             ((class class) (nstimestamp integer)) (date date))
+             ((class class) (nstimestamp integer)) date)
   "Converts a Unix timestamp with microsecond precision to a date object of ~
 provided class."
-  (:function date= ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date= ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the two dates are equal under the provided granularity ~
 unit."
-  (:function date/= ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date/= ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the two dates are not equal under the provided granularity ~
 unit."
-  (:function date> ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date> ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the first date is greater than the other under the ~
 provided granularity unit."
-  (:function date>= ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date>= ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the first date is not less than the other under the ~
 provided granularity unit."
-  (:function date< ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date< ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the first date is less than the other under the provided ~
 granularity unit."
-  (:function date<= ((date-1 date) (date-2 date) &key) :generalized-boolean)
+  (:function date<= ((date-1 date) (date-2 date) &key) t)
   "Returns true iff the first date is not greater than the other under the ~
 provided granularity unit."
-  (:function date-min ((date date) &rest other-dates) (date-min date))
+  (:function date-min ((date date) &rest other-dates) date)
   "Returns the oldest date from all provided dates."
-  (:function date-max ((date date) &rest other-dates) (date-max date))
+  (:function date-max ((date date) &rest other-dates) date)
   "Returns the newest date from all provided dates."
-  (:function now-using-class ((class class)) (now date))
+  (:function now-using-class ((class class)) date)
   "Returns the date object of class CLASS that corresponds to the current ~
 time, relative to the call of this function."
   (:variable *date-granularity-units* t
              '(:year :month :day :hour :minute :second :microsecond))
   "List of all available granularity units.")
+
+(execute-protocol date)

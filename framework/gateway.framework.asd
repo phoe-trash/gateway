@@ -8,7 +8,7 @@
   :author "Michał \"phoe\" Herda"
   :license "AGPL3"
   :depends-on (#:phoe-toolbox
-               #:gateway.protocols)
+               #:gateway.protocol)
   :serial t
   :components ((:file "package")
                (:file "with-restartability")))

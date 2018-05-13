@@ -3,13 +3,16 @@
 ;;;; © Michał "phoe" Herda 2016
 ;;;; protocols/package.lisp
 
-(uiop:define-package #:gateway/protocols
+(uiop:define-package #:gateway/protocol
   (:use #:common-lisp
         #:closer-mop
-        #:protest
+        #:moptilities
         #:phoe-toolbox
         #:gateway/utils)
   (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
                           #:defmethod
-                          #:defgeneric))
+                          #:defgeneric)
+  (:import-from #:protest/protocol
+                #:define-protocol
+                #:execute-protocol))

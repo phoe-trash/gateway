@@ -3,7 +3,7 @@
 ;;;; © Michał "phoe" Herda 2017
 ;;;; utils/verify-arguments.lisp
 
-(in-package :gateway/utils)
+(in-package #:gateway/utils)
 
 (defun verify-arguments (function &rest arguments)
   "Returns true if the provided arguments constitute a valid lambda list for the

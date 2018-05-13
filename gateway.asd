@@ -8,7 +8,7 @@
   :author "Michał \"phoe\" Herda"
   :license "AGPL3"
   :depends-on (#:gateway.utils
-               #:gateway.protocols
+               #:gateway.protocol
                #:gateway.framework
                #:gateway.config
                #:gateway.impl

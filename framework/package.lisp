@@ -6,6 +6,6 @@
 (defpackage #:gateway/framework
   (:use #:common-lisp
         #:phoe-toolbox
-        #:gateway/protocols)
+        #:gateway/protocol)
   (:export
    #:with-restartability))
