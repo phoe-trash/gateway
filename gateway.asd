@@ -9,10 +9,10 @@
   :license "AGPL3"
   :depends-on (#:gateway.utils
                #:gateway.protocol
-               #:gateway.framework
-               #:gateway.config
-               #:gateway.impl
-               #:gateway.sql
-               #:gateway.operations)
+               ;; #:gateway.config
+               ;; #:gateway.impl
+               ;; #:gateway.sql
+               ;; #:gateway.operations
+               )
   :serial t
   :components ((:file "package")))

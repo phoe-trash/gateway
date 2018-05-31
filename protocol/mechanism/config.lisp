@@ -17,6 +17,9 @@ parts of Gateway obtain their configuration."
   "Checks if the new value is of proper type for the provided configuration ~
 option. If not, an error is signaled; if yes, that value is set to the config.
 \
-DEFAULT will be evaluated once if provided, but its value is ignored.")
+DEFAULT will be evaluated once if provided, but its value is ignored."
+  (:macro with-config-transaction (() &body body))
+  "Executes BODY within a configuration transaction to avoid multiple disk
+writes where only one would otherwise be required.")
 
 (execute-protocol config)
