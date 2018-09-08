@@ -14,17 +14,20 @@
         #:usocket
         #:bordeaux-threads
         #:lparallel.queue
-        #:protest
+        ;;#:protest/protocol
         #:phoe-toolbox
         #:gateway/utils
-        #:gateway/protocols
-        #:gateway/framework)
+        #:gateway/protocol
+        ;; #:gateway/framework
+        )
   (:shadowing-import-from #:closer-mop
                           #:standard-generic-function
                           #:defmethod
                           #:defgeneric)
   (:shadowing-import-from #:phoe-toolbox
                           #:with-temp-package)
+  (:shadowing-import-from #:gateway/protocol
+                          #:config)
   (:export #:standard-acceptor
            #:standard-connection
            #:standard-date

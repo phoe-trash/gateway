@@ -20,8 +20,9 @@
                #:protest
                #:phoe-toolbox
                #:gateway.utils
-               #:gateway.protocols
-               #:gateway.framework)
+               #:gateway.protocol
+               ;; #:gateway.framework
+               )
   :serial t
   :components ((:file "package")
                (:file "standard-date")

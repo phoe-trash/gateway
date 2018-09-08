@@ -8,7 +8,7 @@
         #:alexandria
         #:phoe-toolbox
         #:gateway/utils
-        #:gateway/protocols
+        #:gateway/protocol
         #:gateway/impl
         #:gateway/sql)
   (:export #:install

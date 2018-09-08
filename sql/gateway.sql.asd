@@ -13,7 +13,7 @@
                #:cl+ssl
                #:cl-yesql/postmodern
                #:gateway.utils
-               #:gateway.protocols
+               #:gateway.protocol
                #:gateway.config)
   :serial t
   :components ((:file "package")

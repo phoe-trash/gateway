@@ -48,6 +48,7 @@ a connection is created and the handler function is called on it.")))
 (defmethod deadp ((acceptor standard-acceptor))
   (not (thread-alive-p (thread acceptor))))
 
+;; TODO trace KILL, take care of multiple KILL calls
 (defmethod kill ((acceptor standard-acceptor))
   (v:trace :gateway "Standard acceptor from ~A was killed." (address acceptor))
   (unless (eq (thread acceptor) (current-thread))

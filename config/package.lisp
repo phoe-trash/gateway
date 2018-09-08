@@ -8,4 +8,4 @@
         #:alexandria
         #:phoe-toolbox
         #:gateway/utils
-        #:gateway/protocols))
+        #:gateway/protocol))

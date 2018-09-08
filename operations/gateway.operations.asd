@@ -9,7 +9,7 @@
   :license "AGPL3"
   :depends-on (#:alexandria
                #:phoe-toolbox
-               #:gateway.protocols
+               #:gateway.protocol
                #:gateway.impl
                #:gateway.sql)
   :serial t

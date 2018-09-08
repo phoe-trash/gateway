@@ -8,7 +8,7 @@
         #:alexandria
         #:cl-yesql
         #:phoe-toolbox
-        #:gateway/protocols
+        #:gateway/protocol
         #:gateway/utils
         #:gateway/config)
   (:export #:with-db
